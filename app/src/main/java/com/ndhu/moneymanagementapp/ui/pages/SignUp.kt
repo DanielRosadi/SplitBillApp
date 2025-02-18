@@ -1,0 +1,26 @@
+package com.ndhu.moneymanagementapp.ui.pages
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun SignUp() {
+    // Your UI elements go here
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(text = "Welcome to Sign Up Screen!")
+        Button(
+            onClick = { /* Handle button click */ },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text("Click Me")
+        }
+    }
+}
