@@ -1,6 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,14 +10,32 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
+import kotlinx.coroutines.launch
 
 @Composable
 fun Homepage() {
+
+    var isConnected by remember { mutableStateOf<Boolean?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            isConnected = FirebaseHandler.isConnected()
+        }
+    }
+
     val LoginUser = "Daniel"
     val UserMoney = 99999
     val ChosenCurrency = "NTD"
