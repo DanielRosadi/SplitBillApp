@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import com.google.firebase.FirebaseApp
 import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.Homepage
+import com.ndhu.moneymanagementapp.ui.pages.SignIn
+import com.ndhu.moneymanagementapp.ui.pages.SignUp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,7 +16,8 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
         setContent {
             MaterialTheme {
-                Homepage()
+                // Homepage()
+                SignUp()
             }
         }
     }
