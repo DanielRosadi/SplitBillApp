@@ -1,5 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -25,11 +28,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ndhu.moneymanagementapp.controllers.UserController
+import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SignUp() {
+    val coroutine = rememberCoroutineScope()
     // States variable
-    var emailOrUsername by remember { mutableStateOf(TextFieldValue("")) }
+    var email by remember { mutableStateOf(TextFieldValue("")) }
+    var username by remember { mutableStateOf(TextFieldValue("")) }
     var userAge by remember { mutableStateOf(TextFieldValue("")) }
     var userPassword by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -51,21 +59,19 @@ fun SignUp() {
         // email or username text field
         // TODO: need to make mandatory input functionality
         OutlinedTextField(
-            value = emailOrUsername,
-            onValueChange = { emailOrUsername = it },
-            label = { Text("Email/Username") },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth())
 
-        // age text field
-        // TODO: need to make mandatory input functionality
-        // TODO: uses selection based input instead if possible
         OutlinedTextField(
-            value = userAge,
-            onValueChange = { userAge = it },
-            label = { Text("Age") },
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth())
+
 
         // password text field with visibility
         // TODO: need to make mandatory input functionality
@@ -90,7 +96,19 @@ fun SignUp() {
 
         // Submit button
         Button(
-            onClick = { /* Submit functionality here */ },
+            onClick = {
+                coroutine.launch {
+                    val controller : UserController = UserController()
+                    controller.registerUser(
+                        username.text.toString(),
+                        email.text.toString(),
+                        userPassword.text.toString()
+                    )
+                    username = TextFieldValue("")
+                    email = TextFieldValue("")
+                    userPassword = TextFieldValue("")
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(5.dp)
         ) {

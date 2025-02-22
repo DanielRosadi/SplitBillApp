@@ -27,15 +27,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun Homepage() {
 
-    var isConnected by remember { mutableStateOf<Boolean?>(null) }
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            isConnected = FirebaseHandler.isConnected()
-        }
-    }
-
     val LoginUser = "Daniel"
     val UserMoney = 99999
     val ChosenCurrency = "NTD"
