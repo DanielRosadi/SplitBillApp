@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import com.ndhu.moneymanagementapp.controllers.UserController
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SignUp() {
     val coroutine = rememberCoroutineScope()

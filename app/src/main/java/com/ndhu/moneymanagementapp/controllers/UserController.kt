@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.controllers
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.repositories.IUserRepository
 import com.ndhu.moneymanagementapp.repositories.impl.UserRepository
@@ -15,18 +16,17 @@ class UserController {
 
     private val userRepo : IUserRepository = UserRepository()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun registerUser(username : String, email : String, password : String) {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        val current = LocalDateTime.now().format(formatter)
 
         userRepo.add(
-            mapOf(
-                "id" to UUID.randomUUID(),
-                "username" to username,
-                "email" to email,
-                "password" to Util.passwordEncryption(password),
-                "createdAt" to current,
+            User(
+                UUID.randomUUID().toString(),
+                username,
+                0,
+                email,
+                Util.passwordEncryption(password),
+                0,
+                Timestamp.now(),
             )
         )
 
