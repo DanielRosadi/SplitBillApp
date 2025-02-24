@@ -1,8 +1,8 @@
 package com.ndhu.moneymanagementapp.repositories
 
-interface IRepositories {
-    suspend fun add(collectionName: String, data: Map<String, Any>)
-    suspend fun getList(collectionName: String): List<Map<String, Any>>
-    suspend fun update(collectionName: String, documentId: String, data: Map<String, Any>)
+interface IRepositories<T> {
+    suspend fun add(collectionName: String, data: T)
+    suspend fun getList(collectionName: String): List<T>
+    suspend fun update(collectionName: String, documentId: String, data: T)
     suspend fun delete(collectionName: String, documentId: String)
 }
