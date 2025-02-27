@@ -17,6 +17,7 @@ import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
 import com.ndhu.moneymanagementapp.seeds.Seeders
 import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.Homepage
+import com.ndhu.moneymanagementapp.ui.pages.ListStores
 import com.ndhu.moneymanagementapp.ui.pages.SignIn
 import com.ndhu.moneymanagementapp.ui.pages.SignUp
 import kotlinx.coroutines.launch
@@ -38,7 +39,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 // Homepage()
-                SignUp()
+                // SignUp()
+
+                ListStores()
             }
         }
     }
