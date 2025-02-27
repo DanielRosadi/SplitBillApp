@@ -74,7 +74,7 @@ object Seeders {
 
     suspend fun runSeeder() {
 //        seedUsersData()
-//        seedStoresData()
+        seedStoresData()
         seedItemsData()
     }
 }

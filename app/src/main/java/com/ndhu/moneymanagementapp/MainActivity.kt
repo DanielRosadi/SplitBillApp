@@ -17,7 +17,7 @@ import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
 import com.ndhu.moneymanagementapp.seeds.Seeders
 import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.Homepage
-import com.ndhu.moneymanagementapp.ui.pages.ListStores
+import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
 import com.ndhu.moneymanagementapp.ui.pages.SignIn
 import com.ndhu.moneymanagementapp.ui.pages.SignUp
 import kotlinx.coroutines.launch
@@ -35,13 +35,13 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     coroutineScope.launch {
                         isConnected = FirebaseHandler.isConnected()
-//                        Seeders.runSeeder() //uncomment this if u want to run seeder
+                        Seeders.runSeeder() //uncomment this if u want to run seeder
                     }
                 }
                 // Homepage()
                 // SignUp()
 
-                ListStores()
+                ListStorePage()
             }
         }
     }
