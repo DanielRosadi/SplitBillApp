@@ -14,6 +14,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -21,35 +27,58 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 @Composable
 fun ListStorePage(){
 
-    var store = StoreController() // Initialize object
-    var storeList: List<Store>
+    val store = StoreController() // Initialize object
+    // var storeList: List<Store>
 
-    runBlocking {
-        storeList = store.getListOfStores()
-        println(store)
-        Log.d("MyTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
+    val stores = remember { mutableStateOf(emptyList<Store>()) }
+
+    // var storeList = remember { mutableStateOf(emptyList<Store>()) } // Starts as an empty list
+
+
+    LaunchedEffect(Unit) {
+        // var storeList = emptyList<Store>()
+        // val storeList = store.getListOfStores()
+
+        // println(store)
+        Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
+
+        stores.value = store.getListOfStores()
     }
 
+
+
+    /*
+    runBlocking {
+                // var storeList = emptyList<Store>()
+        // val storeList = store.getListOfStores()
+
+        // println(store)
+        // Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
+
+        stores.value = store.getListOfStores()
+    }
+
+     */
+
+
+
+    /*
     for (store in storeList) {
         printStoreAttributes(store)
     }
+    
+     */
 
-    // ComposeListStores()
-}
-
-fun printStoreAttributes(obj: Store){
-    print("Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
-    // Log.d("MyTag", "DEBUG. Printing Store Attributes")
-    Log.d("StoreTag", "Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
+    ComposeListStores(stores)
 }
 
 @Composable
-fun ComposeListStores(data: List<Store>){
+fun ComposeListStores(data: MutableState<List<Store>>){
     // testGetStoreListFromDatabase()
 
     // val myData = listOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5") // List<String>
@@ -60,8 +89,8 @@ fun ComposeListStores(data: List<Store>){
 
         LazyColumn (contentPadding = PaddingValues(5.dp)) {
 
-            items(data) { item ->
-                // ListItem(item)
+            items(data.value) { item ->
+                ListItem(item)
             }
 
         }
@@ -69,18 +98,31 @@ fun ComposeListStores(data: List<Store>){
 }
 
 @Composable
-fun ListItem(text: String) {
+fun ListItem(obj: Store) {
     Card (
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
         Text(
-            text = text,
+            text = obj.name,
+            fontSize = 30.sp,
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = obj.description,
+            fontSize = 20.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge
         )
     }
+}
+
+fun printStoreAttributes(obj: Store){
+    print("Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
+    // Log.d("MyTag", "DEBUG. Printing Store Attributes")
+    Log.d("StoreTag", "Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
 }
 
 fun testGetStoreListFromDatabase(){
