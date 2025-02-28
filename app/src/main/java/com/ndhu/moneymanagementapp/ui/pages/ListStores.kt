@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -35,7 +36,9 @@ fun ListStorePage(){
     val store = StoreController() // Initialize object
     // var storeList: List<Store>
 
-    val stores = remember { mutableStateOf(emptyList<Store>()) }
+    // val stores = remember { mutableStateOf(emptyList<Store>()) }
+
+    val stores = remember { mutableStateListOf<Store>() }
 
     // var storeList = remember { mutableStateOf(emptyList<Store>()) } // Starts as an empty list
 
@@ -46,8 +49,9 @@ fun ListStorePage(){
 
         // println(store)
         Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
+        stores.clear()
 
-        stores.value = store.getListOfStores()
+        stores.addAll( store.getListOfStores() )
     }
 
 
@@ -78,7 +82,7 @@ fun ListStorePage(){
 }
 
 @Composable
-fun ComposeListStores(data: MutableState<List<Store>>){
+fun ComposeListStores(data: SnapshotStateList<Store>){
     // testGetStoreListFromDatabase()
 
     // val myData = listOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5") // List<String>
@@ -89,7 +93,7 @@ fun ComposeListStores(data: MutableState<List<Store>>){
 
         LazyColumn (contentPadding = PaddingValues(5.dp)) {
 
-            items(data.value) { item ->
+            items(data) { item ->
                 ListItem(item)
             }
 
