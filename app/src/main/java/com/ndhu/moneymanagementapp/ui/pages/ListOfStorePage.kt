@@ -36,18 +36,11 @@ fun ListStorePage(navController: NavController){
 fun GetStoreListFromDatabase(){
 
     val store = StoreController() // Initialize object
-    // var storeList: List<Store>
-    // val stores = remember { mutableStateOf(emptyList<Store>()) }
 
     val stores = remember { mutableStateListOf<Store>() }
-    // var storeList = remember { mutableStateOf(emptyList<Store>()) } // Starts as an empty list
 
     // may try LaunchedEffect if runBlocking makes the app loading
     runBlocking {
-        // var storeList = emptyList<Store>()
-        // val storeList = store.getListOfStores()
-
-        // println(store)
         Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
 
         // clear stores list and add data from database into the stores list
@@ -99,7 +92,6 @@ fun ListDataItem(obj: Store) {
 
 fun testPrintStoreAttributes(obj: Store){
     print("Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
-    // Log.d("MyTag", "DEBUG. Printing Store Attributes")
     Log.d("StoreTag", "Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
 }
 
