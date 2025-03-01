@@ -2,11 +2,13 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.util.Log
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,11 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
+import com.ndhu.moneymanagementapp.navigation.AppScreens
 import kotlinx.coroutines.launch
 
 @Composable
-fun Homepage() {
+fun Homepage(navController: NavController) {
 
     val LoginUser = "Daniel"
     val UserMoney = 99999
@@ -70,6 +74,12 @@ fun Homepage() {
         }
 
         Spacer(modifier = Modifier.height(32.dp)) // Space before the buttons
+
+        // temporary card for split bill (only for testing)
+        // TODO: please compose UI according to the agreed concept/design
+        Button(onClick = { navigateToSplitBill(navController) } ) {
+            Text(text = "Split Bill")
+        }
 
         // LazyColumn for buttons
         LazyColumn(
@@ -142,4 +152,9 @@ fun Homepage() {
             }
         }
     }
+}
+
+
+fun navigateToSplitBill(navController: NavController): Unit {
+    navController.navigate(route = AppScreens.ListStoresScreen.name)
 }
