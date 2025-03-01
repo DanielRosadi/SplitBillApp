@@ -1,6 +1,5 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,22 +9,16 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
-import kotlinx.coroutines.launch
+import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.navigation.AppScreens
 
 @Composable
-fun Homepage() {
+fun HomePage(navController: NavController) {
 
     val LoginUser = "Daniel"
     val UserMoney = 99999
@@ -70,6 +63,20 @@ fun Homepage() {
         }
 
         Spacer(modifier = Modifier.height(32.dp)) // Space before the buttons
+
+        // temporary card for split bill (only for testing)
+        // TODO: please compose UI according to the agreed concept/design
+        Button(onClick = { navigateToSplitBillScreen(navController) } ) {
+            Text(text = "Split Bill")
+        }
+
+        Button(onClick = { navigateToContactScreen(navController) } ) {
+            Text(text = "Contact")
+        }
+
+        Button(onClick = { navigateToAccountScreen(navController) } ) {
+            Text(text = "Account")
+        }
 
         // LazyColumn for buttons
         LazyColumn(
@@ -142,4 +149,17 @@ fun Homepage() {
             }
         }
     }
+}
+
+
+fun navigateToSplitBillScreen(navController: NavController) {
+    navController.navigate(route = AppScreens.ListStoresScreen.name)
+}
+
+fun navigateToContactScreen(navController: NavController) {
+    navController.navigate(route = AppScreens.ContactScreen.name)
+}
+
+fun navigateToAccountScreen(navController: NavController) {
+    navController.navigate(route = AppScreens.AccountScreen.name)
 }
