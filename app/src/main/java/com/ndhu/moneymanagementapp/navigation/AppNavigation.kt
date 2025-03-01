@@ -4,9 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ndhu.moneymanagementapp.ui.pages.Homepage
-import com.ndhu.moneymanagementapp.ui.pages.ListStores
-import com.ndhu.moneymanagementapp.ui.pages.ListStoresPage
+import com.ndhu.moneymanagementapp.ui.pages.AccountPage
+import com.ndhu.moneymanagementapp.ui.pages.ContactPage
+import com.ndhu.moneymanagementapp.ui.pages.HomePage
+import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
 
 @Composable
 fun AppNavigation(){
@@ -18,18 +19,29 @@ fun AppNavigation(){
     // navigation will be performed onto
     // starting page/screen will be the Homepage
     NavHost(navController = navController,
-        startDestination = AppScreens.HomepageScreen.name){
+        startDestination = AppScreens.HomePageScreen.name){
         // inside the NavHost, we contains the NavGraph
         // NavGraph will be our collection/list of composable screens of the application
 
-        // Homepage screen
-        composable(AppScreens.HomepageScreen.name){
-            Homepage(navController = navController)
+        // HomePage screen
+        composable(AppScreens.HomePageScreen.name){
+            HomePage(navController = navController)
         }
 
-        // ListStores screen
+        // ListOfStores screen
         composable(AppScreens.ListStoresScreen.name){
-            ListStoresPage(navController = navController)
+            ListStorePage(navController = navController)
         }
+
+        // Contact screen
+        composable(AppScreens.ContactScreen.name){
+            ContactPage(navController = navController)
+        }
+
+        // Account screen
+        composable(AppScreens.AccountScreen.name){
+            AccountPage(navController = navController)
+        }
+
     }
 }

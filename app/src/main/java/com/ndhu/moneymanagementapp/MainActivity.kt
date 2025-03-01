@@ -1,10 +1,8 @@
 package com.ndhu.moneymanagementapp
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,8 +13,6 @@ import androidx.compose.runtime.setValue
 import com.google.firebase.FirebaseApp
 import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
 import com.ndhu.moneymanagementapp.navigation.AppNavigation
-import com.ndhu.moneymanagementapp.ui.pages.ListStores
-import com.ndhu.moneymanagementapp.ui.pages.ListStoresPage
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -31,8 +27,7 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(Unit) {
                     coroutineScope.launch {
-                        // isConnected = FirebaseHandler.isConnected()
-                        // Seeders.runSeeder() //uncomment this if u want to run seeder
+                        isConnected = FirebaseHandler.isConnected()
                     }
                 }
                 // Homepage()

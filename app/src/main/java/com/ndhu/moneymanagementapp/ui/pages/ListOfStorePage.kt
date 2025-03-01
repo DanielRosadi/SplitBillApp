@@ -14,7 +14,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -29,76 +28,47 @@ import com.ndhu.moneymanagementapp.models.Store
 import kotlinx.coroutines.*
 
 @Composable
-fun ListStoresPage(navController: NavController){
-    Text(text = "Hello, this is List of Stores Page!!!")
-    // ListStores()
+fun ListStorePage(navController: NavController){
+    GetStoreListFromDatabase()
 }
 
 @Composable
-fun ListStores(){
+fun GetStoreListFromDatabase(){
 
     val store = StoreController() // Initialize object
     // var storeList: List<Store>
-
     // val stores = remember { mutableStateOf(emptyList<Store>()) }
 
     val stores = remember { mutableStateListOf<Store>() }
-
     // var storeList = remember { mutableStateOf(emptyList<Store>()) } // Starts as an empty list
 
-
-    LaunchedEffect(Unit) {
+    // may try LaunchedEffect if runBlocking makes the app loading
+    runBlocking {
         // var storeList = emptyList<Store>()
         // val storeList = store.getListOfStores()
 
         // println(store)
         Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
-        stores.clear()
 
+        // clear stores list and add data from database into the stores list
+        stores.clear()
         stores.addAll( store.getListOfStores() )
     }
 
-
-
-    /*
-    runBlocking {
-                // var storeList = emptyList<Store>()
-        // val storeList = store.getListOfStores()
-
-        // println(store)
-        // Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
-
-        stores.value = store.getListOfStores()
-    }
-
-     */
-
-
-
-    /*
-    for (store in storeList) {
-        printStoreAttributes(store)
-    }
-    
-     */
-
-    ComposeListStores(stores)
+    // perform UI composition
+    ComposeListStore(stores)
 }
 
 @Composable
-fun ComposeListStores(data: SnapshotStateList<Store>){
-    // testGetStoreListFromDatabase()
-
-    // val myData = listOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5") // List<String>
-
+fun ComposeListStore(data: SnapshotStateList<Store>){
     Column (modifier = Modifier.fillMaxWidth().fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        // drop down box here
+        // TODO: drop down box here
 
         LazyColumn (contentPadding = PaddingValues(5.dp)) {
 
             items(data) { item ->
-                ListItem(item)
+                ListDataItem(item)
             }
 
         }
@@ -106,9 +76,9 @@ fun ComposeListStores(data: SnapshotStateList<Store>){
 }
 
 @Composable
-fun ListItem(obj: Store) {
+fun ListDataItem(obj: Store) {
     Card (
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(10.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
@@ -127,7 +97,7 @@ fun ListItem(obj: Store) {
     }
 }
 
-fun printStoreAttributes(obj: Store){
+fun testPrintStoreAttributes(obj: Store){
     print("Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
     // Log.d("MyTag", "DEBUG. Printing Store Attributes")
     Log.d("StoreTag", "Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
