@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     coroutineScope.launch {
                         isConnected = FirebaseHandler.isConnected()
-                        Seeders.runSeeder() //uncomment this if u want to run seeder
+                        // Seeders.runSeeder() //uncomment this if u want to run seeder
                     }
                 }
                 // Homepage()
