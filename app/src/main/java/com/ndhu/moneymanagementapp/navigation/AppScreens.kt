@@ -4,9 +4,10 @@ import java.lang.IllegalArgumentException
 
 enum class AppScreens{
     HomePageScreen,
+    ListStoresScreen,
+    ListItemsScreen,
     ContactScreen,
-    AccountScreen,
-    ListStoresScreen;
+    AccountScreen;
     // List the App Screens above
 
     companion object{
@@ -14,6 +15,7 @@ enum class AppScreens{
         = when (route?.substringBefore("/")){
             HomePageScreen.name -> HomePageScreen
             ListStoresScreen.name -> ListStoresScreen
+            ListItemsScreen.name -> ListItemsScreen
             ContactScreen.name -> ContactScreen
             AccountScreen.name -> AccountScreen
             null -> HomePageScreen

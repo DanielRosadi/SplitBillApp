@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,15 +29,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
+import com.ndhu.moneymanagementapp.navigation.AppScreens
 import kotlinx.coroutines.*
 
 @Composable
 fun ListStorePage(navController: NavController){
-    GetStoreListFromDatabase()
+    GetStoreListFromDatabase(navController)
 }
 
 @Composable
-fun GetStoreListFromDatabase(){
+fun GetStoreListFromDatabase(navController: NavController){
 
     val store = StoreController() // Initialize object
 
@@ -52,11 +54,11 @@ fun GetStoreListFromDatabase(){
     }
 
     // perform UI composition
-    ComposeListStore(stores)
+    ComposeListStore(stores, navController)
 }
 
 @Composable
-fun ComposeListStore(data: SnapshotStateList<Store>){
+fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavController){
     Column (modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
         Text(text = "List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
@@ -71,7 +73,7 @@ fun ComposeListStore(data: SnapshotStateList<Store>){
         LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
             items(data) { item ->
-                ListDataItem(item)
+                ListDataItem(item, navController)
             }
 
         }
@@ -88,9 +90,9 @@ fun ComposeListStore(data: SnapshotStateList<Store>){
 }
 
 @Composable
-fun ListDataItem(obj: Store) {
+fun ListDataItem(obj: Store, navController: NavController) {
     Card (
-        modifier = Modifier.fillMaxWidth().padding(5.dp),
+        modifier = Modifier.fillMaxWidth().padding(5.dp).clickable {  },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
@@ -122,4 +124,8 @@ fun testGetStoreListFromDatabase(){
         println(storeList)
         Log.d("MyTag", "This is a debug message")  // Prints in Logcat
     }
+}
+
+fun navigateToListOfItemScreen(navController: NavController) {
+    navController.navigate(route = AppScreens.ListItemsScreen.name)
 }
