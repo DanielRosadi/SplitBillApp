@@ -34,7 +34,9 @@ class MainActivity : ComponentActivity() {
                 // SignUp()
 
                 // ListStoresPage()
+                // ListOfItemPage()
                 AppNavigation()
+
             }
         }
     }

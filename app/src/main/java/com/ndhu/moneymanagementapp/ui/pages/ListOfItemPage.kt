@@ -14,9 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 
 @Composable
-fun ListOfItemPage(){
+fun ListItemPage(navController: NavController){
     val listItem = listOf("Item 1", "Item 2", "Item 3")
 
     Column (modifier = Modifier.fillMaxWidth().fillMaxHeight(),

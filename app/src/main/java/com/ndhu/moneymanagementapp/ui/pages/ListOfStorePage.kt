@@ -1,14 +1,18 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,15 +29,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
+import com.ndhu.moneymanagementapp.navigation.AppScreens
 import kotlinx.coroutines.*
 
 @Composable
 fun ListStorePage(navController: NavController){
-    GetStoreListFromDatabase()
+    GetStoreListFromDatabase(navController = navController)
 }
 
 @Composable
-fun GetStoreListFromDatabase(){
+fun GetStoreListFromDatabase(navController: NavController){
 
     val store = StoreController() // Initialize object
 
@@ -48,30 +53,47 @@ fun GetStoreListFromDatabase(){
         stores.addAll( store.getListOfStores() )
     }
 
+    val list = listOf("Contact 1", "Contact 2", "Contact 3")
+
     // perform UI composition
-    ComposeListStore(stores)
+    ComposeListStore(stores, navController =  navController)
 }
 
 @Composable
-fun ComposeListStore(data: SnapshotStateList<Store>){
-    Column (modifier = Modifier.fillMaxWidth().fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        // TODO: drop down box here
+fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavController){
+    Column (modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-        LazyColumn (contentPadding = PaddingValues(5.dp)) {
+        Text(text = "List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // TODO: drop down box here
+        Text(text = "DROP DOWN/SEARCH BOX HERE")
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
             items(data) { item ->
-                ListDataItem(item)
+                ListDataItem(item, navController = navController)
             }
 
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(onClick = {}, modifier = Modifier.fillMaxWidth().height(50.dp)) {
+            Text(text = "Add Store")
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
 @Composable
-fun ListDataItem(obj: Store) {
+fun ListDataItem(obj: Store, navController: NavController) {
     Card (
-        modifier = Modifier.fillMaxWidth().padding(10.dp),
+        modifier = Modifier.fillMaxWidth().padding(5.dp).clickable { },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
@@ -103,4 +125,9 @@ fun testGetStoreListFromDatabase(){
         println(storeList)
         Log.d("MyTag", "This is a debug message")  // Prints in Logcat
     }
+}
+
+
+fun navigateToListOfItemScreen(navController: NavController) {
+    navController.navigate(route = AppScreens.ListItemsScreen.name)
 }
