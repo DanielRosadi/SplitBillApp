@@ -92,7 +92,7 @@ fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavControlle
 @Composable
 fun ListDataItem(obj: Store, navController: NavController) {
     Card (
-        modifier = Modifier.fillMaxWidth().padding(5.dp).clickable {  },
+        modifier = Modifier.fillMaxWidth().padding(5.dp).clickable { navigateToListOfItemScreen(navController) },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
