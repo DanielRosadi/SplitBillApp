@@ -66,7 +66,7 @@ fun HomePage(navController: NavController) {
 
         // temporary card for split bill (only for testing)
         // TODO: please compose UI according to the agreed concept/design
-        Button(onClick = { navigateToListOfStoreScreen(navController) } ) {
+        Button(onClick = { navigateToSplitBillScreen(navController) } ) {
             Text(text = "Split Bill")
         }
 
@@ -152,7 +152,7 @@ fun HomePage(navController: NavController) {
 }
 
 
-fun navigateToListOfStoreScreen(navController: NavController) {
+fun navigateToSplitBillScreen(navController: NavController) {
     navController.navigate(route = AppScreens.ListStoresScreen.name)
 }
 

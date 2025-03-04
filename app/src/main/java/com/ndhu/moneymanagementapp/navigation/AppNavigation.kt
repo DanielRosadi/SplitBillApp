@@ -7,7 +7,6 @@ import androidx.navigation.compose.rememberNavController
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
 import com.ndhu.moneymanagementapp.ui.pages.HomePage
-import com.ndhu.moneymanagementapp.ui.pages.ListItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
 
 @Composable
@@ -29,14 +28,9 @@ fun AppNavigation(){
             HomePage(navController = navController)
         }
 
-        // ListOfStore screen
+        // ListOfStores screen
         composable(AppScreens.ListStoresScreen.name){
             ListStorePage(navController = navController)
-        }
-
-        // ListOfItem screen
-        composable(AppScreens.ListItemsScreen.name){
-            ListItemPage(navController = navController)
         }
 
         // Contact screen
