@@ -4,11 +4,14 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -54,24 +57,40 @@ fun GetStoreListFromDatabase(){
 
 @Composable
 fun ComposeListStore(data: SnapshotStateList<Store>){
-    Column (modifier = Modifier.fillMaxWidth().fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        // TODO: drop down box here
+    Column (modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-        LazyColumn (contentPadding = PaddingValues(5.dp)) {
+        Text(text = "List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // TODO: drop down box here
+        Text(text = "DROP DOWN/SEARCH BOX HERE")
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
             items(data) { item ->
                 ListDataItem(item)
             }
 
         }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Button(onClick = {}, modifier = Modifier.fillMaxWidth().height(60.dp)) {
+            Text(text = "Add Store")
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
     }
 }
 
 @Composable
 fun ListDataItem(obj: Store) {
     Card (
-        modifier = Modifier.fillMaxWidth().padding(10.dp),
+        modifier = Modifier.fillMaxWidth().padding(5.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
