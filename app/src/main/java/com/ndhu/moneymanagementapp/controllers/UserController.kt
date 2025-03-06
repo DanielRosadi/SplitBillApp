@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.controllers
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.google.firebase.Timestamp
@@ -32,7 +33,7 @@ class UserController {
 
     }
 
-    suspend fun loginUser(identify : String, password : String) : User? {
+    suspend fun loginUser(context : Context, identify : String, password : String) : User? {
         var user : User?
         if(identify.contains("@")) {
             user = userRepo.getUserByEmail(identify)
@@ -41,6 +42,9 @@ class UserController {
         }
         val pass = user?.let { Util.verifyPassword(password, it.password) }
         if(pass==true) {
+            if(user != null){
+                Util.saveUserId(context, user.id)
+            }
             return user
         }
         return null
