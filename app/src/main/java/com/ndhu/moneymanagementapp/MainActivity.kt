@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import com.google.firebase.FirebaseApp
 import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
 import com.ndhu.moneymanagementapp.navigation.AppNavigation
+import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -22,12 +23,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
+                val context = this
+                var userId by remember { mutableStateOf<String?>(null) }
                 var isConnected by remember { mutableStateOf<Boolean?>(null) }
                 val coroutineScope = rememberCoroutineScope()
 
                 LaunchedEffect(Unit) {
                     coroutineScope.launch {
                         isConnected = FirebaseHandler.isConnected()
+                        userId = Util.getUserId(context)
                     }
                 }
                 // Homepage()
