@@ -1,9 +1,13 @@
 package com.ndhu.moneymanagementapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ndhu.moneymanagementapp.models.Store
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
 import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
@@ -18,6 +22,7 @@ fun AppNavigation(){
     // this defines nav controller, that controls/instruct the navigation to screens
     // when the user needs to navigate, they should use nav controller to do so
     val navController = rememberNavController()
+    val sharedViewModel: SharedStoreViewModel = viewModel()
 
     // the Nav Host, act as a 'Host', in which they contains the screens where
     // navigation will be performed onto
@@ -34,13 +39,13 @@ fun AppNavigation(){
 
         // ListOfStore screen
         composable(AppScreens.ListStoresScreen.name){
-            ListStorePage(navController = navController)
+            ListStorePage(navController = navController, sharedViewModel)
         }
 
         // ListOfItem screen
         composable(AppScreens.ListItemsScreen.name+"/{storeId}",){backStackEntry ->
             val storeId = backStackEntry.arguments?.getString("storeId")
-            ListOfItemPage(navController = navController, storeId = storeId)
+            ListOfItemPage(navController = navController, storeId = storeId, sharedViewModel)
         }
 
         // Contact screen

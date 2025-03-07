@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,18 +28,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.models.Store
+import com.ndhu.moneymanagementapp.reusable_composables.SearchBox
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 
 @Composable
-fun ListOfItemPage(navController: NavController, storeId: String?, viewModel: StoreViewModel = viewModel<StoreViewModel>()){
+fun ListOfItemPage(navController: NavController, storeId: String?, viewModel: SharedStoreViewModel){
     val listItem = listOf("Item 1", "Item 2", "Item 3")
 
+    // search for specific store object using passed storeId from previous screen, from global viewModel
     val store = storeId?.let { viewModel.getStoreById(it) }
-    Text("Store: ${store?.name}, Description: ${store?.description}")
+    // viewModel.storeList
+    // Text("Store: ${store?.name}, Description: ${store?.description}")
 
-    // ComposeListItem(listItem, store, navController)
+    ComposeListItem(listItem, store, navController)
 
 }
 
@@ -51,13 +55,12 @@ private fun ComposeListItem(listItem: List<String>, store: Store?, navController
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
                 }
-                Spacer(modifier = Modifier.width(50.dp))
 
                 Column() {
-                    Card (modifier = Modifier.fillMaxWidth()) {
+                    Card (modifier = Modifier.fillMaxWidth().clickable { }) {
                         Text(
                             text = store?.name ?: "Unknown Store",
-                            fontSize = 20.sp,
+                            fontSize = 25.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text("{Store Address}", fontSize = 15.sp, fontWeight = FontWeight.Bold)
@@ -77,8 +80,9 @@ private fun ComposeListItem(listItem: List<String>, store: Store?, navController
     ) {
 
         // Text(text = "List of Items", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+        SearchBox()
 
-        Spacer(modifier = Modifier.height(20.dp))
+        // Spacer(modifier = Modifier.height(0.dp))
 
         LazyColumn(
             modifier = Modifier
@@ -123,24 +127,41 @@ private fun ComposeListItem(listItem: List<String>, store: Store?, navController
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button(
-            onClick = {}, modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-        ) {
-            Text(text = "Add Item")
+
+        Column (modifier = Modifier.padding(20.dp)) {
+
+            Button(
+                onClick = {}, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+            ) {
+                Text(text = "Done")
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row {
+                Button(
+                    onClick = {}, modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .weight(1f)
+                ) {
+                    Text(text = "Delete")
+                }
+
+                Spacer(modifier = Modifier.width(20.dp))
+
+                Button(
+                    onClick = {}, modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .weight(1f)
+                ) {
+                    Text(text = "Add item")
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Button(
-            onClick = {}, modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-        ) {
-            Text(text = "Done")
-        }
-
         Spacer(modifier = Modifier.height(20.dp))
 
     }

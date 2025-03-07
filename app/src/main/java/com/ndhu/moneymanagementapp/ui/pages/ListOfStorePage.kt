@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -30,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -44,26 +42,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.navigation.AppScreens
+import com.ndhu.moneymanagementapp.reusable_composables.SearchBox
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 import kotlinx.coroutines.*
 
 @Composable
-fun ListStorePage(navController: NavController){
-    GetStoreListFromDatabase(navController)
+fun ListStorePage(navController: NavController, viewModel: SharedStoreViewModel){
+    GetStoreListFromDatabase(navController, viewModel)
 }
 
 @Composable
-fun GetStoreListFromDatabase(navController: NavController){
+fun GetStoreListFromDatabase(navController: NavController, viewModel: SharedStoreViewModel){
 
     val store = StoreController() // Initialize object
 
     val stores = remember { mutableStateListOf<Store>() }
 
-    val storeViewModel = StoreViewModel()
+    // val storeViewModel = StoreViewModel()
 
     // may try LaunchedEffect if runBlocking makes the app loading
     runBlocking {
@@ -72,7 +71,8 @@ fun GetStoreListFromDatabase(navController: NavController){
         // clear stores list and add data from database into the stores list
         stores.clear()
         stores.addAll( store.getListOfStores() )
-        storeViewModel.addAll(store.getListOfStores())
+        // storeViewModel.addAll(store.getListOfStores())
+        viewModel.storeList = store.getListOfStores()
 
     }
 
@@ -104,12 +104,12 @@ fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavControlle
 
             // Text(text = "List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             SearchBox()
             // ExpandableSearchBox()
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
@@ -153,6 +153,7 @@ fun ListDataItem(obj: Store, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
+            // pass respective storeId to the screen
             .clickable { navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + obj.id) },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
@@ -191,74 +192,8 @@ fun navigateToListOfItemScreen(navController: NavController) {
     navController.navigate(route = AppScreens.ListItemsScreen.name)
 }
 
-@Composable
-fun SearchBox() {
-    var query by remember { mutableStateOf("") }
 
-    TextField(
-        value = query,
-        onValueChange = { query = it },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        placeholder = { Text("Search...") },
-        leadingIcon = {
-            Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
-        },
-        trailingIcon = {
-            if (query.isNotEmpty()) {
-                IconButton(onClick = { query = "" }) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Clear Search")
-                }
-            }
-        },
-        singleLine = true
-    )
-}
-
-
-@Composable
-fun ExpandableSearchBox() {
-    var query by remember { mutableStateOf("") }
-    var isExpanded by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .background(Color.Gray.copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (isExpanded) {
-            TextField(
-                value = query,
-                onValueChange = { query = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Search...") },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
-                },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "Clear Search")
-                        }
-                    }
-                },
-                singleLine = true
-            )
-        }
-
-        IconButton(onClick = { isExpanded = !isExpanded }) {
-            Icon(
-                imageVector = if (isExpanded) Icons.Default.Close else Icons.Default.Search,
-                contentDescription = "Toggle Search"
-            )
-        }
-    }
-}
-
+/*
 class StoreViewModel : ViewModel() {
     private var stores = listOf<Store>()
 
@@ -270,3 +205,7 @@ class StoreViewModel : ViewModel() {
         stores = listStore
     }
 }
+ */
+
+
+
