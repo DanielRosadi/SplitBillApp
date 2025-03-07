@@ -38,8 +38,9 @@ fun AppNavigation(){
         }
 
         // ListOfItem screen
-        composable(AppScreens.ListItemsScreen.name){
-            ListOfItemPage(navController = navController)
+        composable(AppScreens.ListItemsScreen.name+"/{storeId}",){backStackEntry ->
+            val storeId = backStackEntry.arguments?.getString("storeId")
+            ListOfItemPage(navController = navController, storeId = storeId)
         }
 
         // Contact screen

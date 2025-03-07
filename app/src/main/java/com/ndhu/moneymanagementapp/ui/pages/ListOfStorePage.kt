@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
@@ -62,6 +63,8 @@ fun GetStoreListFromDatabase(navController: NavController){
 
     val stores = remember { mutableStateListOf<Store>() }
 
+    val storeViewModel = StoreViewModel()
+
     // may try LaunchedEffect if runBlocking makes the app loading
     runBlocking {
         Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
@@ -69,6 +72,8 @@ fun GetStoreListFromDatabase(navController: NavController){
         // clear stores list and add data from database into the stores list
         stores.clear()
         stores.addAll( store.getListOfStores() )
+        storeViewModel.addAll(store.getListOfStores())
+
     }
 
     // perform UI composition
@@ -101,8 +106,6 @@ fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavControlle
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // TODO: drop down box here
-            // Text(text = "DROP DOWN/SEARCH BOX HERE")
             SearchBox()
             // ExpandableSearchBox()
 
@@ -150,7 +153,7 @@ fun ListDataItem(obj: Store, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
-            .clickable { navigateToListOfItemScreen(navController) },
+            .clickable { navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + obj.id) },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
@@ -253,5 +256,17 @@ fun ExpandableSearchBox() {
                 contentDescription = "Toggle Search"
             )
         }
+    }
+}
+
+class StoreViewModel : ViewModel() {
+    private var stores = listOf<Store>()
+
+    fun getStoreById(id: String): Store? {
+        return stores.find { it.id == id }
+    }
+
+    fun addAll(listStore: List<Store>){
+        stores = listStore
     }
 }
