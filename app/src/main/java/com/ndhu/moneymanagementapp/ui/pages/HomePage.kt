@@ -78,6 +78,18 @@ fun HomePage(navController: NavController) {
             Text(text = "Account")
         }
 
+        Button(onClick = { navController.navigate(route = AppScreens.FirstLoginScreen.name) } ) {
+            Text(text = "First LogIn (Temp)")
+        }
+
+        Button(onClick = { navController.navigate(route = AppScreens.LogInScreen.name) } ) {
+            Text(text = "LogIn (Temp)")
+        }
+
+        Button(onClick = { navController.navigate(route = AppScreens.SignUpScreen.name) } ) {
+            Text(text = "SignUp (Temp)")
+        }
+
         // LazyColumn for buttons
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),

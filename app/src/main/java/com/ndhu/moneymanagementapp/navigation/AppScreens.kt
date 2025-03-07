@@ -7,7 +7,11 @@ enum class AppScreens{
     ListStoresScreen,
     ListItemsScreen,
     ContactScreen,
-    AccountScreen;
+    AccountScreen,
+    FirstLoginScreen,
+    LogInScreen,
+    SignUpScreen
+    ;
     // List the App Screens above
 
     companion object{
@@ -18,6 +22,9 @@ enum class AppScreens{
             ListItemsScreen.name -> ListItemsScreen
             ContactScreen.name -> ContactScreen
             AccountScreen.name -> AccountScreen
+            FirstLoginScreen.name -> FirstLoginScreen
+            LogInScreen.name -> LogInScreen
+            SignUpScreen.name -> SignUpScreen
             null -> HomePageScreen
             else -> throw IllegalArgumentException("Route $route is not recognized")
         }

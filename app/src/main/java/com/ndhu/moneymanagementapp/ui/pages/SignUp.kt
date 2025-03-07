@@ -28,11 +28,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignUp() {
+fun SignUp(navController: NavController) {
     val coroutine = rememberCoroutineScope()
     // States variable
     var email by remember { mutableStateOf(TextFieldValue("")) }

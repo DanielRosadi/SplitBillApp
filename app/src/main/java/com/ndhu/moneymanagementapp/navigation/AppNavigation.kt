@@ -6,9 +6,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
+import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.HomePage
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
+import com.ndhu.moneymanagementapp.ui.pages.LogIn
+import com.ndhu.moneymanagementapp.ui.pages.SignUp
 
 @Composable
 fun AppNavigation(){
@@ -47,6 +50,21 @@ fun AppNavigation(){
         // Account screen
         composable(AppScreens.AccountScreen.name){
             AccountPage(navController = navController)
+        }
+
+        // First Login screen
+        composable(AppScreens.FirstLoginScreen.name){
+            FirstLogin(navController = navController)
+        }
+
+        // LogIn screen
+        composable(AppScreens.LogInScreen.name){
+            LogIn(navController = navController)
+        }
+
+        // SignUp screen
+        composable(AppScreens.SignUpScreen.name){
+            SignUp(navController = navController)
         }
 
     }
