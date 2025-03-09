@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.reusable_composables
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -26,6 +28,18 @@ import androidx.compose.ui.unit.dp
 This file will contains reusable composable (UI component/composable) so that
 developer may use it and avoid code repetition.
  */
+
+
+@Composable
+fun UniformDesignScaffold(topAppBar: @Composable () -> Unit = {}, bottomBar: @Composable () -> Unit = {}, body: @Composable (PaddingValues) -> Unit = {}){
+    Scaffold (
+        topBar = {topAppBar()},
+        bottomBar = {bottomBar()}
+    )
+    {paddingValues ->
+        body(paddingValues)
+    }
+}
 
 @Composable
 fun SearchBox() {

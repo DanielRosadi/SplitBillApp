@@ -6,6 +6,7 @@ enum class AppScreens{
     HomePageScreen,
     ListStoresScreen,
     ListItemsScreen,
+    SelectFriendsScreen,
     ContactScreen,
     AccountScreen,
     FirstLoginScreen,
@@ -20,6 +21,7 @@ enum class AppScreens{
             HomePageScreen.name -> HomePageScreen
             ListStoresScreen.name -> ListStoresScreen
             ListItemsScreen.name -> ListItemsScreen
+            SelectFriendsScreen.name -> SelectFriendsScreen
             ContactScreen.name -> ContactScreen
             AccountScreen.name -> AccountScreen
             FirstLoginScreen.name -> FirstLoginScreen

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.models.Store
+import com.ndhu.moneymanagementapp.navigation.AppScreens
 import com.ndhu.moneymanagementapp.reusable_composables.SearchBox
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 
@@ -126,7 +127,8 @@ private fun ComposeListItem(listItem: List<String>, store: Store?, navController
         Column (modifier = Modifier.padding(20.dp)) {
 
             Button(
-                onClick = {}, modifier = Modifier
+                onClick = { navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update*/ },
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
             ) {
