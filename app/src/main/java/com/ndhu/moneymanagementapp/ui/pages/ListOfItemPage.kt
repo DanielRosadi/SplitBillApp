@@ -39,8 +39,6 @@ fun ListOfItemPage(navController: NavController, storeId: String?, viewModel: Sh
 
     // search for specific store object using passed storeId from previous screen, from global viewModel
     val store = storeId?.let { viewModel.getStoreById(it) }
-    // viewModel.storeList
-    // Text("Store: ${store?.name}, Description: ${store?.description}")
 
     ComposeListItem(listItem, store, navController)
 
@@ -79,10 +77,7 @@ private fun ComposeListItem(listItem: List<String>, store: Store?, navController
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Text(text = "List of Items", fontSize = 30.sp, fontWeight = FontWeight.Bold)
         SearchBox()
-
-        // Spacer(modifier = Modifier.height(0.dp))
 
         LazyColumn(
             modifier = Modifier
@@ -169,12 +164,4 @@ private fun ComposeListItem(listItem: List<String>, store: Store?, navController
 }
 
 }
-
-/*
-fun ListItemCompose(){
-
-}
-
- */
-
 

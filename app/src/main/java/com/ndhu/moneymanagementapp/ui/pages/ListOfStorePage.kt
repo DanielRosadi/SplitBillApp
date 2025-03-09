@@ -62,8 +62,6 @@ fun GetStoreListFromDatabase(navController: NavController, viewModel: SharedStor
 
     val stores = remember { mutableStateListOf<Store>() }
 
-    // val storeViewModel = StoreViewModel()
-
     // may try LaunchedEffect if runBlocking makes the app loading
     runBlocking {
         Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
@@ -71,7 +69,6 @@ fun GetStoreListFromDatabase(navController: NavController, viewModel: SharedStor
         // clear stores list and add data from database into the stores list
         stores.clear()
         stores.addAll( store.getListOfStores() )
-        // storeViewModel.addAll(store.getListOfStores())
         viewModel.storeList = store.getListOfStores()
 
     }
@@ -102,12 +99,9 @@ fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavControlle
             .padding(paddingValues)
             .padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-            // Text(text = "List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-
             Spacer(modifier = Modifier.height(10.dp))
 
             SearchBox()
-            // ExpandableSearchBox()
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -187,25 +181,4 @@ fun testGetStoreListFromDatabase(){
         Log.d("MyTag", "This is a debug message")  // Prints in Logcat
     }
 }
-
-fun navigateToListOfItemScreen(navController: NavController) {
-    navController.navigate(route = AppScreens.ListItemsScreen.name)
-}
-
-
-/*
-class StoreViewModel : ViewModel() {
-    private var stores = listOf<Store>()
-
-    fun getStoreById(id: String): Store? {
-        return stores.find { it.id == id }
-    }
-
-    fun addAll(listStore: List<Store>){
-        stores = listStore
-    }
-}
- */
-
-
 
