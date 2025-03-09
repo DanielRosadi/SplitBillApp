@@ -66,16 +66,28 @@ fun HomePage(navController: NavController) {
 
         // temporary card for split bill (only for testing)
         // TODO: please compose UI according to the agreed concept/design
-        Button(onClick = { navigateToSplitBillScreen(navController) } ) {
+        Button(onClick = { navController.navigate(route = AppScreens.ListStoresScreen.name) } ) {
             Text(text = "Split Bill")
         }
 
-        Button(onClick = { navigateToContactScreen(navController) } ) {
+        Button(onClick = { navController.navigate(route = AppScreens.ContactScreen.name) } ) {
             Text(text = "Contact")
         }
 
-        Button(onClick = { navigateToAccountScreen(navController) } ) {
+        Button(onClick = { navController.navigate(route = AppScreens.AccountScreen.name) } ) {
             Text(text = "Account")
+        }
+
+        Button(onClick = { navController.navigate(route = AppScreens.FirstLoginScreen.name) } ) {
+            Text(text = "First LogIn (Temp)")
+        }
+
+        Button(onClick = { navController.navigate(route = AppScreens.LogInScreen.name) } ) {
+            Text(text = "LogIn (Temp)")
+        }
+
+        Button(onClick = { navController.navigate(route = AppScreens.SignUpScreen.name) } ) {
+            Text(text = "SignUp (Temp)")
         }
 
         // LazyColumn for buttons
@@ -149,17 +161,4 @@ fun HomePage(navController: NavController) {
             }
         }
     }
-}
-
-
-fun navigateToSplitBillScreen(navController: NavController) {
-    navController.navigate(route = AppScreens.ListStoresScreen.name)
-}
-
-fun navigateToContactScreen(navController: NavController) {
-    navController.navigate(route = AppScreens.ContactScreen.name)
-}
-
-fun navigateToAccountScreen(navController: NavController) {
-    navController.navigate(route = AppScreens.AccountScreen.name)
 }
