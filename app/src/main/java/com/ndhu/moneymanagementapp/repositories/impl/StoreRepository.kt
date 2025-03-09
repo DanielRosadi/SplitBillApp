@@ -20,7 +20,11 @@ class StoreRepository : Repositories<Store>(Store::class.java), IStoreRepository
     }
 
     override suspend fun delete(documentId: String) {
-        return this.delete(Collection.STORE.collection)
+        return this.delete(Collection.STORE.collection, documentId)
+    }
+
+    override suspend fun get(id: String) : Store? {
+        return this.getById(Collection.STORE.collection, id, Store::class.java)
     }
 
 
