@@ -58,4 +58,8 @@ class UserRepository : Repositories<User>(User::class.java), IUserRepository  {
             null
         }
     }
+
+    override suspend fun get(id : String) : User? {
+        return this.getById(Collection.USER.collection, id, User::class.java)
+    }
 }
