@@ -9,14 +9,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun LogIn(navController: NavController) {
+fun FirstLogin(navController: NavController) {
     // Your UI elements go here
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Welcome to Log In Screen!")
+        Text(text = "Welcome to First Login Screen!")
         Button(
             onClick = { /* Handle button click */ },
             modifier = Modifier.padding(top = 16.dp)

@@ -15,6 +15,7 @@ import com.ndhu.moneymanagementapp.ui.pages.HomePage
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
 import com.ndhu.moneymanagementapp.ui.pages.LogIn
+import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
 import com.ndhu.moneymanagementapp.ui.pages.SignUp
 
 @Composable
@@ -46,6 +47,11 @@ fun AppNavigation(){
         composable(AppScreens.ListItemsScreen.name+"/{storeId}",){backStackEntry ->
             val storeId = backStackEntry.arguments?.getString("storeId")
             ListOfItemPage(navController = navController, storeId = storeId, sharedViewModel)
+        }
+
+        // SelectFriends screen
+        composable(AppScreens.SelectFriendsScreen.name){
+            SelectFriendsPage(navController = navController)
         }
 
         // Contact screen
