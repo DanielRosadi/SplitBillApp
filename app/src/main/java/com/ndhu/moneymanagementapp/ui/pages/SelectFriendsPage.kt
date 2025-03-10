@@ -87,7 +87,7 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Button(onClick = {}, modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                Button(onClick = { navController.navigate(route = AppScreens.SelectBillOwnerScreen.name)}, modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Done")
                 }
 
