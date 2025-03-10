@@ -15,6 +15,7 @@ import com.ndhu.moneymanagementapp.ui.pages.HomePage
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
 import com.ndhu.moneymanagementapp.ui.pages.LogIn
+import com.ndhu.moneymanagementapp.ui.pages.SelectBillOwnerScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
 import com.ndhu.moneymanagementapp.ui.pages.SignUp
 
@@ -52,6 +53,11 @@ fun AppNavigation(){
         // SelectFriends screen
         composable(AppScreens.SelectFriendsScreen.name){
             SelectFriendsPage(navController = navController)
+        }
+
+        // SelectFriends screen
+        composable(AppScreens.SelectBillOwnerScreen.name){
+            SelectBillOwnerScreen(navController = navController)
         }
 
         // Contact screen
