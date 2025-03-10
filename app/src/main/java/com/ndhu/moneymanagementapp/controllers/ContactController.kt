@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.controllers
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import com.google.firebase.firestore.local.LocalStore
 import com.ndhu.moneymanagementapp.enums.FriendStatus
 import com.ndhu.moneymanagementapp.models.Contact
@@ -29,5 +30,38 @@ class ContactController {
 
     suspend fun getPendingUserListContact(context: Context) : List<Contact> {
         return contactRepository.getPendingContact(Util.getUserId(context).toString())
+    }
+
+    suspend fun acceptFriend(context : Context, userId : String)  {
+        val userId2 = Util.getUserId(context).toString()
+        var contact = contactRepository.getContactFromUsers(userId, userId2)
+        if(contact.friendStatus == FriendStatus.PENDING.name) {
+            //update status from userId1
+            contact.friendStatus = FriendStatus.FRIEND.name
+            contactRepository.update(contact.id, contact)
+
+            var contact2 = Contact(
+                id = UUID.randomUUID().toString(),
+                userId1 = userId2,
+                userId2 = userId2,
+                friendStatus = FriendStatus.FRIEND.name
+            )
+            contactRepository.add(contact2)
+            return
+        }
+        Log.w("INFO", "ckptw sih gak ada contact")
+    }
+
+    suspend fun rejectFriend(context : Context, userId : String) {
+        val userId2 = Util.getUserId(context).toString()
+        var contact = contactRepository.getContactFromUsers(userId, userId2)
+        if(contact.friendStatus == FriendStatus.PENDING.name) {
+            //update status from userId1
+            contact.friendStatus = FriendStatus.REJECT.name
+            contactRepository.update(contact.id, contact)
+            Log.w("INFO", "YAHAHAHAHHA KENA REJECT")
+            return
+        }
+        Log.w("INFO", "ckptw sih gak ada contact")
     }
 }
