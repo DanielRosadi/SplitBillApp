@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -9,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun ContactPage(navController: NavController) {
+fun ContactPage(context: Context, navController: NavController) {
     // Your UI elements go here
     Column(
         modifier = Modifier

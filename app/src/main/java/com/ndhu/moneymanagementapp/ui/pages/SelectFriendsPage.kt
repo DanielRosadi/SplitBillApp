@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,18 +35,18 @@ import com.ndhu.moneymanagementapp.reusable_composables.SearchBox
 import com.ndhu.moneymanagementapp.reusable_composables.UniformDesignScaffold
 
 @Composable
-fun SelectFriendsPage(navController: NavController){
+fun SelectFriendsPage(context : Context, navController: NavController){
 
     // getContacts() here
 
     val listFriends = listOf("Friend 1", "Friend 2", "Friend 3")
 
-    ComposeSelectFriends(listFriends, navController)
+    ComposeSelectFriends(context, listFriends, navController)
 }
 
 
 @Composable
-fun ComposeSelectFriends(listFriends: List<String>, navController: NavController){
+fun ComposeSelectFriends(context : Context, listFriends: List<String>, navController: NavController){
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {

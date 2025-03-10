@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,7 +19,7 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.navigation.AppScreens
 
 @Composable
-fun HomePage(navController: NavController) {
+fun HomePage(context : Context, navController: NavController) {
 
     val LoginUser = "Daniel"
     val UserMoney = 99999

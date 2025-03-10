@@ -3,11 +3,12 @@ package com.ndhu.moneymanagementapp.models
 import com.google.firebase.Timestamp
 
 data class User(
-    val id : String = "",
-    val username : String = "",
-    val balance : Int = 0,
-    val email : String = "",
-    val password : String = "",
-    val age : Number = 0,
-    val createdAt : Timestamp
-)
+    var id : String = "",
+    var username : String = "",
+    var balance : Int = 0,
+    var email : String = "",
+    var password : String = "",
+    var createdAt : Timestamp
+) {
+    constructor() : this("", "", 0, "", "", Timestamp.now())
+}

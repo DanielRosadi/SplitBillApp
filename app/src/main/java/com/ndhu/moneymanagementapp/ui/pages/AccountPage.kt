@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import com.ndhu.moneymanagementapp.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -25,7 +26,7 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountPage(navController: NavController) {
+fun AccountPage(context: Context, navController: NavController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(

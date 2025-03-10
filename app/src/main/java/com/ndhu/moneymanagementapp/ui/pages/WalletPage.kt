@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun WalletPage() {
+fun WalletPage(context : Context) {
     Column(
         modifier = Modifier
             .fillMaxSize()

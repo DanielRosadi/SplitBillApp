@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,7 +32,7 @@ import com.ndhu.moneymanagementapp.controllers.UserController
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignUp(navController: NavController) {
+fun SignUp(context : Context, navController: NavController) {
     val coroutine = rememberCoroutineScope()
     // States variable
     var email by remember { mutableStateOf(TextFieldValue("")) }

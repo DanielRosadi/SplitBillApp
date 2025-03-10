@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,12 +52,12 @@ import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 import kotlinx.coroutines.*
 
 @Composable
-fun ListStorePage(navController: NavController, viewModel: SharedStoreViewModel){
-    GetStoreListFromDatabase(navController, viewModel)
+fun ListStorePage(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
+    GetStoreListFromDatabase(context, navController, viewModel)
 }
 
 @Composable
-fun GetStoreListFromDatabase(navController: NavController, viewModel: SharedStoreViewModel){
+fun GetStoreListFromDatabase(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
 
     val store = StoreController() // Initialize object
 

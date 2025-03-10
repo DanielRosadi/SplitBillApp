@@ -26,7 +26,6 @@ class UserController {
                 0,
                 email,
                 Util.passwordEncryption(password),
-                0,
                 Timestamp.now(),
             )
         )

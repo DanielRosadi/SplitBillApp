@@ -28,7 +28,6 @@ object Seeders {
                 balance = (1000..5000).random(),
                 email = "user${index + 1}@example.com",
                 password = Util.passwordEncryption("test_1234"),
-                age = (18..50).random(),
                 createdAt = Timestamp.now()
             )
         }
