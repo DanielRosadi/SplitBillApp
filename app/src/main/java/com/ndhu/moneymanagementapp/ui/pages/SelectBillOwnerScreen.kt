@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,7 +37,7 @@ import com.ndhu.moneymanagementapp.reusable_composables.SearchBox
 import com.ndhu.moneymanagementapp.reusable_composables.UniformDesignScaffold
 
 @Composable
-fun SelectBillOwnerScreen(navController: NavController){
+fun SelectBillOwnerScreen(context: Context, navController: NavController){
 
     // getContacts() here
 
@@ -44,11 +45,11 @@ fun SelectBillOwnerScreen(navController: NavController){
 
     val listBillOwners = List(17) { "User ${it + 1}" } // Example: 11 items
 
-    ComposeSelectBillOwner(listBillOwners, navController)
+    ComposeSelectBillOwner(context, listBillOwners, navController)
 }
 
 @Composable
-fun ComposeSelectBillOwner(listBillOwner: List<String>, navController: NavController){
+fun ComposeSelectBillOwner(context: Context, listBillOwner: List<String>, navController: NavController){
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -116,7 +117,7 @@ fun ComposeSelectBillOwner(listBillOwner: List<String>, navController: NavContro
 }
 
 @Composable
-fun ListBillOwners(friends: String){
+fun ListBillOwners(billOwners: String){
     Card (
         modifier = Modifier
             .size(115.dp)
@@ -127,7 +128,7 @@ fun ListBillOwners(friends: String){
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
         Text(
-            text = friends,
+            text = billOwners,
             fontSize = 18.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge
