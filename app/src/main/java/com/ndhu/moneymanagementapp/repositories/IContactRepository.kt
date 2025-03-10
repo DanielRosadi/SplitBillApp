@@ -7,4 +7,6 @@ interface IContactRepository {
     suspend fun getList(): List<Contact>
     suspend fun update(documentId: String, data: Contact)
     suspend fun delete(documentId: String)
+    suspend fun getUserContact(userId : String) : List<Contact>
+    suspend fun getPendingContact(userId : String) : List<Contact>
 }
