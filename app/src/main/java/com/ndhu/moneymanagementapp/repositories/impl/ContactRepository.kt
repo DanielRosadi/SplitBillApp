@@ -68,4 +68,18 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
 
         return contact
     }
+
+    override suspend fun getUserContactsByStatus(userId1 : String, friendStatus : FriendStatus) : List<Contact> {
+        var contacts = mutableListOf<Contact>()
+        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
+        whereEqualTo("userId1", userId1).
+        whereEqualTo("friendStatus", friendStatus.name).
+        get().await()
+        if(!querySnapshot.isEmpty) {
+            for (document in querySnapshot.documents) {
+                document.toObject(Contact::class.java)?.let { contacts.add(it) }
+            }
+        }
+        return contacts
+    }
 }
