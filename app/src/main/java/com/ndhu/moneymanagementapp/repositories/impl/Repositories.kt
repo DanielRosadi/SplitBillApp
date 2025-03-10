@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
 import com.ndhu.moneymanagementapp.repositories.IRepositories
 import kotlinx.coroutines.tasks.await
@@ -31,10 +32,23 @@ open class Repositories<T>(private val clazz: Class<T>) : IRepositories<T> {
         }
     }
 
-    override suspend fun update(collectionName: String, documentId: String, data: T) {
+    override suspend fun update(collectionName: String, id: String, data: T) {
         try {
-            firestore.collection(collectionName).document(documentId).set(data as Any).await()
-            Log.d("SUCCESS", "DocumentSnapshot successfully updated!")
+            val firestore = FirebaseFirestore.getInstance()
+            val querySnapshot = firestore.collection(collectionName)
+                .whereEqualTo("id", id)
+                .limit(1)
+                .get()
+                .await()
+
+            if (!querySnapshot.isEmpty) {
+                val dataMap = Gson().toJson(data) // Convert object to JSON string
+                val updates: Map<String, Any> = Gson().fromJson(dataMap, Map::class.java) as Map<String, Any>
+
+                for (document in querySnapshot.documents) {
+                    document.reference.update(updates).await()
+                }
+            }
         } catch (e: Exception) {
             Log.w("ERROR", "Error updating document", e)
         }
@@ -42,10 +56,41 @@ open class Repositories<T>(private val clazz: Class<T>) : IRepositories<T> {
 
     override suspend fun delete(collectionName: String, documentId: String) {
         try {
-            firestore.collection(collectionName).document(documentId).delete().await()
-            Log.d("SUCCESS", "DocumentSnapshot successfully deleted!")
+            val firestore = FirebaseFirestore.getInstance()
+            val querySnapshot = firestore.collection(collectionName)
+                .whereEqualTo("id", documentId)
+                .limit(1)
+                .get()
+                .await()
+
+            if (!querySnapshot.isEmpty) {
+                for (document in querySnapshot.documents) {
+                    document.reference.delete().await()
+                }
+            }
         } catch (e: Exception) {
             Log.w("ERROR", "Error deleting document", e)
         }
     }
+
+    override suspend fun <T> getById(collectionName : String, id : String, clazz: Class<T>) : T? {
+        return try {
+            val firestore = FirebaseFirestore.getInstance()
+            val querySnapshot = firestore.collection(collectionName)
+                .whereEqualTo("id", id)
+                .limit(1)
+                .get()
+                .await()
+
+            if (!querySnapshot.isEmpty) {
+                querySnapshot.documents.first().toObject(clazz)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.w("ERROR", "Error while trying to get document", e)
+            null
+        }
+    }
+
 }
