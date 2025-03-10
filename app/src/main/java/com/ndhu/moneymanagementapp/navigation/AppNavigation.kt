@@ -58,7 +58,7 @@ fun AppNavigation(context : Context){
 
         // SelectFriends screen
         composable(AppScreens.SelectBillOwnerScreen.name){
-            SelectBillOwnerScreen(navController = navController)
+            SelectBillOwnerScreen(context, navController = navController)
         }
 
         // Contact screen
