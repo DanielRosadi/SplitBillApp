@@ -8,7 +8,6 @@ interface IUserRepository{
     suspend fun update(documentId: String, data: User)
     suspend fun delete(documentId: String)
     suspend fun getUserByEmail(email : String) : User?
-
     suspend fun getUserByUsername(username : String) : User?
-
+    suspend fun get(id : String) : User?
 }

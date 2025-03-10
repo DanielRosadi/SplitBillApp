@@ -49,4 +49,18 @@ class UserController {
         return null
     }
 
+    suspend fun getOnboardUser(context : Context) : User? {
+        val userId = Util.getUserId(context)
+        if(userId != null) {
+            val user = userRepo.get(userId)
+            if (user != null) {
+                return user
+            }
+        }
+        return null
+    }
+
+    suspend fun logout(context : Context) {
+        Util.clearUserId(context)
+    }
 }

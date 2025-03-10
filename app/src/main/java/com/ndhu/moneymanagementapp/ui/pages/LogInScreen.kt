@@ -104,7 +104,6 @@ fun LogIn(context : Context, navController: NavController) {
                     var pasValue = userPassword.text.toString()
                     var user = userController.loginUser(context, emValue, pasValue)
                     if(user != null){
-                        Util.saveUserId(context, userId = user.id)
                         Log.w("INFO", "User id : " + Util.getUserId(context).toString())
                         email = TextFieldValue("")
                         userPassword = TextFieldValue("")
