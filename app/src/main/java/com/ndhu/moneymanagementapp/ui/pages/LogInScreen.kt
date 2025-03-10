@@ -106,6 +106,8 @@ fun LogIn(context : Context, navController: NavController) {
                     if(user != null){
                         Util.saveUserId(context, userId = user.id)
                         Log.w("INFO", "User id : " + Util.getUserId(context).toString())
+                        email = TextFieldValue("")
+                        userPassword = TextFieldValue("")
                     }else {
                         Log.w("ERROR", "user tidak ketemu aku cedih")
                     }
