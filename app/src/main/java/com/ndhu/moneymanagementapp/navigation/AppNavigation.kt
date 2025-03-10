@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,7 +20,7 @@ import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
 import com.ndhu.moneymanagementapp.ui.pages.SignUp
 
 @Composable
-fun AppNavigation(){
+fun AppNavigation(context : Context){
     // this defines nav controller, that controls/instruct the navigation to screens
     // when the user needs to navigate, they should use nav controller to do so
     val navController = rememberNavController()
@@ -35,48 +36,48 @@ fun AppNavigation(){
 
         // HomePage screen
         composable(AppScreens.HomePageScreen.name){
-            HomePage(navController = navController)
+            HomePage(context, navController = navController)
         }
 
         // ListOfStore screen
         composable(AppScreens.ListStoresScreen.name){
-            ListStorePage(navController = navController, sharedViewModel)
+            ListStorePage(context, navController = navController, sharedViewModel)
         }
 
         // ListOfItem screen
         composable(AppScreens.ListItemsScreen.name+"/{storeId}",){backStackEntry ->
             val storeId = backStackEntry.arguments?.getString("storeId")
-            ListOfItemPage(navController = navController, storeId = storeId, sharedViewModel)
+            ListOfItemPage(context, navController = navController, storeId = storeId, sharedViewModel)
         }
 
         // SelectFriends screen
         composable(AppScreens.SelectFriendsScreen.name){
-            SelectFriendsPage(navController = navController)
+            SelectFriendsPage(context, navController = navController)
         }
 
         // Contact screen
         composable(AppScreens.ContactScreen.name){
-            ContactPage(navController = navController)
+            ContactPage(context, navController = navController)
         }
 
         // Account screen
         composable(AppScreens.AccountScreen.name){
-            AccountPage(navController = navController)
+            AccountPage(context, navController = navController)
         }
 
         // First Login screen
         composable(AppScreens.FirstLoginScreen.name){
-            FirstLogin(navController = navController)
+            FirstLogin(context, navController = navController)
         }
 
         // LogIn screen
         composable(AppScreens.LogInScreen.name){
-            LogIn(navController = navController)
+            LogIn(context, navController = navController)
         }
 
         // SignUp screen
         composable(AppScreens.SignUpScreen.name){
-            SignUp(navController = navController)
+            SignUp(context, navController = navController)
         }
 
     }

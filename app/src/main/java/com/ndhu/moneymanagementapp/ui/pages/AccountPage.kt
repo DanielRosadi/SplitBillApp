@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
 import com.ndhu.moneymanagementapp.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -13,6 +14,12 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,10 +29,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.models.User
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountPage(navController: NavController) {
+fun AccountPage(context: Context, navController: NavController) {
+    val coroutine = rememberCoroutineScope()
+
+    val userController = UserController()
+    var user by remember { mutableStateOf<User?>(null) }
+    LaunchedEffect(Unit) {
+        user = userController.getOnboardUser(context)
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -92,7 +110,7 @@ fun AccountPage(navController: NavController) {
 
                 // Name and Bio
                 Text(
-                    text = "Full name",
+                    text = user?.username ?: "Full name",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -122,18 +140,26 @@ fun AccountPage(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                SettingsButton(text = "Change Currency")
-                SettingsButton(text = "Clear User Data")
-                SettingsButton(text = "Log Out")
+                SettingsButton(text = "Change Currency", onClick = {
+
+                })
+                SettingsButton(text = "Clear User Data", onClick = {
+
+                })
+                SettingsButton(text = "Log Out", onClick = {
+                    coroutine.launch {
+                        userController.logout(context)
+                    }
+                })
             }
         }
     }
 }
 
 @Composable
-fun SettingsButton(text: String) {
+fun SettingsButton(text: String, onClick : () -> Unit) {
     Button(
-        onClick = { /* TODO: Handle button click */ },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)

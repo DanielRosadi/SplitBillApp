@@ -10,9 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavController
 import com.google.firebase.FirebaseApp
 import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
 import com.ndhu.moneymanagementapp.navigation.AppNavigation
+import com.ndhu.moneymanagementapp.ui.pages.LogIn
 import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.launch
 
@@ -38,7 +40,8 @@ class MainActivity : ComponentActivity() {
                 // SignUp()
 
                 // ListStoresPage()
-                AppNavigation()
+                AppNavigation(context)
+//                LogIn(context, NavController(context))
             }
         }
     }

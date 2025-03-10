@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,18 +36,18 @@ import com.ndhu.moneymanagementapp.reusable_composables.SearchBox
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 
 @Composable
-fun ListOfItemPage(navController: NavController, storeId: String?, viewModel: SharedStoreViewModel){
+fun ListOfItemPage(context : Context, navController: NavController, storeId: String?, viewModel: SharedStoreViewModel){
     val listItem = listOf("Item 1", "Item 2", "Item 3")
 
     // search for specific store object using passed storeId from previous screen, from global viewModel
     val store = storeId?.let { viewModel.getStoreById(it) }
 
-    ComposeListItem(listItem, store, navController)
+    ComposeListItem(context, listItem, store, navController)
 
 }
 
 @Composable
-private fun ComposeListItem(listItem: List<String>, store: Store?, navController: NavController) {
+private fun ComposeListItem(context : Context, listItem: List<String>, store: Store?, navController: NavController) {
 
     Scaffold (
         topBar = {

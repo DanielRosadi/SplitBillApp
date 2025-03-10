@@ -1,5 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -25,15 +28,20 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.utils.Util
+import kotlinx.coroutines.launch
 
 @Composable
-fun LogIn(navController: NavController) {
+fun LogIn(context : Context, navController: NavController) {
     // Your UI elements go here
 
     var email by remember { mutableStateOf(TextFieldValue("")) }
     // var username by remember { mutableStateOf(TextFieldValue("")) }
     var userPassword by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by remember { mutableStateOf(false) }
+    var userController = UserController()
+    val coroutine = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -91,6 +99,19 @@ fun LogIn(navController: NavController) {
         // Log In button
         Button(
             onClick = {
+                coroutine.launch {
+                    var emValue = email.text.toString()
+                    var pasValue = userPassword.text.toString()
+                    var user = userController.loginUser(context, emValue, pasValue)
+                    if(user != null){
+                        Log.w("INFO", "User id : " + Util.getUserId(context).toString())
+                        email = TextFieldValue("")
+                        userPassword = TextFieldValue("")
+                    }else {
+                        Log.w("ERROR", "user tidak ketemu aku cedih")
+                    }
+                }
+
             },
             modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(5.dp)
