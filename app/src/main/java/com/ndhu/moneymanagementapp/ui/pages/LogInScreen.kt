@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.navigation.AppScreens
 import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.launch
 
@@ -107,6 +108,9 @@ fun LogIn(context : Context, navController: NavController) {
                         Log.w("INFO", "User id : " + Util.getUserId(context).toString())
                         email = TextFieldValue("")
                         userPassword = TextFieldValue("")
+                        navController.navigate(AppScreens.HomePageScreen.name) {
+                            popUpTo(0) { this.inclusive = true }
+                        }
                     }else {
                         Log.w("ERROR", "user tidak ketemu aku cedih")
                     }
