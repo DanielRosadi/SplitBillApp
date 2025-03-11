@@ -15,11 +15,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -66,7 +70,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listIt
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text(text = "Now Selecting: {User 1}")
+                Text(text = "Now Selecting: {User x}")
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -76,7 +80,6 @@ fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listIt
                     // it also automatically handles when the list is not perfectly divisible by 3
                     items(listItems) { item ->
                         ListItemSplits(item)
-
                     }
 
                 }
@@ -86,13 +89,14 @@ fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listIt
                 LazyRow () {
                     items(listParticipants) { participant ->
                         ListBillParticipants(participant)
-
                     }
                 }
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Button(onClick = { }, modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                Button(onClick = { }, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)) {
                     Text(text = "Done")
                 }
 
@@ -106,10 +110,49 @@ fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listIt
 
 @Composable
 fun ListItemSplits(item: String){
+    Card (
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(5.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+    ) {
+        Row () {
+            Text(
+            text = item,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyLarge)
 
+            // TODO: implement selected users here
+
+            Text(
+                text = "{quantity x price}",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyLarge)
+        }
+
+    }
 }
 
 @Composable
 fun ListBillParticipants(participant: String){
-
+    Card (
+        modifier = Modifier
+            .size(90.dp)
+            .fillMaxWidth()
+            .padding(5.dp),
+        shape = CircleShape, // Makes it round
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+    ) {
+        Text(
+            text = participant,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
