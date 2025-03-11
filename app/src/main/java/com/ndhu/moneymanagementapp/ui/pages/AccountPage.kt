@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.util.Log
 import com.ndhu.moneymanagementapp.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.User
+import com.ndhu.moneymanagementapp.navigation.AppScreens
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +42,8 @@ fun AccountPage(context: Context, navController: NavController) {
 
     val userController = UserController()
     var user by remember { mutableStateOf<User?>(null) }
+    var showClearUserDataDialog by remember { mutableStateOf(false) }
+    var showLogOutDialog by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         user = userController.getOnboardUser(context)
     }
@@ -144,15 +148,86 @@ fun AccountPage(context: Context, navController: NavController) {
 
                 })
                 SettingsButton(text = "Clear User Data", onClick = {
-
+                    showClearUserDataDialog = true
                 })
                 SettingsButton(text = "Log Out", onClick = {
-                    coroutine.launch {
-                        userController.logout(context)
-                    }
+                    showLogOutDialog = true
                 })
             }
         }
+    }
+    // Confirmation dialog on pressing button "Clear User Data"
+    if (showClearUserDataDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearUserDataDialog = false },
+            title = { Text("Confirm delete account") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showClearUserDataDialog = false
+                        Log.w("Info","Deleting data, sedih")
+                        //TODO: Change this to clear data logic
+                        coroutine.launch {
+                            userController.logout(context)
+                        }
+                        navController.navigate(AppScreens.LogInScreen.name) {
+                            popUpTo(0) { this.inclusive = true }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.hsv(120f, 0.53f, 0.31f))
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        showClearUserDataDialog = false
+                        Log.w("Info","DATA STILL STAYS, YAY")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("No")
+
+                }
+            }
+        )
+    }
+
+    // Confirmation dialog on pressing button "Log Out"
+    if (showLogOutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogOutDialog = false },
+            title = { Text("Confirm log out") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogOutDialog = false
+                        Log.w("Info","User logged out, bye bye see you again")
+                        coroutine.launch {
+                            userController.logout(context)
+                        }
+                        navController.navigate(AppScreens.LogInScreen.name) {
+                            popUpTo(0) { this.inclusive = true }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.hsv(120f, 0.53f, 0.31f))
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        showLogOutDialog = false
+                        Log.w("Info","No bye bye for you, only for Duolingo")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("No")
+                }
+            }
+        )
     }
 }
 
