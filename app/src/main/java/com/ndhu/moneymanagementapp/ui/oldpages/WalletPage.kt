@@ -1,4 +1,4 @@
-package com.ndhu.moneymanagementapp.ui.pages
+package com.ndhu.moneymanagementapp.ui.oldpages
 
 import android.content.Context
 import androidx.compose.foundation.Canvas
@@ -9,8 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -110,7 +112,7 @@ fun WalletOption(title: String, value: Int) {
             ) {
                 drawCircle(
                     color = Color.Black,
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx())
+                    style = Stroke(2.dp.toPx())
                 )
             }
 
@@ -140,15 +142,15 @@ fun DrawPlaceholderGraph() {
         // Draw axes
         drawLine(
             color = Color.DarkGray,
-            start = androidx.compose.ui.geometry.Offset(0f, size.height),
-            end = androidx.compose.ui.geometry.Offset(0f, 0f),
+            start = Offset(0f, size.height),
+            end = Offset(0f, 0f),
             strokeWidth = 4f,
             cap = StrokeCap.Round
         )
         drawLine(
             color = Color.DarkGray,
-            start = androidx.compose.ui.geometry.Offset(0f, size.height),
-            end = androidx.compose.ui.geometry.Offset(size.width, size.height),
+            start = Offset(0f, size.height),
+            end = Offset(size.width, size.height),
             strokeWidth = 4f,
             cap = StrokeCap.Round
         )
@@ -156,15 +158,15 @@ fun DrawPlaceholderGraph() {
         // Draw graph line
         drawLine(
             color = Color.Cyan,
-            start = androidx.compose.ui.geometry.Offset(0f, size.height),
-            end = androidx.compose.ui.geometry.Offset(size.width / 2, size.height / 2),
+            start = Offset(0f, size.height),
+            end = Offset(size.width / 2, size.height / 2),
             strokeWidth = 4f,
             cap = StrokeCap.Round
         )
         drawLine(
             color = Color.Cyan,
-            start = androidx.compose.ui.geometry.Offset(size.width / 2, size.height / 2),
-            end = androidx.compose.ui.geometry.Offset(size.width, size.height / 3),
+            start = Offset(size.width / 2, size.height / 2),
+            end = Offset(size.width, size.height / 3),
             strokeWidth = 4f,
             cap = StrokeCap.Round
         )
