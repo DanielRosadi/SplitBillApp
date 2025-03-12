@@ -2,17 +2,15 @@ package com.ndhu.moneymanagementapp.navigation
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
 import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
-import com.ndhu.moneymanagementapp.ui.pages.HomePage
+import com.ndhu.moneymanagementapp.ui.pages.Home
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
 import com.ndhu.moneymanagementapp.ui.pages.LogIn
@@ -31,13 +29,13 @@ fun AppNavigation(context : Context){
     // navigation will be performed onto
     // starting page/screen will be the Homepage
     NavHost(navController = navController,
-        startDestination = AppScreens.HomePageScreen.name){
+        startDestination = AppScreens.HomeScreen.name){
         // inside the NavHost, we contains the NavGraph
         // NavGraph will be our collection/list of composable screens of the application
 
-        // HomePage screen
-        composable(AppScreens.HomePageScreen.name){
-            HomePage(context, navController = navController)
+        // Home screen
+        composable(AppScreens.HomeScreen.name){
+            Home(navController = navController)
         }
 
         // ListOfStore screen
@@ -58,7 +56,7 @@ fun AppNavigation(context : Context){
 
         // SelectFriends screen
         composable(AppScreens.SelectBillOwnerScreen.name){
-            SelectBillOwnerScreen(navController = navController)
+            SelectBillOwnerScreen(context,navController = navController)
         }
 
         // Contact screen

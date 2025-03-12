@@ -3,7 +3,7 @@ package com.ndhu.moneymanagementapp.navigation
 import java.lang.IllegalArgumentException
 
 enum class AppScreens{
-    HomePageScreen,
+    HomeScreen,
     ListStoresScreen,
     ListItemsScreen,
     SelectFriendsScreen,
@@ -19,7 +19,7 @@ enum class AppScreens{
     companion object{
         fun fromRoute(route: String?): AppScreens
         = when (route?.substringBefore("/")){
-            HomePageScreen.name -> HomePageScreen
+            HomeScreen.name -> HomeScreen
             ListStoresScreen.name -> ListStoresScreen
             ListItemsScreen.name -> ListItemsScreen
             SelectFriendsScreen.name -> SelectFriendsScreen
@@ -29,7 +29,7 @@ enum class AppScreens{
             FirstLoginScreen.name -> FirstLoginScreen
             LogInScreen.name -> LogInScreen
             SignUpScreen.name -> SignUpScreen
-            null -> HomePageScreen
+            null -> HomeScreen
             else -> throw IllegalArgumentException("Route $route is not recognized")
         }
     }

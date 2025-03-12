@@ -108,7 +108,7 @@ fun LogIn(context : Context, navController: NavController) {
                         Log.w("INFO", "User id : " + Util.getUserId(context).toString())
                         email = TextFieldValue("")
                         userPassword = TextFieldValue("")
-                        navController.navigate(AppScreens.HomePageScreen.name) {
+                        navController.navigate(AppScreens.HomeScreen.name) {
                             popUpTo(0) { this.inclusive = true }
                         }
                     }else {
