@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,56 +45,46 @@ fun AccountPage(context: Context, navController: NavController) {
         user = userController.getOnboardUser(context)
     }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text("Settings", color = Color.Black)
-                },
-                navigationIcon = {},
-                actions = {}
-            )
-        },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-                    selected = false,
-                    onClick = { /* Navigate to Home */ }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.List, contentDescription = "List") },
-                    selected = false,
-                    onClick = { /* Navigate to List */ }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart") },
-                    selected = false,
-                    onClick = { /* Navigate to Cart */ }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-                    selected = false,
-                    onClick = { /* Navigate to Settings */ }
-                )
-            }
-        }
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding) // Ensure the content respects Scaffold padding
                 .padding(16.dp)
         ) {
-            // Profile Section
-            Column(
+            // Navigation and account text
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Back button
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.size(44.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null,
+                        tint = Color(0xFF039be5),
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+
+                // Account text
+                Text(
+                    text = "Account",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(50.dp))
+
+            //Profile section
+            Column(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Avatar
@@ -105,54 +92,62 @@ fun AccountPage(context: Context, navController: NavController) {
                     painter = painterResource(id = R.drawable.defaultavatarimage),
                     contentDescription = "Profile Picture",
                     modifier = Modifier
-                        .size(160.dp)
+                        .size(200.dp)
                         .clip(CircleShape)
                         .border(2.dp, Color.Cyan, CircleShape)
                 )
-
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Name and Bio
                 Text(
                     text = user?.username ?: "Full name",
-                    fontSize = 18.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "Bio",
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     color = Color.Gray
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider(thickness = 2.dp, color = Color.Gray)
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(40.dp))
+        }
+
+        HorizontalDivider(
+            thickness = 2.dp,
+            color = Color.Gray,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Settings Section
             Text(
                 text = "Settings",
-                fontSize = 20.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 6.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             // Settings Buttons
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                SettingsButton(text = "Change Currency", onClick = {
-
-                })
-                SettingsButton(text = "Clear User Data", onClick = {
-                    showClearUserDataDialog = true
-                })
-                SettingsButton(text = "Log Out", onClick = {
-                    showLogOutDialog = true
-                })
+                SettingsButton(text = "Change Currency", onClick = {}, false)
+                SettingsButton(
+                    text = "Clear User Data",
+                    onClick = { showClearUserDataDialog = true },
+                    false
+                )
+                SettingsButton(text = "Log Out", onClick = { showLogOutDialog = true }, true)
             }
         }
     }
@@ -160,41 +155,30 @@ fun AccountPage(context: Context, navController: NavController) {
     if (showClearUserDataDialog) {
         AlertDialog(
             onDismissRequest = { showClearUserDataDialog = false },
-            title = { Text("Confirm delete account") },
+            title = { Text("Confirm clear user data") },
             confirmButton = {
                 Button(
                     onClick = {
                         showClearUserDataDialog = false
                         Log.w("Info","Deleting data, sedih")
                         //TODO: Change this to clear data logic
-                        coroutine.launch {
-                            userController.logout(context)
-                        }
+                        coroutine.launch { userController.logout(context) }
                         navController.navigate(AppScreens.LogInScreen.name) {
                             popUpTo(0) { this.inclusive = true }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.hsv(120f, 0.53f, 0.31f))
-                ) {
-                    Text("Yes")
-                }
+                ) { Text("Yes") }
             },
             dismissButton = {
                 Button(
-                    onClick = {
-                        showClearUserDataDialog = false
-                        Log.w("Info","DATA STILL STAYS, YAY")
-                    },
+                    onClick = { showClearUserDataDialog = false },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text("No")
-
-                }
+                ) { Text("No") }
             }
         )
     }
 
-    // Confirmation dialog on pressing button "Log Out"
     if (showLogOutDialog) {
         AlertDialog(
             onDismissRequest = { showLogOutDialog = false },
@@ -204,17 +188,13 @@ fun AccountPage(context: Context, navController: NavController) {
                     onClick = {
                         showLogOutDialog = false
                         Log.w("Info","User logged out, bye bye see you again")
-                        coroutine.launch {
-                            userController.logout(context)
-                        }
+                        coroutine.launch { userController.logout(context) }
                         navController.navigate(AppScreens.LogInScreen.name) {
                             popUpTo(0) { this.inclusive = true }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.hsv(120f, 0.53f, 0.31f))
-                ) {
-                    Text("Yes")
-                }
+                ) { Text("Yes") }
             },
             dismissButton = {
                 Button(
@@ -223,28 +203,26 @@ fun AccountPage(context: Context, navController: NavController) {
                         Log.w("Info","No bye bye for you, only for Duolingo")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text("No")
-                }
+                ) { Text("No") }
             }
         )
     }
 }
 
 @Composable
-fun SettingsButton(text: String, onClick : () -> Unit) {
+fun SettingsButton(text: String, onClick : () -> Unit, isLogout: Boolean) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(70.dp)
             .border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White,
+            containerColor = if (isLogout) Color.hsv(355f, 0.51f, 0.96f) else Color.White,
             contentColor = Color.Black
         )
     ) {
-        Text(text = text, fontSize = 16.sp)
+        Text(text = text, fontSize = 20.sp)
     }
 }
