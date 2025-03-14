@@ -10,6 +10,7 @@ enum class AppScreens{
     SelectBillOwnerScreen,
     ContactScreen,
     AccountScreen,
+    EditProfileScreen,
     FirstLoginScreen,
     LogInScreen,
     SignUpScreen
@@ -26,6 +27,7 @@ enum class AppScreens{
             SelectBillOwnerScreen.name -> SelectBillOwnerScreen
             ContactScreen.name -> ContactScreen
             AccountScreen.name -> AccountScreen
+            EditProfileScreen.name -> EditProfileScreen
             FirstLoginScreen.name -> FirstLoginScreen
             LogInScreen.name -> LogInScreen
             SignUpScreen.name -> SignUpScreen

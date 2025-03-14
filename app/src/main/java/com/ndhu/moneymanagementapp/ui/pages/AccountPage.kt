@@ -80,7 +80,7 @@ fun AccountPage(context: Context, navController: NavController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             //Profile section
             Column(
@@ -141,7 +141,9 @@ fun AccountPage(context: Context, navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                SettingsButton(text = "Change Currency", onClick = {}, false)
+                SettingsButton(text = "Edit Profile", onClick = {
+                    navigateToEditAccountScreen(navController)
+                }, false)
                 SettingsButton(
                     text = "Clear User Data",
                     onClick = { showClearUserDataDialog = true },
@@ -209,6 +211,11 @@ fun AccountPage(context: Context, navController: NavController) {
     }
 }
 
+fun navigateToEditAccountScreen(navController: NavController) {
+    //TODO: This can be reused, create a new shareable functions to navigate to which page by passing in parameters
+    navController.navigate(route = AppScreens.EditProfileScreen.name)
+}
+
 @Composable
 fun SettingsButton(text: String, onClick : () -> Unit, isLogout: Boolean) {
     Button(
@@ -226,3 +233,4 @@ fun SettingsButton(text: String, onClick : () -> Unit, isLogout: Boolean) {
         Text(text = text, fontSize = 20.sp)
     }
 }
+

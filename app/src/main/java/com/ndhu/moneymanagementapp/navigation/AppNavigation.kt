@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
+import com.ndhu.moneymanagementapp.ui.pages.EditProfile
 import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.Home
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
@@ -67,6 +68,11 @@ fun AppNavigation(context : Context){
         // Account screen
         composable(AppScreens.AccountScreen.name){
             AccountPage(context, navController = navController)
+        }
+
+        // EditAccount screen
+        composable(AppScreens.EditProfileScreen.name){
+            EditProfile(context, navController = navController)
         }
 
         // First Login screen
