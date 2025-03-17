@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,32 +52,25 @@ fun AccountPage(context: Context, navController: NavController) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            // Navigation and account text
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                // Back button
+                //BackButton
                 IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.size(44.dp)
+                    onClick = { navController.popBackStack() }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = null,
-                        tint = Color(0xFF039be5),
-                        modifier = Modifier.size(30.dp)
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        modifier = Modifier.size(32.dp)
                     )
                 }
 
-                // Account text
-                Text(
-                    text = "Account",
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                //Account text
+                Text(text = "Account", fontSize = 22.sp, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
