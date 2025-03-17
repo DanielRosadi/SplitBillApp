@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,7 +28,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -80,7 +78,7 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
 @Composable
 fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController){
 
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialogAddStore by remember { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
@@ -110,7 +108,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
             LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
                 items(data) { item ->
-                    ListDataItem(storeController, item, navController)
+                    ListDataStore(storeController, item, navController)
                 }
 
             }
@@ -125,7 +123,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                     Text(text = "Delete")
                 }
 
-                Button(onClick = { showDialog = true },
+                Button(onClick = { showDialogAddStore = true },
                     modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
@@ -135,9 +133,9 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                     // PopUp(storeController = storeController, buttonName = "Add Store", showDialogPar = showDialog )
                 }
 
-                if (showDialog){
-                    PopUp(storeController = storeController,
-                        onDismiss = {showDialog = false}
+                if (showDialogAddStore){
+                    PopUpAddStore(storeController = storeController,
+                        onDismiss = {showDialogAddStore = false}
                     )
                 }
 
@@ -154,33 +152,43 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
 }
 
 @Composable
-fun ListDataItem(store: StoreController, obj: Store, navController: NavController) {
+fun ListDataStore(storeController: StoreController, storeObject: Store, navController: NavController) {
+    var showDialogEditStore by remember { mutableStateOf(false) }
+
     Card (
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
             // pass respective storeId to the screen
-            .clickable { navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + obj.id) },
+            .clickable { navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + storeObject.id) },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
         Text(
-            text = obj.name,
+            text = storeObject.name,
             fontSize = 30.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = obj.description,
+            text = storeObject.description,
             fontSize = 20.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge
         )
+        Button(onClick = { showDialogEditStore = true } ) {
+            Text(text = "Edit (Temp)")
+        }
+        if (showDialogEditStore){
+            PopUpEditStore(storeObject = storeObject, storeController = storeController,
+                onDismiss = {showDialogEditStore = false}
+            )
+        }
     }
 }
 
 @Composable
-fun PopUp(storeController: StoreController, onDismiss: () -> Unit) {
+fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit) {
     // var showDialog by remember { mutableStateOf(false) }
     //var showDialog by remember { mutableStateOf(showDialogPar) }
     var storeName by remember { mutableStateOf("") }
@@ -257,6 +265,90 @@ fun PopUp(storeController: StoreController, onDismiss: () -> Unit) {
                     }
                 }
             )
+
+    //}
+}
+
+
+@Composable
+fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismiss: () -> Unit) {
+    // var showDialog by remember { mutableStateOf(false) }
+    //var showDialog by remember { mutableStateOf(showDialogPar) }
+    var storeName by remember { mutableStateOf("") }
+    var storeAddress by remember { mutableStateOf("") }
+    var storeDescription by remember { mutableStateOf("") }
+
+
+
+    /*
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Button(onClick = { showDialog = true },
+            modifier = Modifier
+                .height(60.dp)
+                .fillMaxWidth()
+        ) {
+            Text(text = buttonName)
+        }
+
+     */
+
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Edit Store") },
+        text = {
+            Column {
+                TextField(
+                    value = storeName,
+                    onValueChange = { storeName = it },
+                    label = { Text("Store Name") }
+                )
+                TextField(
+                    value = storeAddress,
+                    onValueChange = { storeAddress = it },
+                    label = { Text("Store Address") }
+                )
+                TextField(
+                    value = storeDescription,
+                    onValueChange = { storeDescription = it },
+                    label = { Text("Store Description") }
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+
+                    runBlocking {
+                        storeController.updateStore(
+                            storeObject.id,
+                            storeName,
+                            storeAddress,
+                            storeDescription
+                        )
+                    }
+
+                    println("User edited: ${storeObject.id} $storeName $storeAddress $storeDescription") // Handle input
+
+                    onDismiss()
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
 
     //}
 }
