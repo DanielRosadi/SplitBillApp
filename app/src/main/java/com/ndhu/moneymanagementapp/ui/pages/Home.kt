@@ -16,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.test.core.app.ActivityScenario.launch
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.navigation.AppScreens
 import kotlinx.coroutines.runBlocking
@@ -86,7 +84,7 @@ fun Home(context: Context, navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /* navigateToBillHistoryScreen(navController) */ },
+                onClick = { navigateToBillHistoryScreen(navController) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp)
@@ -139,6 +137,11 @@ fun Home(context: Context, navController: NavController) {
 
 fun navigateToSplitBillScreen(navController: NavController) {
     navController.navigate(route = AppScreens.ListStoresScreen.name)
+}
+
+//TODO: Make the navigation to one function only, as this function can be reused
+fun navigateToBillHistoryScreen(navController: NavController) {
+    navController.navigate(route = AppScreens.BillHistoryScreen.name)
 }
 
 fun navigateToContactScreen(navController: NavController) {
