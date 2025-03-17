@@ -129,8 +129,6 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                     .fillMaxWidth()
                     .weight(1f)) {
                     Text(text = "Add Store")
-                    // PopUp(storeController = storeController, buttonName = "Add Store")
-                    // PopUp(storeController = storeController, buttonName = "Add Store", showDialogPar = showDialog )
                 }
 
                 if (showDialogAddStore){
@@ -189,30 +187,9 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
 
 @Composable
 fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit) {
-    // var showDialog by remember { mutableStateOf(false) }
-    //var showDialog by remember { mutableStateOf(showDialogPar) }
     var storeName by remember { mutableStateOf("") }
     var storeAddress by remember { mutableStateOf("") }
     var storeDescription by remember { mutableStateOf("") }
-
-
-
-    /*
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-        Button(onClick = { showDialog = true },
-            modifier = Modifier
-                .height(60.dp)
-                .fillMaxWidth()
-        ) {
-            Text(text = buttonName)
-        }
-
-     */
 
 
             AlertDialog(
@@ -266,37 +243,14 @@ fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit) {
                 }
             )
 
-    //}
 }
 
 
 @Composable
 fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismiss: () -> Unit) {
-    // var showDialog by remember { mutableStateOf(false) }
-    //var showDialog by remember { mutableStateOf(showDialogPar) }
     var storeName by remember { mutableStateOf("") }
     var storeAddress by remember { mutableStateOf("") }
     var storeDescription by remember { mutableStateOf("") }
-
-
-
-    /*
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-        Button(onClick = { showDialog = true },
-            modifier = Modifier
-                .height(60.dp)
-                .fillMaxWidth()
-        ) {
-            Text(text = buttonName)
-        }
-
-     */
-
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -350,7 +304,6 @@ fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismi
         }
     )
 
-    //}
 }
 
 
