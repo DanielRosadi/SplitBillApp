@@ -36,7 +36,7 @@ fun AppNavigation(context : Context){
 
         // Home screen
         composable(AppScreens.HomeScreen.name){
-            Home(navController = navController)
+            Home(navController = navController, context = context)
         }
 
         // ListOfStore screen

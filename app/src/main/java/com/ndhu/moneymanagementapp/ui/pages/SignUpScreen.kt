@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.navigation.AppScreens
 import kotlinx.coroutines.launch
 
 @Composable
@@ -106,6 +107,7 @@ fun SignUp(context : Context, navController: NavController) {
                     username = TextFieldValue("")
                     email = TextFieldValue("")
                     userPassword = TextFieldValue("")
+                    navController.navigate(route = AppScreens.HomeScreen.name)
                 }
             },
             modifier = Modifier.fillMaxWidth().height(60.dp),
