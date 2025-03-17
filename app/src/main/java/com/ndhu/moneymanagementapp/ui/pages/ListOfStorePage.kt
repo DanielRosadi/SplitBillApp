@@ -2,7 +2,6 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,17 +9,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,27 +57,30 @@ fun ListStorePage(context : Context, navController: NavController, viewModel: Sh
 @Composable
 fun GetStoreListFromDatabase(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
 
-    val store = StoreController() // Initialize object
+    val storeController = StoreController() // Initialize object
 
     val stores = remember { mutableStateListOf<Store>() }
 
+    // TODO: doesnt update when adding store?
     // may try LaunchedEffect if runBlocking makes the app loading
     runBlocking {
         Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
 
         // clear stores list and add data from database into the stores list
         stores.clear()
-        stores.addAll( store.getListOfStores() )
-        viewModel.storeList = store.getListOfStores()
+        stores.addAll( storeController.getListOfStores() )
+        viewModel.storeList = storeController.getListOfStores()
 
     }
 
     // perform UI composition
-    ComposeListStore(stores, navController)
+    ComposeListStore(storeController, stores, navController)
 }
 
 @Composable
-fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavController){
+fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController){
+
+    var showDialog by remember { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
@@ -109,7 +110,7 @@ fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavControlle
             LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
                 items(data) { item ->
-                    ListDataItem(item, navController)
+                    ListDataItem(storeController, item, navController)
                 }
 
             }
@@ -124,12 +125,22 @@ fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavControlle
                     Text(text = "Delete")
                 }
 
-                Button(onClick = {}, modifier = Modifier
+                Button(onClick = { showDialog = true },
+                    modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
                     .weight(1f)) {
                     Text(text = "Add Store")
+                    // PopUp(storeController = storeController, buttonName = "Add Store")
+                    // PopUp(storeController = storeController, buttonName = "Add Store", showDialogPar = showDialog )
                 }
+
+                if (showDialog){
+                    PopUp(storeController = storeController,
+                        onDismiss = {showDialog = false}
+                    )
+                }
+
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -143,7 +154,7 @@ fun ComposeListStore(data: SnapshotStateList<Store>, navController: NavControlle
 }
 
 @Composable
-fun ListDataItem(obj: Store, navController: NavController) {
+fun ListDataItem(store: StoreController, obj: Store, navController: NavController) {
     Card (
         modifier = Modifier
             .fillMaxWidth()
@@ -167,6 +178,89 @@ fun ListDataItem(obj: Store, navController: NavController) {
         )
     }
 }
+
+@Composable
+fun PopUp(storeController: StoreController, onDismiss: () -> Unit) {
+    // var showDialog by remember { mutableStateOf(false) }
+    //var showDialog by remember { mutableStateOf(showDialogPar) }
+    var storeName by remember { mutableStateOf("") }
+    var storeAddress by remember { mutableStateOf("") }
+    var storeDescription by remember { mutableStateOf("") }
+
+
+
+    /*
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Button(onClick = { showDialog = true },
+            modifier = Modifier
+                .height(60.dp)
+                .fillMaxWidth()
+        ) {
+            Text(text = buttonName)
+        }
+
+     */
+
+
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text(text = "Add Store") },
+                text = {
+                    Column {
+                        TextField(
+                            value = storeName,
+                            onValueChange = { storeName = it },
+                            label = { Text("Store Name") }
+                        )
+                        TextField(
+                            value = storeAddress,
+                            onValueChange = { storeAddress = it },
+                            label = { Text("Store Address") }
+                        )
+                        TextField(
+                            value = storeDescription,
+                            onValueChange = { storeDescription = it },
+                            label = { Text("Store Description") }
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+
+                            runBlocking {
+                                storeController.addStore(
+                                    storeName,
+                                    storeAddress,
+                                    storeDescription
+                                )
+                            }
+
+                            println("User entered: $storeName $storeAddress $storeDescription") // Handle input
+
+                            onDismiss()
+                        }
+                    ) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = onDismiss
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+
+    //}
+}
+
 
 fun testPrintStoreAttributes(obj: Store){
     print("Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
