@@ -88,17 +88,6 @@ fun BillDetails(context: Context, navController: NavController) {
         Spacer(modifier = Modifier.height(20.dp))
 
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            // Section Title for Bill Items
-            item {
-                Text(
-                    text = "Bill Items",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
-
-            // Display multiple Bill details with respective items
             items(billDetails) { bill ->
                 val itemsForBill = billItemDetailsMap[bill.id] ?: emptyList()
                 DetailItemByUser(bill, itemsForBill)
