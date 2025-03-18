@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -61,18 +62,21 @@ fun BillHistory(context: Context, navController: NavController) {
 
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(histories) { history ->
-                HistoryItem(history)
+                HistoryItem(history,navController)
             }
         }
     }
 }
 
 @Composable
-fun HistoryItem(history: History) {
+fun HistoryItem(history: History, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable{
+                navController.navigate(route = AppScreens.BillDetailsScreen.name)
+            },
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
