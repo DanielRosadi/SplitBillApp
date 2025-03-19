@@ -1,8 +1,8 @@
 package com.ndhu.moneymanagementapp.models
 
-data class Bill (
+data class BillDetails (
     val id : String = "",
-    var history_id : String = "",
-    var user_id : String = "",
+    var historyId : String = "",
+    var userId : String = "",
     var status : String = ""
 )

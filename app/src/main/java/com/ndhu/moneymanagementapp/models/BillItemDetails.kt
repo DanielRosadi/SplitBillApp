@@ -2,7 +2,7 @@ package com.ndhu.moneymanagementapp.models
 
 data class BillItemDetails (
     val id : String = "",
-    var bill_detail_id : String = "",
-    var item_id : String = "",
+    var billDetailId : String = "",
+    var itemId : String = "",
     var qty : String = ""
 )

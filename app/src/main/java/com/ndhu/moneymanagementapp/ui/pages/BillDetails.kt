@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.models.Bill
+import com.ndhu.moneymanagementapp.models.BillDetails
 import com.ndhu.moneymanagementapp.models.BillItemDetails
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,26 +24,26 @@ fun BillDetails(context: Context, navController: NavController) {
 
 
     val billDetails = listOf(
-        Bill(id = "B001", history_id = "H123", user_id = "U456", status = "Paid"),
-        Bill(id = "B002", history_id = "H124", user_id = "U789", status = "Unpaid"),
-        Bill(id = "B003", history_id = "H125", user_id = "U321", status = "Paid"),
+        BillDetails(id = "B001", historyId = "H123", userId = "U456", status = "Paid"),
+        BillDetails(id = "B002", historyId = "H124", userId = "U789", status = "Unpaid"),
+        BillDetails(id = "B003", historyId = "H125", userId = "U321", status = "Paid"),
     )
 
 
     val billItemDetailsMap = mapOf(
         "B001" to listOf(
-            BillItemDetails(id = "1", bill_detail_id = "B001", item_id = "Item001", qty = "2"),
-            BillItemDetails(id = "2", bill_detail_id = "B001", item_id = "Item002", qty = "1"),
-            BillItemDetails(id = "3", bill_detail_id = "B001", item_id = "Item003", qty = "5"),
+            BillItemDetails(id = "1", billDetailId = "B001", itemId = "Item001", qty = "2"),
+            BillItemDetails(id = "2", billDetailId = "B001", itemId = "Item002", qty = "1"),
+            BillItemDetails(id = "3", billDetailId = "B001", itemId = "Item003", qty = "5"),
         ),
         "B002" to listOf(
-            BillItemDetails(id = "4", bill_detail_id = "B002", item_id = "Item004", qty = "3"),
-            BillItemDetails(id = "5", bill_detail_id = "B002", item_id = "Item005", qty = "2"),
+            BillItemDetails(id = "4", billDetailId = "B002", itemId = "Item004", qty = "3"),
+            BillItemDetails(id = "5", billDetailId = "B002", itemId = "Item005", qty = "2"),
         ),
         "B003" to listOf(
-            BillItemDetails(id = "6", bill_detail_id = "B003", item_id = "Item006", qty = "4"),
-            BillItemDetails(id = "7", bill_detail_id = "B003", item_id = "Item007", qty = "6"),
-            BillItemDetails(id = "8", bill_detail_id = "B003", item_id = "Item008", qty = "1"),
+            BillItemDetails(id = "6", billDetailId = "B003", itemId = "Item006", qty = "4"),
+            BillItemDetails(id = "7", billDetailId = "B003", itemId = "Item007", qty = "6"),
+            BillItemDetails(id = "8", billDetailId = "B003", itemId = "Item008", qty = "1"),
         ),
     )
 
@@ -97,10 +97,10 @@ fun BillDetails(context: Context, navController: NavController) {
 }
 
 @Composable
-fun DetailItemByUser(bill: Bill, billItems: List<BillItemDetails>) {
-    val itemDetailsText = billItems.joinToString("\n") { "Item ID: ${it.item_id}, Qty: ${it.qty}" }
+fun DetailItemByUser(billDetails: BillDetails, billItems: List<BillItemDetails>) {
+    val itemDetailsText = billItems.joinToString("\n") { "Item ID: ${it.itemId}, Qty: ${it.qty}" }
 
-    val statusColor = if (bill.status.lowercase() == "paid") {
+    val statusColor = if (billDetails.status.lowercase() == "paid") {
         Color.hsv(158f, 0.92f, 0.58f) // Green
     } else {
         MaterialTheme.colorScheme.error // Red
@@ -120,12 +120,12 @@ fun DetailItemByUser(bill: Bill, billItems: List<BillItemDetails>) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "User ID: ${bill.user_id}", style = MaterialTheme.typography.titleMedium)
+                Text(text = "User ID: ${billDetails.userId}", style = MaterialTheme.typography.titleMedium)
                 Text(text = itemDetailsText, style = MaterialTheme.typography.bodyMedium)
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = bill.status,
+                    text = billDetails.status,
                     style = MaterialTheme.typography.titleMedium,
                     color = statusColor
                 )
