@@ -57,37 +57,49 @@ class SplitBillController {
         return success
     }
 
-    suspend fun getLoginUserListOfBills(context : Context) : ListUserSplitBillResponse {
+    suspend fun getLoginUserListOfBills(context : Context) : List<ListUserSplitBillResponse> {
 
-        var billMap : MutableMap<BillHeader, MutableList<ItemDetail>> = mutableMapOf()
+        var billList : MutableList<ListUserSplitBillResponse> = mutableListOf()
         var billItemDetailList = billDetailRepo.getBillListBasedOnUserId(Util.getUserId(context).toString())
 
-        billItemDetailList.forEach { it1 ->
-            it1?.let {
-                val itemList = billMap.getOrPut(BillHeader(
-                    id = it1.billId,
-                    status = it1.status
-                )) { mutableListOf() }
+        for (billItem in billItemDetailList) {
+            val index = getListUserResponseFromBillId(billList, billItem.billId)
 
-                if (itemList.isNotEmpty()) {
-                    var item = itemRepo.get(it1.itemId)
-                    if(item != null) {
-                        itemList.add(0, ItemDetail(
-                            id = it1.itemId,
-                            name = item.name,
-                            price = item.price,
-                            qty = it1.qty
-                        ))
-                    }
+            if (index == -1) {
+                billList.add(
+                    ListUserSplitBillResponse(
+                        billId = billItem.billId,
+                        status = billItem.status,
+                        itemList = mutableListOf()
+                    )
+                )
+            }
+
+            val updatedIndex = getListUserResponseFromBillId(billList, billItem.billId)
+            if (updatedIndex != -1) {
+                var item = itemRepo.get(billItem.itemId)
+                if(item  != null){
+                    billList[updatedIndex].itemList.add(0, ItemDetail(
+                        id = billItem.itemId,
+                        name = item.name,
+                        price = item.price,
+                        qty = billItem.qty
+                    ))
                 }
             }
         }
 
-        var splitUserResponse = ListUserSplitBillResponse(
-            splitBills = billMap
-        )
 
-        return splitUserResponse
+        return billList
+    }
+
+    private fun getListUserResponseFromBillId(list : List<ListUserSplitBillResponse>, id : String) : Int {
+        for (i in 0 until list.size) {
+            if(list.get(i).billId == id) {
+                return i
+            }
+        }
+        return -1
     }
 
 }

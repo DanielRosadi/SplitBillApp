@@ -9,11 +9,8 @@ data class ItemDetail(
     var qty: Number = 0
 )
 
-data class BillHeader (
-    var id : String = "",
-    var status : BillStatus = BillStatus.UNPAID
-)
-
 data class ListUserSplitBillResponse (
-    var splitBills : Map<BillHeader, List<ItemDetail>> = mapOf(),
+    var billId : String = "",
+    var status : BillStatus = BillStatus.UNPAID,
+    var itemList : MutableList<ItemDetail> = mutableListOf()
 )
