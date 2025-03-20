@@ -6,7 +6,6 @@ import com.google.firebase.installations.Utils
 import com.ndhu.moneymanagementapp.enums.BillStatus
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.BillItemDetail
-import com.ndhu.moneymanagementapp.payloads.BillHeader
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
