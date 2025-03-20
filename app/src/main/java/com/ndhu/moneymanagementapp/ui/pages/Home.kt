@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.UserController
-import com.ndhu.moneymanagementapp.navigation.AppScreens
+import com.ndhu.moneymanagementapp.enums.AppScreens
 import kotlinx.coroutines.runBlocking
 
 @Composable
