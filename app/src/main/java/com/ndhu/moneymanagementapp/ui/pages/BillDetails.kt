@@ -23,8 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.models.BillDetails
-import com.ndhu.moneymanagementapp.models.BillItemDetails
+import com.ndhu.moneymanagementapp.models.Bill
+import com.ndhu.moneymanagementapp.models.BillItemDetail
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,40 +32,40 @@ fun BillDetails(context: Context, navController: NavController) {
     var showConfirmationDialog by remember { mutableStateOf(false) }
     var selectedBillId by remember { mutableStateOf<String?>(null) }
 
-    var billDetails by remember {
-        mutableStateOf(
-            listOf(
-                BillDetails(id = "B001", historyId = "H123", userId = "U456", status = "Paid"),
-                BillDetails(id = "B002", historyId = "H124", userId = "U789", status = "Unpaid"),
-                BillDetails(id = "B003", historyId = "H125", userId = "U321", status = "Paid"),
-            )
-        )
-    }
+//    var billDetails by remember {
+//        mutableStateOf(
+//            listOf(
+//                BillDetails(id = "B001", historyId = "H123", userId = "U456", status = "Paid"),
+//                BillDetails(id = "B002", historyId = "H124", userId = "U789", status = "Unpaid"),
+//                BillDetails(id = "B003", historyId = "H125", userId = "U321", status = "Paid"),
+//            )
+//        )
+//    }
 
     var totalNotPaid by remember { mutableStateOf(0) }
 
-    LaunchedEffect(billDetails) {
-        totalNotPaid = billDetails.count { it.status == "Unpaid" }
-    }
+//    LaunchedEffect(billDetails) {
+//        totalNotPaid = billDetails.count { it.status == "Unpaid" }
+//    }
 
     val billAllPaid = totalNotPaid == 0
 
-    val billItemDetailsMap = mapOf(
-        "B001" to listOf(
-            BillItemDetails(id = "1", billDetailId = "B001", itemId = "Item001", qty = "2"),
-            BillItemDetails(id = "2", billDetailId = "B001", itemId = "Item002", qty = "1"),
-            BillItemDetails(id = "3", billDetailId = "B001", itemId = "Item003", qty = "5"),
-        ),
-        "B002" to listOf(
-            BillItemDetails(id = "4", billDetailId = "B002", itemId = "Item004", qty = "3"),
-            BillItemDetails(id = "5", billDetailId = "B002", itemId = "Item005", qty = "2"),
-        ),
-        "B003" to listOf(
-            BillItemDetails(id = "6", billDetailId = "B003", itemId = "Item006", qty = "4"),
-            BillItemDetails(id = "7", billDetailId = "B003", itemId = "Item007", qty = "6"),
-            BillItemDetails(id = "8", billDetailId = "B003", itemId = "Item008", qty = "1"),
-        ),
-    )
+//    val billItemDetailsMap = mapOf(
+//        "B001" to listOf(
+//            BillItemDetails(id = "1", billDetailId = "B001", itemId = "Item001", qty = "2"),
+//            BillItemDetails(id = "2", billDetailId = "B001", itemId = "Item002", qty = "1"),
+//            BillItemDetails(id = "3", billDetailId = "B001", itemId = "Item003", qty = "5"),
+//        ),
+//        "B002" to listOf(
+//            BillItemDetails(id = "4", billDetailId = "B002", itemId = "Item004", qty = "3"),
+//            BillItemDetails(id = "5", billDetailId = "B002", itemId = "Item005", qty = "2"),
+//        ),
+//        "B003" to listOf(
+//            BillItemDetails(id = "6", billDetailId = "B003", itemId = "Item006", qty = "4"),
+//            BillItemDetails(id = "7", billDetailId = "B003", itemId = "Item007", qty = "6"),
+//            BillItemDetails(id = "8", billDetailId = "B003", itemId = "Item008", qty = "1"),
+//        ),
+//    )
 
     Column(
         modifier = Modifier
@@ -93,36 +93,36 @@ fun BillDetails(context: Context, navController: NavController) {
         Spacer(modifier = Modifier.height(20.dp))
 
         //In flutter, it is named as listview.builder
-        LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = 120.dp)) {
-            items(billDetails) { bill ->
-                val itemsForBill = billItemDetailsMap[bill.id] ?: emptyList()
-                DetailItemByUser(
-                    billDetails = bill,
-                    billItems = itemsForBill,
-                    onStatusClick = { billId ->
-                        selectedBillId = billId
-                        showConfirmationDialog = true
-                    }
-                )
-            }
-        }
+//        LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = 120.dp)) {
+//            items(billDetails) { bill ->
+//                val itemsForBill = billItemDetailsMap[bill.id] ?: emptyList()
+//                DetailItemByUser(
+//                    billDetails = bill,
+//                    billItems = itemsForBill,
+//                    onStatusClick = { billId ->
+//                        selectedBillId = billId
+//                        showConfirmationDialog = true
+//                    }
+//                )
+//            }
+//        }
     }
 
     //If confirmation dialog wants to be shown
     if (showConfirmationDialog && selectedBillId != null) {
-        confirmationDialog(
-            onDismiss = { showConfirmationDialog = false },
-            onConfirm = {
-                billDetails = billDetails.map { bill ->
-                    if (bill.id == selectedBillId) {
-                        bill.copy(status = if (bill.status == "Paid") "Unpaid" else "Paid")
-                    } else bill
-                }.toList() // Ensuring a new list is created
-                Log.d("Recalculating", "Recalculating...Total not paid: $totalNotPaid")
-                showConfirmationDialog = false
-            },
-            status = billDetails.firstOrNull { it.id == selectedBillId }?.status == "Paid"
-        )
+//        confirmationDialog(
+//            onDismiss = { showConfirmationDialog = false },
+//            onConfirm = {
+//                billDetails = billDetails.map { bill ->
+//                    if (bill.id == selectedBillId) {
+//                        bill.copy(status = if (bill.status == "Paid") "Unpaid" else "Paid")
+//                    } else bill
+//                }.toList() // Ensuring a new list is created
+//                Log.d("Recalculating", "Recalculating...Total not paid: $totalNotPaid")
+//                showConfirmationDialog = false
+//            },
+//            status = billDetails.firstOrNull { it.id == selectedBillId }?.status == "Paid"
+//        )
     }
 
     //Green button below
@@ -150,17 +150,17 @@ fun BillDetails(context: Context, navController: NavController) {
 
 @Composable
 fun DetailItemByUser(
-    billDetails: BillDetails,
-    billItems: List<BillItemDetails>,
+    billDetails: Bill,
+    billItems: List<BillItemDetail>,
     onStatusClick: (String) -> Unit
 ) {
     val itemDetailsText = billItems.joinToString("\n") { "Item ID: ${it.itemId}, Qty: ${it.qty}" }
 
-    val statusColor = if (billDetails.status.lowercase() == "paid") {
-        Color.hsv(158f, 0.92f, 0.58f) // Green
-    } else {
-        MaterialTheme.colorScheme.error // Red
-    }
+//    val statusColor = if (billDetails.status.lowercase() == "paid") {
+//        Color.hsv(158f, 0.92f, 0.58f) // Green
+//    } else {
+//        MaterialTheme.colorScheme.error // Red
+//    }
 
     Card(
         modifier = Modifier
@@ -176,7 +176,7 @@ fun DetailItemByUser(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "User ID: ${billDetails.userId}", style = MaterialTheme.typography.titleMedium)
+                Text(text = "User ID: ${billDetails.ownerId}", style = MaterialTheme.typography.titleMedium)
                 Text(text = itemDetailsText, style = MaterialTheme.typography.bodyMedium)
             }
             Column(
@@ -186,9 +186,10 @@ fun DetailItemByUser(
                 }
             ) {
                 Text(
-                    text = billDetails.status,
+//                    text = billDetails.status,
+                    text = "",
                     style = MaterialTheme.typography.titleMedium,
-                    color = statusColor
+//                    color = statusColor
                 )
             }
         }
