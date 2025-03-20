@@ -1,4 +1,4 @@
-package com.ndhu.moneymanagementapp.navigation
+package com.ndhu.moneymanagementapp.enums
 
 import java.lang.IllegalArgumentException
 

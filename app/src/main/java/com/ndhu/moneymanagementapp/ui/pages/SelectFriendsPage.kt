@@ -1,7 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,9 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.navigation.AppScreens
-import com.ndhu.moneymanagementapp.reusable_composables.SearchBox
-import com.ndhu.moneymanagementapp.reusable_composables.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.components.SearchBox
+import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 
 @Composable
 fun SelectFriendsPage(context : Context, navController: NavController){

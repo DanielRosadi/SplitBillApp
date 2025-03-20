@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.navigation.AppScreens
+import com.ndhu.moneymanagementapp.enums.AppScreens
 
 @Composable
 fun HomePage(context : Context, navController: NavController) {
