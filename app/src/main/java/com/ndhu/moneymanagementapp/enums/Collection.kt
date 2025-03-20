@@ -5,5 +5,7 @@ enum class Collection(val collection : String) {
     STORE("stores"),
     ITEM("items"),
     HISTORY("histories"),
-    CONTACT("contacts")
+    CONTACT("contacts"),
+    BILL("bills"),
+    BILLITEMDETAIL("bill_item_details")
 }
