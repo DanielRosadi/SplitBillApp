@@ -8,6 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
+import com.ndhu.moneymanagementapp.ui.pages.BillDetails
+import com.ndhu.moneymanagementapp.ui.pages.BillHistory
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
 import com.ndhu.moneymanagementapp.ui.pages.EditProfile
 import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
@@ -39,6 +41,16 @@ fun AppNavigation(context : Context){
             Home(navController = navController, context = context)
         }
 
+        // BillHistory screen
+        composable(AppScreens.BillHistoryScreen.name){
+            BillHistory(context, navController = navController)
+        }
+
+        // BillDetails screen
+        composable(AppScreens.BillDetailsScreen.name){
+            BillDetails(context, navController = navController)
+        }
+
         // ListOfStore screen
         composable(AppScreens.ListStoresScreen.name){
             ListStorePage(context, navController = navController, sharedViewModel)
@@ -55,7 +67,7 @@ fun AppNavigation(context : Context){
             SelectFriendsPage(context, navController = navController)
         }
 
-        // SelectFriends screen
+        // SelectBillOwner screen
         composable(AppScreens.SelectBillOwnerScreen.name){
             SelectBillOwnerScreen(context,navController = navController)
         }

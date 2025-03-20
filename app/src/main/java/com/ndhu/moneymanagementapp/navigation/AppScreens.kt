@@ -4,6 +4,8 @@ import java.lang.IllegalArgumentException
 
 enum class AppScreens{
     HomeScreen,
+    BillHistoryScreen,
+    BillDetailsScreen,
     ListStoresScreen,
     ListItemsScreen,
     SelectFriendsScreen,
@@ -21,6 +23,8 @@ enum class AppScreens{
         fun fromRoute(route: String?): AppScreens
         = when (route?.substringBefore("/")){
             HomeScreen.name -> HomeScreen
+            BillHistoryScreen.name -> BillHistoryScreen
+            BillDetailsScreen.name -> BillDetailsScreen
             ListStoresScreen.name -> ListStoresScreen
             ListItemsScreen.name -> ListItemsScreen
             SelectFriendsScreen.name -> SelectFriendsScreen
