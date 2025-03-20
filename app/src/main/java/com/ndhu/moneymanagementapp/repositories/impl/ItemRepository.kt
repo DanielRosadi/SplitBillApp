@@ -45,4 +45,8 @@ class ItemRepository : Repositories<Item>(Item::class.java), IItemRepository{
             null
         }
     }
+
+    override suspend fun get(id : String) : Item? {
+        return this.getById(Collection.ITEM.collection, id, Item::class.java)
+    }
 }
