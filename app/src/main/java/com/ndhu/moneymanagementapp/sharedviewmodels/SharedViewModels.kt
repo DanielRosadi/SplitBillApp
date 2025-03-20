@@ -16,9 +16,13 @@ And pass respective dataId to find specific database record/row/document
  */
 
 class SharedStoreViewModel : ViewModel() {
-    var storeList: List<Store>? = null
+    var storeList: MutableList<Store>? = null
 
     fun getStoreById(id: String): Store? {
         return storeList?.find { it.id == id }
+    }
+
+    fun addStore(store: Store){
+        storeList?.add(store)
     }
 }
