@@ -63,4 +63,8 @@ class UserController {
     suspend fun logout(context : Context) {
         Util.clearUserId(context)
     }
+
+    suspend fun searchUserByUserName(context : Context, userName : String) : User? {
+        return userRepo.getUserByUsername(userName)
+    }
 }
