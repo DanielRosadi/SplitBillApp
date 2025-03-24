@@ -79,6 +79,9 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController /*,
 fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController){
 
     var showDialogDeleteStore by remember { mutableStateOf(false) }
+    // selectedStores stores currently selected stores. Its null initially because no store is selected.
+    // When the user clicks an item, it updates to that item.
+    // When the delete button is pressed, the selected store is removed, and selectedStores is reset to null.
     val selectedStores = remember { mutableStateListOf<Store>() }
 
     Scaffold (
@@ -125,6 +128,7 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
 
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
+                // if user wants to delete, it turns on the delete dialog flag
                 Button(onClick = { showDialogDeleteStore = true },
                     modifier = Modifier
                         .height(60.dp)
@@ -133,6 +137,8 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
                     Text(text = "Delete Store")
                 }
 
+                // when delete dialog flag is on/true, call the pop up
+                // pass selectedStores list into the pop up
                 if (showDialogDeleteStore){
                     PopUpDeleteStore(storeController = storeController,
                         onDismiss = {showDialogDeleteStore = false},
@@ -201,10 +207,11 @@ fun ListDataStoreForDelete(storeController: StoreController, storeObject: Store,
             .fillMaxWidth()
             .height(130.dp)
             .padding(5.dp)
-            // pass respective storeId to the screen
+            // onClick() notes down which stores are currently selected. Selected stores will be put inside selectedStores list
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
         // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        // change card color to red if it isSelected, else stays gray
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) Color.Red else Color.Gray
         )
@@ -247,15 +254,19 @@ fun PopUpDeleteStore(storeController: StoreController, onDismiss: () -> Unit, st
         confirmButton = {
             Button(
                 onClick = {
+                    // tracked selectedStores are passed into the pop up
+
                     // TODO: try rememberCoroutineScope(), coroutineScope.launch{}
-                    // iteratively delete store
+                    // iteratively delete store in database
                     for(store in selectedStores){
                         runBlocking {
                             storeController.deleteStore(store.id)
                         }
                     }
+                    // remove from the selectedStores list all stores
                     storeList.removeAll(selectedStores)
-                    selectedStores.clear() // Clear the selection after deletion
+                    // Clear the selection after deletion
+                    selectedStores.clear()
 
                     // println("User entered: $storeName $storeAddress $storeDescription") // Handle input
 
