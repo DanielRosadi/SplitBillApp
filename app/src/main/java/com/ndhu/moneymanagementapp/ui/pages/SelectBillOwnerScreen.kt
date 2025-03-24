@@ -107,7 +107,7 @@ fun ComposeSelectBillOwner(context: Context, listBillOwner: List<String>, navCon
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Button(onClick = { }, modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                Button(onClick = { navController.navigate(route = AppScreens.AssignSplitsScreen.name) }, modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Done")
                 }
 
