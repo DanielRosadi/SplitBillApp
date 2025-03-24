@@ -12,6 +12,7 @@ import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.ui.pages.BillDetails
 import com.ndhu.moneymanagementapp.ui.pages.BillHistory
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
+import com.ndhu.moneymanagementapp.ui.pages.DeleteStoreScreen
 import com.ndhu.moneymanagementapp.ui.pages.EditProfile
 import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.Home
@@ -55,6 +56,11 @@ fun AppNavigation(context : Context){
         // ListOfStore screen
         composable(AppScreens.ListStoresScreen.name){
             ListStorePage(context, navController = navController, sharedViewModel)
+        }
+
+        // DeleteStoreScreen
+        composable(AppScreens.DeleteStoresScreen.name){
+            DeleteStoreScreen(context, navController = navController, viewModel = sharedViewModel)
         }
 
         // ListOfItem screen

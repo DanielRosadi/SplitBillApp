@@ -7,6 +7,7 @@ enum class AppScreens{
     BillHistoryScreen,
     BillDetailsScreen,
     ListStoresScreen,
+    DeleteStoresScreen,
     ListItemsScreen,
     SelectFriendsScreen,
     SelectBillOwnerScreen,
@@ -26,6 +27,7 @@ enum class AppScreens{
             BillHistoryScreen.name -> BillHistoryScreen
             BillDetailsScreen.name -> BillDetailsScreen
             ListStoresScreen.name -> ListStoresScreen
+            DeleteStoresScreen.name -> DeleteStoresScreen
             ListItemsScreen.name -> ListItemsScreen
             SelectFriendsScreen.name -> SelectFriendsScreen
             SelectBillOwnerScreen.name -> SelectBillOwnerScreen
