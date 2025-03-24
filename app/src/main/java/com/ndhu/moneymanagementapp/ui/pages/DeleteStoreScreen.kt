@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,6 +83,7 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController /*,
 fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController){
 
     var showDialogDeleteStore by remember { mutableStateOf(false) }
+    val selectedItems = remember { mutableStateListOf<Store>() }
 
     Scaffold (
         topBar = {
@@ -108,8 +112,14 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
 
             LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
-                items(data) { item ->
-                    ListDataStoreForDelete(storeController, item, navController)
+                items(data) { store ->
+                    ListDataStoreForDelete(storeController, store, navController, isSelected = store in selectedItems, onClick = {
+                        if (store in selectedItems) {
+                            selectedItems.remove(store) // Deselect if already selected
+                        } else {
+                            selectedItems.add(store) // Select if not already selected
+                        }
+                    })
                 }
 
             }
@@ -117,12 +127,6 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
             Spacer(modifier = Modifier.height(30.dp))
 
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Button(onClick = {}, modifier = Modifier
-                    .height(60.dp)
-                    .fillMaxWidth()
-                    .weight(1f)) {
-                    Text(text = "Delete")
-                }
 
                 Button(onClick = { showDialogDeleteStore = true },
                     modifier = Modifier
@@ -135,7 +139,7 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
                 if (showDialogDeleteStore){
                     PopUpDeleteStore(storeController = storeController,
                         onDismiss = {showDialogDeleteStore = false},
-                        data
+                        data, selectedItems
                     )
                 }
 
@@ -148,6 +152,7 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
     }
 }
 
+/*
 @Composable
 fun ListDataStoreForDelete(storeController: StoreController, storeObject: Store, navController: NavController) {
     var showDialogEditStore by remember { mutableStateOf(false) }
@@ -188,9 +193,73 @@ fun ListDataStoreForDelete(storeController: StoreController, storeObject: Store,
         }
     }
 }
+ */
 
 @Composable
-fun PopUpDeleteStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>) {
+fun ListDataStoreForDelete(storeController: StoreController, storeObject: Store, navController: NavController, isSelected: Boolean, onClick: () -> Unit) {
+    var showDialogEditStore by remember { mutableStateOf(false) }
+
+    Card (
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(130.dp)
+            .padding(5.dp)
+            // pass respective storeId to the screen
+            .clickable { onClick() }
+            .background(if (isSelected) Color.Red else Color.Gray),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+    ) {
+        Card(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(10.dp)
+                // pass respective storeId to the screen
+                .clickable { showDialogEditStore = true },
+            // elevation = CardDefaults.cardElevation(4.dp),
+            // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+
+        ) {
+            Text(
+                text = storeObject.name,
+                fontSize = 30.sp,
+                //modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = storeObject.address,
+                fontSize = 20.sp,
+                //modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+        }
+    }
+}
+
+/*
+@Composable
+fun StoreCard(store: Store, isSelected: Boolean, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { onClick() }
+            .background(if (isSelected) Color.Red else Color.Gray),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Text(
+            text = store.name,
+            modifier = Modifier.padding(16.dp),
+            color = Color.White
+        )
+    }
+}
+ */
+
+
+@Composable
+fun PopUpDeleteStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, selectedItems: SnapshotStateList<Store>) {
     // var storeName by remember { mutableStateOf("") }
     // var storeAddress by remember { mutableStateOf("") }
     // var storeDescription by remember { mutableStateOf("") }
@@ -222,12 +291,20 @@ fun PopUpDeleteStore(storeController: StoreController, onDismiss: () -> Unit, st
         confirmButton = {
             Button(
                 onClick = {
-                    // TODO: delete func here
+                    // TODO: try rememberCoroutineScope(), coroutineScope.launch{}
+                    for(store in selectedItems){
+                        runBlocking {
+                            storeController.deleteStore(store.id)
+                        }
+                    }
+                    storeList.removeAll(selectedItems)
+                    selectedItems.clear() // Clear the selection after deletion
 
                     // println("User entered: $storeName $storeAddress $storeDescription") // Handle input
 
                     onDismiss()
-                }
+                },
+                enabled = selectedItems.isNotEmpty()
             ) {
                 Text("Yes")
             }
@@ -242,3 +319,4 @@ fun PopUpDeleteStore(storeController: StoreController, onDismiss: () -> Unit, st
     )
 
 }
+

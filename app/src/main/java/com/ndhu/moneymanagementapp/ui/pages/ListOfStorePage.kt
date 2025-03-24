@@ -118,7 +118,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
             Spacer(modifier = Modifier.height(30.dp))
 
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Button(onClick = {}, modifier = Modifier
+                Button(onClick = {navController.navigate(route = AppScreens.DeleteStoresScreen.name)}, modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
                     .weight(1f)) {
