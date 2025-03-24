@@ -45,9 +45,9 @@ import com.ndhu.moneymanagementapp.models.Store
 @Composable
 fun SelectFriendsPage(context : Context, navController: NavController){
 
+    // TODO: Get Contacts
     // getContacts() here
 
-    // val listFriends = listOf("Friend 1", "Friend 2", "Friend 3")
     val listFriends = List(7) { "Friend ${it + 1}" }
 
     ComposeSelectFriends(context, listFriends, navController)
@@ -80,6 +80,7 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // TODO: implement search feature
                 SearchBox()
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -105,6 +106,7 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 
                 Spacer(modifier = Modifier.height(30.dp))
 
+                // TODO: Add Friend/Contact here
                 Button(onClick = {}, modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Add Friend")
                     }
@@ -123,12 +125,6 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 
 @Composable
 fun ListFriends(friend: String, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit){
-    /*
-    val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) Color.LightGray else Color.White,
-        label = "CardColorAnimation"
-    )
-     */
 
     Card (
         modifier = Modifier

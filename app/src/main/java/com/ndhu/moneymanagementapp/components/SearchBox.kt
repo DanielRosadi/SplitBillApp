@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SearchBox() {
+    // TODO: implement search feature
     var query by remember { mutableStateOf("") }
 
     TextField(
