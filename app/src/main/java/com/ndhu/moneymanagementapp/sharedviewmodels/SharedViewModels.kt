@@ -23,16 +23,16 @@ class SharedStoreViewModel : ViewModel() {
     var storeList: MutableList<Store>? = null
 
     // selectedStore for the bill
-    var selectedStore: Store? = null
+    private var selectedStore: Store? = null
 
     // list of items for the bill
-    var itemList: List<Item>? = null
+    private var itemList: List<Item>? = null
 
     // list of friends/contacts participating in the bill
-    var friendList: List<Contact>? = null
+    private var friendList: List<Contact>? = null
 
     // bill owner of the bill
-    var billOwner: Contact? = null
+    private var billOwner: Contact? = null
 
 
 

@@ -32,8 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.reusable_composables.SearchBox
-import com.ndhu.moneymanagementapp.reusable_composables.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.components.SearchBox
+import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 
 @Composable
 fun AssignSplitsScreen(context: Context, navController: NavController){

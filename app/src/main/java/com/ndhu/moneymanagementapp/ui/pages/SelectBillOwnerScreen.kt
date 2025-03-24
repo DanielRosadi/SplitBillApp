@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 
 @Composable
