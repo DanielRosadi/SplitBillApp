@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,8 +24,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +36,8 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.models.Contact
+import com.ndhu.moneymanagementapp.models.Store
 
 @Composable
 fun SelectFriendsPage(context : Context, navController: NavController){
@@ -46,6 +52,9 @@ fun SelectFriendsPage(context : Context, navController: NavController){
 
 @Composable
 fun ComposeSelectFriends(context : Context, listFriends: List<String>, navController: NavController){
+    // val selectedItems = remember { mutableStateListOf<Contact>() }
+    val selectedItems = remember { mutableStateListOf<String>() }
+
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -72,8 +81,14 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 
                 LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
-                    items(listFriends) { item ->
-                        ListFriends(item)
+                    items(listFriends) { friend ->
+                        val isSelected = friend in selectedItems
+
+                        ListFriends(friend = friend, isSelected = isSelected, onCheckedChange = {
+                                checked ->
+                            if (checked) selectedItems.add(friend)
+                            else selectedItems.remove(friend)
+                        })
                     }
 
                 }
@@ -97,7 +112,15 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 }
 
 @Composable
-fun ListFriends(friends: String){
+fun ListFriends(friend: String, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit){
+    /*
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isSelected) Color.LightGray else Color.White,
+        label = "CardColorAnimation"
+    )
+
+     */
+
     Card (
         modifier = Modifier
             .fillMaxWidth()
@@ -106,7 +129,7 @@ fun ListFriends(friends: String){
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
         Text(
-            text = friends,
+            text = friend,
             fontSize = 30.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge
