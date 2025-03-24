@@ -34,18 +34,27 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.controllers.SplitBillController
+import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
-fun AssignSplitsScreen(context: Context, navController: NavController){
+fun AssignSplitsScreen(context: Context, navController: NavController, viewModel: SharedStoreViewModel){
+
+    // TODO: need to save bill owner in view model?
+    // viewModel.setBillOwner()
+
+    val splitBillController = SplitBillController()
 
     val listParticipants = List(7) { "User ${it + 1}" } // Example: 7 items
     val listItems = List(5) { "Item ${it + 1}" } // Example: 5 items
 
-    ComposeAssignSplits(context, listParticipants, listItems, navController)
+    ComposeAssignSplits(context, listParticipants, listItems, navController, splitBillController, viewModel)
 }
 
 @Composable
-fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listItems: List<String>, navController: NavController){
+fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listItems: List<String>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedStoreViewModel){
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -94,11 +103,27 @@ fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listIt
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Button(onClick = { }, modifier = Modifier
+
+
+                Button(onClick = {
+                    // TODO: if done, create list of itemIdAndOwners
+
+                    // TODO: then, submit bill data to database (with list of itemIdAndOwners)
+                    // val splitBillRequest = SplitBillRequest(billOwnerId = viewModel.getBillOwner(), itemIdAndOwners = )
+                    /*
+                    runBlocking {
+                        splitBillController.addSplitBill(context = context, request = splitBillRequest)
+                    }
+                     */
+
+                },
+                    modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)) {
                     Text(text = "Done")
                 }
+
+
 
                 Spacer(modifier = Modifier.height(20.dp))
 

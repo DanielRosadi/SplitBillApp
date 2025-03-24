@@ -35,7 +35,6 @@ class SharedStoreViewModel : ViewModel() {
     private var billOwner: Contact? = null
 
 
-
     // to contains information of one bill (1 store, items, friends, 1 bill owner, item assigns)
     var bill: Bill? = null
 
@@ -63,8 +62,16 @@ class SharedStoreViewModel : ViewModel() {
         friendList = listOfFriends
     }
 
+    fun getBillOwner(): String{
+        return billOwner?.id ?: "Unknown Bill Owner"
+    }
+
     fun setBillOwner(contact: Contact?){
         billOwner = contact
+    }
+
+    fun setBill(){
+        bill = Bill()
     }
 
 

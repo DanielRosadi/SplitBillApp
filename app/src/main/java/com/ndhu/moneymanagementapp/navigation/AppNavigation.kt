@@ -82,7 +82,7 @@ fun AppNavigation(context : Context){
 
         // AssignSplits screen
         composable(AppScreens.AssignSplitsScreen.name){
-            AssignSplitsScreen(context, navController = navController)
+            AssignSplitsScreen(context, navController = navController, viewModel = sharedViewModel)
         }
 
         // Contact screen
