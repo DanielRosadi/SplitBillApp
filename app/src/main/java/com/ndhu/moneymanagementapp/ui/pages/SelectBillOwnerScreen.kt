@@ -33,10 +33,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 
 @Composable
-fun SelectBillOwnerScreen(context: Context, navController: NavController){
+fun SelectBillOwnerScreen(context: Context, navController: NavController, viewModel: SharedStoreViewModel){
 
+    // TODO: need to save friends in view model
+    // viewModel.setFriendList()
+
+    // TODO: Get Contacts
     // getContacts() here
 
     // val listBillOwners = listOf("User 1", "User 2", "User 3", "User 4", "User 5", "User 6", "User 7", "User 8", "User 9", "User 10", "User 11")

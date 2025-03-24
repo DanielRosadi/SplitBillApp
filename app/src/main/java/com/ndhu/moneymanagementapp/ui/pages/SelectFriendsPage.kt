@@ -32,13 +32,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 
 @Composable
-fun SelectFriendsPage(context : Context, navController: NavController){
+fun SelectFriendsPage(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
+
+    // TODO: need to save item list in viewModel
+    // viewModel.setItemList()
 
     // TODO: Get Contacts
     // getContacts() here

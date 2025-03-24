@@ -41,6 +41,7 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
 
     // search for specific store object using passed storeId from previous screen, from global viewModel
     val store = storeId?.let { viewModel.getStoreById(it) }
+    viewModel.setSelectedStore(store)
 
     ComposeListItem(context, listItem, store, navController)
 
@@ -63,7 +64,10 @@ private fun ComposeListItem(context : Context, listItem: List<String>, store: St
                             fontSize = 25.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        Text("{Store Address}", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = store?.address ?: "Unknown Store",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold)
                     }
             }
             }
@@ -128,6 +132,7 @@ private fun ComposeListItem(context : Context, listItem: List<String>, store: St
         Column (modifier = Modifier.padding(20.dp)) {
 
             Button(
+                // TODO: need to pass item list
                 onClick = { navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update*/ },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -139,6 +144,7 @@ private fun ComposeListItem(context : Context, listItem: List<String>, store: St
             Spacer(modifier = Modifier.height(20.dp))
 
             Row {
+                // TODO: delete item
                 Button(
                     onClick = {}, modifier = Modifier
                         .fillMaxWidth()
@@ -150,6 +156,7 @@ private fun ComposeListItem(context : Context, listItem: List<String>, store: St
 
                 Spacer(modifier = Modifier.width(20.dp))
 
+                // TODO: add item
                 Button(
                     onClick = {}, modifier = Modifier
                         .fillMaxWidth()

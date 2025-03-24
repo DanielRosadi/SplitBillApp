@@ -71,12 +71,12 @@ fun AppNavigation(context : Context){
 
         // SelectFriends screen
         composable(AppScreens.SelectFriendsScreen.name){
-            SelectFriendsPage(context, navController = navController)
+            SelectFriendsPage(context, navController = navController, viewModel = sharedViewModel)
         }
 
         // SelectBillOwner screen
         composable(AppScreens.SelectBillOwnerScreen.name){
-            SelectBillOwnerScreen(context,navController = navController)
+            SelectBillOwnerScreen(context,navController = navController, viewModel = sharedViewModel)
         }
 
         // Contact screen
