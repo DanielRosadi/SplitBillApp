@@ -62,7 +62,7 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
     val stores = remember { mutableStateListOf<Store>() }
 
     // TODO: doesnt update when adding store?
-    // may try LaunchedEffect if runBlocking makes the app loading
+    // TODO: may try LaunchedEffect if runBlocking makes the app loading
     runBlocking {
         Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
 
@@ -189,6 +189,7 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
                 //modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge
             )
+            // TODO: Need confirmation for store details to display
             /*
             Text(
                 text = storeObject.description,
@@ -197,11 +198,6 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
                 style = MaterialTheme.typography.bodyLarge
             )
          */
-            /*
-            Button(onClick = { showDialogEditStore = true }) {
-                Text(text = "Edit (Temp)")
-            }
-             */
         }
         if (showDialogEditStore){
             PopUpEditStore(storeObject = storeObject, storeController = storeController,
@@ -263,7 +259,7 @@ fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, store
                             // add store to SharedViewModel
                             viewModel.storeList?.add(Store(storeName, storeAddress, storeDescription))
 
-                            println("User entered: $storeName $storeAddress $storeDescription") // Handle input
+                            // println("User entered: $storeName $storeAddress $storeDescription") // Handle input
 
                             onDismiss()
                         }
@@ -324,7 +320,7 @@ fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismi
                         )
                     }
 
-                    println("User edited: ${storeObject.id} $storeName $storeAddress $storeDescription") // Handle input
+                    // println("User edited: ${storeObject.id} $storeName $storeAddress $storeDescription") // Handle input
 
                     onDismiss()
                 }

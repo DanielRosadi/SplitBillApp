@@ -2,7 +2,6 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,9 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +43,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.StoreController
-import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 import kotlinx.coroutines.runBlocking
@@ -64,7 +60,7 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController /*,
     val stores = remember { mutableStateListOf<Store>() }
 
     // TODO: doesnt update when adding store?
-    // may try LaunchedEffect if runBlocking makes the app loading
+    // TODO: may try LaunchedEffect if runBlocking makes the app loading
     runBlocking {
         Log.d("LaunchTag", "DEBUG. Accessing Store List.")  // Prints in Logcat
 
@@ -83,7 +79,7 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController /*,
 fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController){
 
     var showDialogDeleteStore by remember { mutableStateOf(false) }
-    val selectedItems = remember { mutableStateListOf<Store>() }
+    val selectedStores = remember { mutableStateListOf<Store>() }
 
     Scaffold (
         topBar = {
@@ -106,6 +102,7 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            // TODO: implement search feature
             SearchBox()
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -113,11 +110,11 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
             LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
                 items(data) { store ->
-                    ListDataStoreForDelete(storeController, store, navController, isSelected = store in selectedItems, onClick = {
-                        if (store in selectedItems) {
-                            selectedItems.remove(store) // Deselect if already selected
+                    ListDataStoreForDelete(storeController, store, navController, isSelected = store in selectedStores, onClick = {
+                        if (store in selectedStores) {
+                            selectedStores.remove(store) // Deselect if already selected
                         } else {
-                            selectedItems.add(store) // Select if not already selected
+                            selectedStores.add(store) // Select if not already selected
                         }
                     })
                 }
@@ -139,7 +136,7 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
                 if (showDialogDeleteStore){
                     PopUpDeleteStore(storeController = storeController,
                         onDismiss = {showDialogDeleteStore = false},
-                        data, selectedItems
+                        data, selectedStores
                     )
                 }
 
@@ -206,7 +203,6 @@ fun ListDataStoreForDelete(storeController: StoreController, storeObject: Store,
             .padding(5.dp)
             // pass respective storeId to the screen
             .clickable { onClick() },
-            // .background(if (isSelected) Color.Red else Color.Gray),
         elevation = CardDefaults.cardElevation(4.dp),
         // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
         colors = CardDefaults.cardColors(
@@ -240,75 +236,32 @@ fun ListDataStoreForDelete(storeController: StoreController, storeObject: Store,
     }
 }
 
-/*
 @Composable
-fun StoreCard(store: Store, isSelected: Boolean, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick() }
-            .background(if (isSelected) Color.Red else Color.Gray),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Text(
-            text = store.name,
-            modifier = Modifier.padding(16.dp),
-            color = Color.White
-        )
-    }
-}
- */
-
-
-@Composable
-fun PopUpDeleteStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, selectedItems: SnapshotStateList<Store>) {
-    // var storeName by remember { mutableStateOf("") }
-    // var storeAddress by remember { mutableStateOf("") }
-    // var storeDescription by remember { mutableStateOf("") }
+fun PopUpDeleteStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, selectedStores: SnapshotStateList<Store>) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = "Confirm to Delete Store ?") },
         text = {
-            /*
-            Column {
-                TextField(
-                    value = storeName,
-                    onValueChange = { storeName = it },
-                    label = { Text("Store Name") }
-                )
-                TextField(
-                    value = storeAddress,
-                    onValueChange = { storeAddress = it },
-                    label = { Text("Store Address") }
-                )
-                TextField(
-                    value = storeDescription,
-                    onValueChange = { storeDescription = it },
-                    label = { Text("Store Description") }
-                )
-            }
-            */
         },
         confirmButton = {
             Button(
                 onClick = {
                     // TODO: try rememberCoroutineScope(), coroutineScope.launch{}
                     // iteratively delete store
-                    for(store in selectedItems){
+                    for(store in selectedStores){
                         runBlocking {
                             storeController.deleteStore(store.id)
                         }
                     }
-                    storeList.removeAll(selectedItems)
-                    selectedItems.clear() // Clear the selection after deletion
+                    storeList.removeAll(selectedStores)
+                    selectedStores.clear() // Clear the selection after deletion
 
                     // println("User entered: $storeName $storeAddress $storeDescription") // Handle input
 
                     onDismiss()
                 },
-                enabled = selectedItems.isNotEmpty()
+                enabled = selectedStores.isNotEmpty()
             ) {
                 Text("Yes")
             }

@@ -1,7 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,7 +29,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,8 +36,6 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
-import com.ndhu.moneymanagementapp.models.Contact
-import com.ndhu.moneymanagementapp.models.Store
 
 @Composable
 fun SelectFriendsPage(context : Context, navController: NavController){
@@ -57,8 +52,8 @@ fun SelectFriendsPage(context : Context, navController: NavController){
 @Composable
 fun ComposeSelectFriends(context : Context, listFriends: List<String>, navController: NavController){
     // TODO: Bind with Contact
-    // val selectedItems = remember { mutableStateListOf<Contact>() }
-    val selectedItems = remember { mutableStateListOf<String>() }
+    // val selectedFriends = remember { mutableStateListOf<Contact>() }
+    val selectedFriends = remember { mutableStateListOf<String>() }
 
     UniformDesignScaffold(
         topAppBar = {
@@ -90,15 +85,15 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
                     items(listFriends) { friend ->
                         // initially, isSelected is false for all friends (cards are unchecked)
                         // selectedFriends list are empty
-                        val isSelected = friend in selectedItems
+                        val isSelected = friend in selectedFriends
 
                         // if user clicks the friend's card, it will be added to selectedFriends list
                         // else, if user unclick the friend's card, it will be remove from the selectedFriends list
                         // we only define the isSelected and onCheckedChange function as parameter here, execution happens later
                         ListFriends(friend = friend, isSelected = isSelected, onCheckedChange = {
                                 checked ->
-                            if (checked) selectedItems.add(friend)
-                            else selectedItems.remove(friend)
+                            if (checked) selectedFriends.add(friend)
+                            else selectedFriends.remove(friend)
                         })
                     }
 
