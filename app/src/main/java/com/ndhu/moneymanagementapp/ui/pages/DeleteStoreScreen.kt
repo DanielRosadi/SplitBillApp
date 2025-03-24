@@ -205,10 +205,13 @@ fun ListDataStoreForDelete(storeController: StoreController, storeObject: Store,
             .height(130.dp)
             .padding(5.dp)
             // pass respective storeId to the screen
-            .clickable { onClick() }
-            .background(if (isSelected) Color.Red else Color.Gray),
+            .clickable { onClick() },
+            // .background(if (isSelected) Color.Red else Color.Gray),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color.Red else Color.Gray
+        )
     ) {
         Card(
             modifier = Modifier
@@ -292,6 +295,7 @@ fun PopUpDeleteStore(storeController: StoreController, onDismiss: () -> Unit, st
             Button(
                 onClick = {
                     // TODO: try rememberCoroutineScope(), coroutineScope.launch{}
+                    // iteratively delete store
                     for(store in selectedItems){
                         runBlocking {
                             storeController.deleteStore(store.id)
