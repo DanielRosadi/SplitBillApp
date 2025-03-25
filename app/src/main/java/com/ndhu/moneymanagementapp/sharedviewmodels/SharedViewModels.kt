@@ -6,7 +6,8 @@ import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.models.Store
 
-// ignore this for now
+// ignore this for
+
 class SharedViewModels {
 }
 
@@ -26,10 +27,10 @@ class SharedStoreViewModel : ViewModel() {
     private var selectedStore: Store? = null
 
     // list of items for the bill
-    private var itemList: List<Item>? = null
+    private var itemList: List<Item>? = emptyList()
 
     // list of friends/contacts participating in the bill
-    private var friendList: List<Contact>? = null
+    private var friendList: List<Contact>? = emptyList()
 
     // bill owner of the bill
     private var billOwner: Contact? = null
