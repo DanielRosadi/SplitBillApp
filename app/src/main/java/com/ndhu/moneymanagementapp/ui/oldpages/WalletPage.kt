@@ -178,6 +178,7 @@ fun DrawPlaceholderGraph() {
     }
 }
 
+/*
 @Composable
 fun HomePage(context : Context, navController: NavController) {
 
@@ -327,3 +328,4 @@ fun HomePage(context : Context, navController: NavController) {
         }
     }
 }
+*/
