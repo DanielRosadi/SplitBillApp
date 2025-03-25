@@ -23,6 +23,7 @@ import com.ndhu.moneymanagementapp.ui.pages.LogIn
 import com.ndhu.moneymanagementapp.ui.pages.SelectBillOwnerScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
 import com.ndhu.moneymanagementapp.ui.pages.SignUp
+import com.ndhu.moneymanagementapp.ui.pages.TestingScreen
 
 @Composable
 fun AppNavigation(context : Context){
@@ -113,6 +114,11 @@ fun AppNavigation(context : Context){
         // SignUp screen
         composable(AppScreens.SignUpScreen.name){
             SignUp(context, navController = navController)
+        }
+
+        // Testing Screen
+        composable(AppScreens.TestingScreen.name){
+            TestingScreen(context, navController = navController)
         }
 
     }
