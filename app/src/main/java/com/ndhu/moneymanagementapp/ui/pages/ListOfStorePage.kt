@@ -29,7 +29,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,16 +45,16 @@ import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.*
 
 @Composable
-fun ListStorePage(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
+fun ListStorePage(context : Context, navController: NavController, viewModel: SharedViewModel){
     GetStoreListFromDatabase(context, navController, viewModel)
 }
 
 @Composable
-fun GetStoreListFromDatabase(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
+fun GetStoreListFromDatabase(context : Context, navController: NavController, viewModel: SharedViewModel){
 
     val storeController = StoreController() // Initialize object
 
@@ -78,7 +77,7 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
 }
 
 @Composable
-fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedStoreViewModel){
+fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel){
 
     var showDialogAddStore by remember { mutableStateOf(false) }
 
@@ -208,7 +207,7 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
 }
 
 @Composable
-fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedStoreViewModel) {
+fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedViewModel) {
     var storeName by remember { mutableStateOf("") }
     var storeAddress by remember { mutableStateOf("") }
     var storeDescription by remember { mutableStateOf("") }

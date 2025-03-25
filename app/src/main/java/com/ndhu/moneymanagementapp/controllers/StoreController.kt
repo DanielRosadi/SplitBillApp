@@ -25,7 +25,7 @@ class StoreController {
     }
 
     suspend fun updateStore(id : String, newName : String, newAddress : String, newDescription : String) : Store? {
-        var oldStoreData = this.storeRepository.get(id)
+        var oldStoreData = this.storeRepository.getById(id)
 
         if(oldStoreData != null) {
             if(newName != "") {

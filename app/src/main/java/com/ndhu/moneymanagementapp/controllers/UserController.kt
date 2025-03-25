@@ -1,15 +1,11 @@
 package com.ndhu.moneymanagementapp.controllers
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.repositories.IUserRepository
 import com.ndhu.moneymanagementapp.repositories.impl.UserRepository
 import com.ndhu.moneymanagementapp.utils.Util
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 
@@ -52,7 +48,7 @@ class UserController {
     suspend fun getOnboardUser(context : Context) : User? {
         val userId = Util.getUserId(context)
         if(userId != null) {
-            val user = userRepo.get(userId)
+            val user = userRepo.getById(userId)
             if (user != null) {
                 return user
             }
@@ -66,5 +62,9 @@ class UserController {
 
     suspend fun searchUserByUserName(context : Context, userName : String) : User? {
         return userRepo.getUserByUsername(userName)
+    }
+
+    suspend fun searchUserByUserId(context: Context, userId: String): User?{
+        return userRepo.getById(userId)
     }
 }

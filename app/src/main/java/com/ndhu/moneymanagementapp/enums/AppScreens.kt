@@ -17,7 +17,8 @@ enum class AppScreens{
     EditProfileScreen,
     FirstLoginScreen,
     LogInScreen,
-    SignUpScreen
+    SignUpScreen,
+    TestingScreen
     ;
     // List the App Screens above
 
@@ -39,6 +40,7 @@ enum class AppScreens{
             FirstLoginScreen.name -> FirstLoginScreen
             LogInScreen.name -> LogInScreen
             SignUpScreen.name -> SignUpScreen
+            TestingScreen.name -> TestingScreen
             null -> HomeScreen
             else -> throw IllegalArgumentException("Route $route is not recognized")
         }

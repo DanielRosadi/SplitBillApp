@@ -44,11 +44,11 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun DeleteStoreScreen(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
+fun DeleteStoreScreen(context : Context, navController: NavController, viewModel: SharedViewModel){
     GetStoreListFromDatabase(context, navController)
 }
 

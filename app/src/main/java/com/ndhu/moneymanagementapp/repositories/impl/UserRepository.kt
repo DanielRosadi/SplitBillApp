@@ -6,7 +6,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.ndhu.moneymanagementapp.enums.Collection
 import com.ndhu.moneymanagementapp.models.User
-import com.ndhu.moneymanagementapp.repositories.IRepositories
 import com.ndhu.moneymanagementapp.repositories.IUserRepository
 import kotlinx.coroutines.tasks.await
 
@@ -59,7 +58,7 @@ class UserRepository : Repositories<User>(User::class.java), IUserRepository  {
         }
     }
 
-    override suspend fun get(id : String) : User? {
+    override suspend fun getById(id : String) : User? {
         return this.getById(Collection.USER.collection, id, User::class.java)
     }
 }
