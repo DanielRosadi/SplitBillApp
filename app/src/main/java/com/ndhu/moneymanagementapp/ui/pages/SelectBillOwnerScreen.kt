@@ -33,27 +33,40 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SelectBillOwnerScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
+    var userController = UserController()
 
-    // TODO: need to save friends in view model
-    // viewModel.setFriendList()
+    // get friend list from previous page
+    var listContacts = viewModel.getFriendList()
 
-    // TODO: Get Contacts
-    // getContacts() here
+    // add the user himself/herself
+    var listPossibleOwners = mutableListOf(runBlocking { userController.getOnboardUser(context) } )
 
-    // val listBillOwners = listOf("User 1", "User 2", "User 3", "User 4", "User 5", "User 6", "User 7", "User 8", "User 9", "User 10", "User 11")
+    // populate listBillOwners with user's contacts
+    if (listContacts != null) {
+        for (contact in listContacts){
+            runBlocking {
+                listPossibleOwners.add(
+                    userController.searchUserByUserId(context, contact.userId2)
+                )
+            }
+        }
+    }
 
-    val listBillOwners = List(17) { "User ${it + 1}" } // Example: 11 items
+    // val listBillOwners = List(17) { "User ${it + 1}" } // Example: 11 items
 
-    ComposeSelectBillOwner(context, listBillOwners, navController)
+    ComposeSelectBillOwner(context, listPossibleOwners, navController, viewModel)
 }
 
 @Composable
-fun ComposeSelectBillOwner(context: Context, listBillOwner: List<String>, navController: NavController){
+fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<User?>, navController: NavController, viewModel: SharedViewModel){
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -78,11 +91,12 @@ fun ComposeSelectBillOwner(context: Context, listBillOwner: List<String>, navCon
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // TODO: implement single selection for bill owner here
                 LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
                     // chunked groups items into sets of 3 for each row
                     // it also automatically handles when the list is not perfectly divisible by 3
-                    items(listBillOwner.chunked(3)) { rowItems ->
+                    items(listPossibleOwners.chunked(3)) { rowItems ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -90,8 +104,10 @@ fun ComposeSelectBillOwner(context: Context, listBillOwner: List<String>, navCon
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             // iterate each item in list of 3 item
-                            rowItems.forEach { item ->
-                                ListBillOwners(item)
+                            rowItems.forEach { user ->
+                                if (user != null) {
+                                    ListBillOwners(user.username)
+                                }
                             }
                             // Add empty spaces for the last row if it has less than 3 items
                             // need to add empty spaces for the remaining non-existing elements
@@ -108,7 +124,13 @@ fun ComposeSelectBillOwner(context: Context, listBillOwner: List<String>, navCon
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Button(onClick = { navController.navigate(route = AppScreens.AssignSplitsScreen.name) }, modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                Button(
+                    onClick = {
+                        navController.navigate(route = AppScreens.AssignSplitsScreen.name)
+                        // TODO: save bill owner data here
+                        // viewModel.setBillOwner()
+                              },
+                    modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Done")
                 }
 

@@ -5,6 +5,7 @@ import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.models.Store
+import com.ndhu.moneymanagementapp.models.User
 
 // ignore this for
 /*
@@ -32,10 +33,10 @@ class SharedViewModel : ViewModel() {
     private var itemList: List<Item>? = emptyList()
 
     // list of friends/contacts participating in the bill
-    private var friendList: List<Contact>? = emptyList()
+    private var friendList: List<Contact>? = null
 
     // bill owner of the bill
-    private var billOwner: Contact? = null
+    private var billOwner: User? = null
 
 
     // to contains information of one bill (1 store, items, friends, 1 bill owner, item assigns)
@@ -65,12 +66,16 @@ class SharedViewModel : ViewModel() {
         friendList = listOfFriends
     }
 
+    fun getFriendList(): List<Contact>?{
+        return friendList
+    }
+
     fun getBillOwner(): String{
         return billOwner?.id ?: "Unknown Bill Owner"
     }
 
-    fun setBillOwner(contact: Contact?){
-        billOwner = contact
+    fun setBillOwner(user: User){
+        billOwner = user
     }
 
     fun setBill(){

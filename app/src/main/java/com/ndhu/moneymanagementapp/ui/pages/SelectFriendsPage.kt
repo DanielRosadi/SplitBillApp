@@ -71,12 +71,12 @@ fun SelectFriendsPage(context : Context, navController: NavController, viewModel
         listFriends.addAll(contactController.getCurrUserLoginContact(context))
     }
 
-    ComposeSelectFriends(context, listFriends, navController, contactController, userController)
+    ComposeSelectFriends(context, listFriends, navController, contactController, userController, viewModel)
 }
 
 
 @Composable
-fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Contact>, navController: NavController, contactController: ContactController, userController: UserController){
+fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Contact>, navController: NavController, contactController: ContactController, userController: UserController, viewModel: SharedViewModel){
     // TODO: Bind with Contact
     val selectedFriends = remember { mutableStateListOf<Contact>() }
     // val selectedFriends = remember { mutableStateListOf<String>() }
@@ -129,7 +129,6 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                // TODO: Add Friend/Contact here
                 Button(onClick = { showDialogAddFriend = true },
                     modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Add Friend")
@@ -137,7 +136,13 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Button(onClick = { navController.navigate(route = AppScreens.SelectBillOwnerScreen.name)}, modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                Button(
+                    onClick = {
+                        navController.navigate(route = AppScreens.SelectBillOwnerScreen.name)
+                        // TODO: should pass only selected Friends
+                        viewModel.setFriendList(listFriends) // save the list of friends in SharedViewModel
+                              },
+                    modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Done")
                 }
 
