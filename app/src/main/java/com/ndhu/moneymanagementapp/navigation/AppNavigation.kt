@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
+import com.ndhu.moneymanagementapp.ui.pages.AssignSplitsScreen
 import com.ndhu.moneymanagementapp.ui.pages.BillDetails
 import com.ndhu.moneymanagementapp.ui.pages.BillHistory
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
@@ -71,12 +72,17 @@ fun AppNavigation(context : Context){
 
         // SelectFriends screen
         composable(AppScreens.SelectFriendsScreen.name){
-            SelectFriendsPage(context, navController = navController)
+            SelectFriendsPage(context, navController = navController, viewModel = sharedViewModel)
         }
 
         // SelectBillOwner screen
         composable(AppScreens.SelectBillOwnerScreen.name){
-            SelectBillOwnerScreen(context,navController = navController)
+            SelectBillOwnerScreen(context, navController = navController, viewModel = sharedViewModel)
+        }
+
+        // AssignSplits screen
+        composable(AppScreens.AssignSplitsScreen.name){
+            AssignSplitsScreen(context, navController = navController, viewModel = sharedViewModel)
         }
 
         // Contact screen

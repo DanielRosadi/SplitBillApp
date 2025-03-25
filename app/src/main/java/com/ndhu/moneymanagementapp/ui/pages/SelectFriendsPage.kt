@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,27 +19,36 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
 
 @Composable
-fun SelectFriendsPage(context : Context, navController: NavController){
+fun SelectFriendsPage(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
 
+    // TODO: need to save item list in viewModel
+    // viewModel.setItemList()
+
+    // TODO: Get Contacts
     // getContacts() here
 
-    val listFriends = listOf("Friend 1", "Friend 2", "Friend 3")
+    val listFriends = List(7) { "Friend ${it + 1}" }
 
     ComposeSelectFriends(context, listFriends, navController)
 }
@@ -46,6 +56,10 @@ fun SelectFriendsPage(context : Context, navController: NavController){
 
 @Composable
 fun ComposeSelectFriends(context : Context, listFriends: List<String>, navController: NavController){
+    // TODO: Bind with Contact
+    // val selectedFriends = remember { mutableStateListOf<Contact>() }
+    val selectedFriends = remember { mutableStateListOf<String>() }
+
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -66,20 +80,33 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // TODO: implement search feature
                 SearchBox()
 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
-                    items(listFriends) { item ->
-                        ListFriends(item)
+                    items(listFriends) { friend ->
+                        // initially, isSelected is false for all friends (cards are unchecked)
+                        // selectedFriends list are empty
+                        val isSelected = friend in selectedFriends
+
+                        // if user clicks the friend's card, it will be added to selectedFriends list
+                        // else, if user unclick the friend's card, it will be remove from the selectedFriends list
+                        // we only define the isSelected and onCheckedChange function as parameter here, execution happens later
+                        ListFriends(friend = friend, isSelected = isSelected, onCheckedChange = {
+                                checked ->
+                            if (checked) selectedFriends.add(friend)
+                            else selectedFriends.remove(friend)
+                        })
                     }
 
                 }
 
                 Spacer(modifier = Modifier.height(30.dp))
 
+                // TODO: Add Friend/Contact here
                 Button(onClick = {}, modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Add Friend")
                     }
@@ -97,19 +124,36 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 }
 
 @Composable
-fun ListFriends(friends: String){
+fun ListFriends(friend: String, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit){
+
     Card (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(5.dp)
+            .clickable{onCheckedChange(!isSelected)},
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
-        Text(
-            text = friends,
-            fontSize = 30.sp,
-            modifier = Modifier.padding(16.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Row(modifier = Modifier.
+            fillMaxWidth().
+            padding(5.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = friend,
+                fontSize = 30.sp,
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyLarge
+            )
+            // Added checkbox based on whether friend/contact is selected or not
+            // If user clicks the Friend's card, isSelected is true. Else, if unclicks, isSelected is false
+            // Using the defined onCheckedChange function, it gets evaluated in this code block
+            // This is done separately in each card/friend/record
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = onCheckedChange
+            )
+        }
     }
 }

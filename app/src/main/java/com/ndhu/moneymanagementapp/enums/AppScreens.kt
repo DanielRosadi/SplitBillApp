@@ -11,6 +11,7 @@ enum class AppScreens{
     ListItemsScreen,
     SelectFriendsScreen,
     SelectBillOwnerScreen,
+    AssignSplitsScreen,
     ContactScreen,
     AccountScreen,
     EditProfileScreen,
@@ -31,6 +32,7 @@ enum class AppScreens{
             ListItemsScreen.name -> ListItemsScreen
             SelectFriendsScreen.name -> SelectFriendsScreen
             SelectBillOwnerScreen.name -> SelectBillOwnerScreen
+            AssignSplitsScreen.name -> AssignSplitsScreen
             ContactScreen.name -> ContactScreen
             AccountScreen.name -> AccountScreen
             EditProfileScreen.name -> EditProfileScreen
