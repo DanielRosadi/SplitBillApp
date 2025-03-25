@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.ui.pages.AssignSplitsScreen
 import com.ndhu.moneymanagementapp.ui.pages.BillDetails
@@ -29,7 +29,7 @@ fun AppNavigation(context : Context){
     // this defines nav controller, that controls/instruct the navigation to screens
     // when the user needs to navigate, they should use nav controller to do so
     val navController = rememberNavController()
-    val sharedViewModel: SharedStoreViewModel = viewModel()
+    val sharedViewModel: SharedViewModel = viewModel()
 
     // the Nav Host, act as a 'Host', in which they contains the screens where
     // navigation will be performed onto

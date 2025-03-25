@@ -7,9 +7,11 @@ import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.models.Store
 
 // ignore this for
-
+/*
 class SharedViewModels {
 }
+
+ */
 
 /*
 This file will contains SharedViewModel of every database table/collection.
@@ -19,7 +21,7 @@ And developer only need to pass it onto the screen via AppNavigation.kt
 And pass respective dataId to find specific database record/row/document
  */
 
-class SharedStoreViewModel : ViewModel() {
+class SharedViewModel : ViewModel() {
 
     var storeList: MutableList<Store>? = null
 

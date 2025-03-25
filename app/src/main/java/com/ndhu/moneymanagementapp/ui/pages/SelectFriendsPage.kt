@@ -32,15 +32,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
+import com.ndhu.moneymanagementapp.controllers.ContactController
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
-fun SelectFriendsPage(context : Context, navController: NavController, viewModel: SharedStoreViewModel){
+fun SelectFriendsPage(context : Context, navController: NavController, viewModel: SharedViewModel){
+
+    var contactController = ContactController()
 
     // TODO: need to save item list in viewModel
     // viewModel.setItemList()
@@ -50,12 +53,12 @@ fun SelectFriendsPage(context : Context, navController: NavController, viewModel
 
     val listFriends = List(7) { "Friend ${it + 1}" }
 
-    ComposeSelectFriends(context, listFriends, navController)
+    ComposeSelectFriends(context, listFriends, navController, contactController)
 }
 
 
 @Composable
-fun ComposeSelectFriends(context : Context, listFriends: List<String>, navController: NavController){
+fun ComposeSelectFriends(context : Context, listFriends: List<String>, navController: NavController, contactController: ContactController){
     // TODO: Bind with Contact
     // val selectedFriends = remember { mutableStateListOf<Contact>() }
     val selectedFriends = remember { mutableStateListOf<String>() }
@@ -107,7 +110,12 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
                 Spacer(modifier = Modifier.height(30.dp))
 
                 // TODO: Add Friend/Contact here
-                Button(onClick = {}, modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                Button(onClick = {
+                    runBlocking {
+                        contactController.addContact(context = context, "51d6b880-27bc-4d60-b47f-e090cb115e62")
+                    }
+                },
+                    modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Add Friend")
                     }
 

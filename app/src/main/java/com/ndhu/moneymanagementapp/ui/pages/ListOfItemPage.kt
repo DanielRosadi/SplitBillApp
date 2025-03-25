@@ -33,10 +33,10 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 
 @Composable
-fun ListOfItemPage(context : Context, navController: NavController, storeId: String?, viewModel: SharedStoreViewModel){
+fun ListOfItemPage(context : Context, navController: NavController, storeId: String?, viewModel: SharedViewModel){
     val listItem = listOf("Item 1", "Item 2", "Item 3")
 
     // search for specific store object using passed storeId from previous screen, from global viewModel

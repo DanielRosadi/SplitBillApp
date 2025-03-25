@@ -35,12 +35,10 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
-import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
-import kotlinx.coroutines.runBlocking
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 
 @Composable
-fun AssignSplitsScreen(context: Context, navController: NavController, viewModel: SharedStoreViewModel){
+fun AssignSplitsScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
 
     // TODO: need to save bill owner in view model?
     // viewModel.setBillOwner()
@@ -54,7 +52,7 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
 }
 
 @Composable
-fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listItems: List<String>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedStoreViewModel){
+fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listItems: List<String>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel){
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {

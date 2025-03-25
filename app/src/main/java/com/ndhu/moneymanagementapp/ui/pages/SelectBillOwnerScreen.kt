@@ -34,10 +34,10 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedStoreViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 
 @Composable
-fun SelectBillOwnerScreen(context: Context, navController: NavController, viewModel: SharedStoreViewModel){
+fun SelectBillOwnerScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
 
     // TODO: need to save friends in view model
     // viewModel.setFriendList()
