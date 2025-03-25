@@ -58,23 +58,6 @@ class UserRepository : Repositories<User>(User::class.java), IUserRepository  {
         }
     }
 
-    /*
-    override suspend fun getUserByUserId(userId: String): User? {
-        return try {
-            val querySnapshot = firestore.collection(Collection.USER.collection)
-                .whereEqualTo("id", userId)
-                .get()
-                .await()
-
-            querySnapshot.documents.firstOrNull()?.toObject(User::class.java)
-        } catch (e: Exception) {
-            Log.w("ERROR", "Error getting user by userid", e)
-            null
-        }
-    }
-
-     */
-
     override suspend fun getById(id : String) : User? {
         return this.getById(Collection.USER.collection, id, User::class.java)
     }
