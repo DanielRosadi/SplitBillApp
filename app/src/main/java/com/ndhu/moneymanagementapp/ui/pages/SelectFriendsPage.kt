@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,9 +25,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +43,10 @@ import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.ContactController
+import com.ndhu.moneymanagementapp.controllers.StoreController
+import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.models.Contact
+import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 
@@ -44,24 +54,34 @@ import kotlinx.coroutines.runBlocking
 fun SelectFriendsPage(context : Context, navController: NavController, viewModel: SharedViewModel){
 
     var contactController = ContactController()
+    var userController = UserController()
 
     // TODO: need to save item list in viewModel
     // viewModel.setItemList()
 
+
+
+    // val listFriends = List(7) { "Friend ${it + 1}" }
+    var listFriends = remember { mutableStateListOf<Contact>() }
+
     // TODO: Get Contacts
     // getContacts() here
+    runBlocking {
+        listFriends.clear()
+        listFriends.addAll(contactController.getCurrUserLoginContact(context))
+    }
 
-    val listFriends = List(7) { "Friend ${it + 1}" }
-
-    ComposeSelectFriends(context, listFriends, navController, contactController)
+    ComposeSelectFriends(context, listFriends, navController, contactController, userController)
 }
 
 
 @Composable
-fun ComposeSelectFriends(context : Context, listFriends: List<String>, navController: NavController, contactController: ContactController){
+fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Contact>, navController: NavController, contactController: ContactController, userController: UserController){
     // TODO: Bind with Contact
-    // val selectedFriends = remember { mutableStateListOf<Contact>() }
-    val selectedFriends = remember { mutableStateListOf<String>() }
+    val selectedFriends = remember { mutableStateListOf<Contact>() }
+    // val selectedFriends = remember { mutableStateListOf<String>() }
+
+    var showDialogAddFriend by remember { mutableStateOf(false) }
 
     UniformDesignScaffold(
         topAppBar = {
@@ -98,11 +118,11 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
                         // if user clicks the friend's card, it will be added to selectedFriends list
                         // else, if user unclick the friend's card, it will be remove from the selectedFriends list
                         // we only define the isSelected and onCheckedChange function as parameter here, execution happens later
-                        ListFriends(friend = friend, isSelected = isSelected, onCheckedChange = {
+                        ListFriends(context = context, friend = friend, isSelected = isSelected, onCheckedChange = {
                                 checked ->
                             if (checked) selectedFriends.add(friend)
                             else selectedFriends.remove(friend)
-                        })
+                        }, userController = userController)
                     }
 
                 }
@@ -110,14 +130,10 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
                 Spacer(modifier = Modifier.height(30.dp))
 
                 // TODO: Add Friend/Contact here
-                Button(onClick = {
-                    runBlocking {
-                        contactController.addContact(context = context, "51d6b880-27bc-4d60-b47f-e090cb115e62")
-                    }
-                },
+                Button(onClick = { showDialogAddFriend = true },
                     modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Add Friend")
-                    }
+                }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -127,12 +143,18 @@ fun ComposeSelectFriends(context : Context, listFriends: List<String>, navContro
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                if (showDialogAddFriend){
+                    PopUpAddFriend(context, contactController, userController, onDismiss = {showDialogAddFriend = false}, listFriends = listFriends )
+                }
+
             }
         })
 }
 
 @Composable
-fun ListFriends(friend: String, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit){
+fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit, userController: UserController){
+    var friendName = runBlocking { userController.searchUserByUserId(context, friend.userId2)?.username
+        ?: "Unknown Contact" }
 
     Card (
         modifier = Modifier
@@ -149,7 +171,7 @@ fun ListFriends(friend: String, isSelected: Boolean, onCheckedChange: (Boolean) 
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
-                text = friend,
+                text = friendName,
                 fontSize = 30.sp,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge
@@ -164,4 +186,54 @@ fun ListFriends(friend: String, isSelected: Boolean, onCheckedChange: (Boolean) 
             )
         }
     }
+}
+
+@Composable
+fun PopUpAddFriend(context: Context, contactController: ContactController, userController: UserController, onDismiss: () -> Unit, listFriends: SnapshotStateList<Contact>) {
+    var userName by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Username") },
+        text = {
+            Column {
+                TextField(
+                    value = userName,
+                    onValueChange = { userName = it },
+                    label = { /*Text("Username")*/ }
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+
+
+                    // TODO: try rememberCoroutineScope(), coroutineScope.launch{}
+                    runBlocking {
+                        userController.searchUserByUserName(context, userName)
+                            ?.let { contactController.addContact(context = context, it.id) }
+                    }
+
+
+                    runBlocking {
+                        listFriends.clear()
+                        listFriends.addAll(contactController.getCurrUserLoginContact(context))
+                    }
+
+                    onDismiss()
+                },
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+
 }

@@ -67,4 +67,8 @@ class UserController {
     suspend fun searchUserByUserName(context : Context, userName : String) : User? {
         return userRepo.getUserByUsername(userName)
     }
+
+    suspend fun searchUserByUserId(context: Context, userId: String): User?{
+        return userRepo.getUserByUserId(userId)
+    }
 }
