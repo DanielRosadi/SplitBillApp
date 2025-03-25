@@ -7,5 +7,5 @@ interface IStoreRepository {
     suspend fun getList(): List<Store>
     suspend fun update(id: String, data: Store)
     suspend fun delete(id: String)
-    suspend fun get(id : String) : Store?
+    suspend fun getById(id : String) : Store?
 }

@@ -2,7 +2,6 @@ package com.ndhu.moneymanagementapp.controllers
 
 import android.content.Context
 import com.google.firebase.Timestamp
-import com.google.firebase.installations.Utils
 import com.ndhu.moneymanagementapp.enums.BillStatus
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.BillItemDetail
@@ -76,7 +75,7 @@ class SplitBillController {
 
             val updatedIndex = getListUserResponseFromBillId(billList, billItem.billId)
             if (updatedIndex != -1) {
-                var item = itemRepo.get(billItem.itemId)
+                var item = itemRepo.getById(billItem.itemId)
                 if(item  != null){
                     billList[updatedIndex].itemList.add(0, ItemDetail(
                         id = billItem.itemId,

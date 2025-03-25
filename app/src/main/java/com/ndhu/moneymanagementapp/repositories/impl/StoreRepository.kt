@@ -2,8 +2,6 @@ package com.ndhu.moneymanagementapp.repositories.impl
 
 import com.ndhu.moneymanagementapp.enums.Collection
 import com.ndhu.moneymanagementapp.models.Store
-import com.ndhu.moneymanagementapp.models.User
-import com.ndhu.moneymanagementapp.repositories.IRepositories
 import com.ndhu.moneymanagementapp.repositories.IStoreRepository
 
 class StoreRepository : Repositories<Store>(Store::class.java), IStoreRepository{
@@ -23,7 +21,7 @@ class StoreRepository : Repositories<Store>(Store::class.java), IStoreRepository
         return this.delete(Collection.STORE.collection, documentId)
     }
 
-    override suspend fun get(id: String) : Store? {
+    override suspend fun getById(id: String) : Store? {
         return this.getById(Collection.STORE.collection, id, Store::class.java)
     }
 

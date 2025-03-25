@@ -9,6 +9,5 @@ interface IUserRepository{
     suspend fun delete(documentId: String)
     suspend fun getUserByEmail(email : String) : User?
     suspend fun getUserByUsername(username : String) : User?
-    suspend fun getUserByUserId(userId: String): User?
-    suspend fun get(id : String) : User?
+    suspend fun getById(id : String) : User?
 }

@@ -139,8 +139,7 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                 Button(
                     onClick = {
                         navController.navigate(route = AppScreens.SelectBillOwnerScreen.name)
-                        // TODO: should pass only selected Friends
-                        viewModel.setFriendList(listFriends) // save the list of friends in SharedViewModel
+                        viewModel.setFriendList(selectedFriends) // save the list of friends in SharedViewModel
                               },
                     modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Done")
@@ -185,6 +184,7 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
             // If user clicks the Friend's card, isSelected is true. Else, if unclicks, isSelected is false
             // Using the defined onCheckedChange function, it gets evaluated in this code block
             // This is done separately in each card/friend/record
+            // TODO: should save checked friends for when user navigates back?
             Checkbox(
                 checked = isSelected,
                 onCheckedChange = onCheckedChange
