@@ -75,7 +75,7 @@ fun EditProfile(context: Context, navController: NavController) {
         ) {
             //BackButton
             IconButton(
-                onClick = { navController.popBackStack()}
+                onClick = { navController.popBackStack() }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -141,7 +141,7 @@ fun EditProfile(context: Context, navController: NavController) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { /* Handle Cancel */ },
+                onClick = { navController.popBackStack() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
@@ -153,7 +153,10 @@ fun EditProfile(context: Context, navController: NavController) {
             }
 
             Button(
-                onClick = { /* Handle Save */ },
+                onClick = {
+                    //TODO: Modify pop back stack with the logic of saving the username, email and bio into the database.
+                    navController.popBackStack()
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
