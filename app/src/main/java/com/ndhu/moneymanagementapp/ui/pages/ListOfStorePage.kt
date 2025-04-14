@@ -256,6 +256,8 @@ fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, store
                             }
 
                             // add store to SharedViewModel
+                            // TODO: need to check for possibility of having different Store object.
+                            // TODO: if yes, then need to use the same Store object created at the top.
                             viewModel.storeList?.add(Store(storeName, storeAddress, storeDescription))
 
                             // println("User entered: $storeName $storeAddress $storeDescription") // Handle input

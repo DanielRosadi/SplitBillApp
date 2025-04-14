@@ -30,7 +30,7 @@ class SharedViewModel : ViewModel() {
     private var selectedStore: Store? = null
 
     // list of items for the bill
-    private var itemList: List<Item>? = emptyList()
+    private var itemList: MutableList<Item>? = null
 
     // list of friends/contacts participating in the bill
     private var friendList: List<Contact>? = null
@@ -58,7 +58,15 @@ class SharedViewModel : ViewModel() {
         selectedStore = store
     }
 
-    fun setItemList(listOfItems: List<Item>?){
+    fun addItem(item: Item){
+        itemList?.add(item)
+    }
+
+    fun getItemList(): MutableList<Item>?{
+        return itemList
+    }
+
+    fun setItemList(listOfItems: MutableList<Item>?){
         itemList = listOfItems
     }
 
