@@ -65,7 +65,23 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
 
         // clear stores list and add data from database into the stores list
         items.clear()
+        // storeId?.let { itemController.getItemListBasedStoreId(it) }?.let { items.addAll(it) }
+
+        // TODO: remove if code above works
+        /*
+        if (storeId != null) {
+            val itemList = itemController.getItemListBasedStoreId(storeId)
+                ?: throw IllegalStateException("getItemListBasedStoreId() returned null for storeId: $storeId")
+
+            items.addAll(itemList)
+        } else {
+            Log.e("ItemLoader", "storeId is null. Cannot load items.")
+        }
+        */
+
+        // load items based on store id
         storeId?.let { itemController.getItemListBasedStoreId(it) }?.let { items.addAll(it) }
+
         // viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it) })
         viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it).toMutableList() })
 
