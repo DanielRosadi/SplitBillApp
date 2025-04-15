@@ -9,4 +9,5 @@ interface IItemRepository  {
     suspend fun delete(documentId: String)
     suspend fun getById(id : String) : Item?
     suspend fun searchByNameAndStore(storeId : String, itemName : String) : Item?
+    suspend fun getItemsByStoreId(storeId : String) : List<Item>
 }
