@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -76,6 +77,8 @@ fun SelectBillOwnerScreen(context: Context, navController: NavController, viewMo
 fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<User?>, navController: NavController, viewModel: SharedViewModel){
     var selectedIndex by remember { mutableStateOf(-1) }
 
+    // chunked groups items into sets of 3 for each row
+    // it also automatically handles when the list is not perfectly divisible by 3
     val rows = listPossibleOwners.chunked(3)
 
     UniformDesignScaffold(
@@ -102,11 +105,8 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // TODO: implement single selection for bill owner here
                 LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
-                    // chunked groups items into sets of 3 for each row
-                    // it also automatically handles when the list is not perfectly divisible by 3
                     itemsIndexed(rows) { rowIndex, rowItems ->
                         Row(
                             modifier = Modifier
@@ -143,9 +143,17 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
 
                 Button(
                     onClick = {
-                        navController.navigate(route = AppScreens.AssignSplitsScreen.name)
-                        // TODO: save bill owner data here
-                        // viewModel.setBillOwner()
+                        val selectedUser = listPossibleOwners.getOrNull(selectedIndex) // take user which has been chosen as bill owner
+
+                        if (selectedUser != null) {
+                            // save bill owner data for the bill
+                            viewModel.setBillOwner(selectedUser)
+                            // navigate to next page
+                            navController.navigate(route = AppScreens.AssignSplitsScreen.name)
+                        } else {
+                            // feedback when user forgets to select a bill owner
+                            Toast.makeText(context, "Please select a user for Bill Owner", Toast.LENGTH_SHORT).show()
+                        }
                               },
                     modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Done")
