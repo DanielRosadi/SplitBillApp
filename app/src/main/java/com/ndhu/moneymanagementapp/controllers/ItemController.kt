@@ -33,4 +33,22 @@ class ItemController {
         return itemRepo.searchByNameAndStore(storeId, searchItemName)
     }
 
+    suspend fun updateItem(itemId : String, itemUpdate : Item) {
+        var item: Item? = this.itemRepo.getById(itemId) ?: return
+
+        if(itemUpdate.name != item?.name) {
+            item?.name = itemUpdate.name
+        }
+
+        if(itemUpdate.price != item?.price) {
+            item?.price = itemUpdate.price
+        }
+
+        if (item != null) {
+            this.itemRepo.update(itemId, item)
+        }
+
+        return
+    }
+
 }
