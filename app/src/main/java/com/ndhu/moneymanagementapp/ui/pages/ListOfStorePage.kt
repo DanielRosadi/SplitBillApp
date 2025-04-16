@@ -118,12 +118,15 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
             Spacer(modifier = Modifier.height(30.dp))
 
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                // we no longer need delete item, keep it for possible future change
+                /*
                 Button(onClick = {navController.navigate(route = AppScreens.DeleteStoresScreen.name)}, modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
                     .weight(1f)) {
-                    Text(text = "Delete")
+                    Text(text = "Delete (Temp)")
                 }
+                 */
 
                 Button(onClick = { showDialogAddStore = true },
                     modifier = Modifier

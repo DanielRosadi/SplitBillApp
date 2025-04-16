@@ -173,17 +173,18 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
             Spacer(modifier = Modifier.height(20.dp))
 
             Row {
-                // TODO: delete item
+                // we no longer need delete item, keep it for possible future change
+                /*
                 Button(
                     onClick = {}, modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp)
                         .weight(1f)
                 ) {
-                    Text(text = "Delete")
+                    Text(text = "Delete (Temp)")
                 }
-
                 Spacer(modifier = Modifier.width(20.dp))
+                 */
 
                 Button(
                     onClick = { showDialogAddItem = true}, modifier = Modifier
@@ -235,11 +236,11 @@ private fun ListDataItem(
             .clickable { showDialogEditItem = true }
     ) {
         Row(
-            modifier = Modifier.padding(5.dp),
+            modifier = Modifier.padding(8.dp),
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = item.name)
-            Spacer(modifier = Modifier.width(30.dp))
+            Spacer(modifier = Modifier.width(20.dp))
 
             Text(text = item.price.toString())
             Spacer(modifier = Modifier.width(25.dp))
@@ -253,7 +254,7 @@ private fun ListDataItem(
             Spacer(modifier = Modifier.width(30.dp))
 
             Text(text = itemQuantity.toString())
-            Spacer(modifier = Modifier.width(30.dp))
+            Spacer(modifier = Modifier.width(20.dp))
 
             Button(onClick = { itemQuantity++ }) { Text(text = "+") }
         }
