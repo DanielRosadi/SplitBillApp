@@ -1,6 +1,8 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -25,8 +27,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,6 +74,10 @@ fun SelectBillOwnerScreen(context: Context, navController: NavController, viewMo
 
 @Composable
 fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<User?>, navController: NavController, viewModel: SharedViewModel){
+    var selectedIndex by remember { mutableStateOf(-1) }
+
+    val rows = listPossibleOwners.chunked(3)
+
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -96,7 +107,7 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
 
                     // chunked groups items into sets of 3 for each row
                     // it also automatically handles when the list is not perfectly divisible by 3
-                    items(listPossibleOwners.chunked(3)) { rowItems ->
+                    itemsIndexed(rows) { rowIndex, rowItems ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -104,9 +115,15 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             // iterate each item in list of 3 item
-                            rowItems.forEach { user ->
+                            rowItems.forEachIndexed { columnIndex, user ->
+                                // calculate globalIndex (original index from list of users/owners)
+                                val globalIndex = rowIndex * 3 + columnIndex
+
                                 if (user != null) {
-                                    ListBillOwners(user.username)
+                                    ListBillOwners(
+                                        billOwner = user.username,
+                                        isSelected = selectedIndex == globalIndex,
+                                        onClick = { selectedIndex = if (selectedIndex == globalIndex) -1 else globalIndex } /* toggle logic */)
                                 }
                             }
                             // Add empty spaces for the last row if it has less than 3 items
@@ -143,18 +160,26 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
 }
 
 @Composable
-fun ListBillOwners(billOwners: String){
+fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit){
+    val backgroundColor = if (isSelected) Color.Red else Color.White
+    val borderColor = if (isSelected) Color.Red else Color.Gray
+
     Card (
         modifier = Modifier
             .size(115.dp)
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(5.dp)
+            .clickable { onClick() /* changes selectedIndex to globalIndex, therefore making it currently selected user/owner because (selectedIndex == globalIndex) for isSelected condition */ },
         shape = CircleShape, // Makes it round
+        border = BorderStroke(2.dp, borderColor),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+
     ) {
         Text(
-            text = billOwners,
+            text = billOwner,
+            color = if (isSelected) Color.White else Color.Black,
+            fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge
