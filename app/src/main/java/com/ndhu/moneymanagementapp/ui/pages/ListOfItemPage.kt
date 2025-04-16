@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
@@ -48,6 +46,7 @@ import com.ndhu.moneymanagementapp.controllers.ItemController
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
+import java.util.UUID
 
 @Composable
 fun ListOfItemPage(context : Context, navController: NavController, storeId: String?, viewModel: SharedViewModel){
@@ -101,6 +100,7 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
 private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>, store: Store?, navController: NavController, itemController: ItemController, viewModel: SharedViewModel) {
 
     var showDialogAddItem by remember { mutableStateOf(false) }
+    // var showDialogEditItem by remember { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
@@ -146,36 +146,12 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
         ) {
 
             items(listItem) { item ->
-                var itemQuantity by remember { mutableStateOf(0) }
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .padding(7.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(8.dp),
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Text(text = item.name)
-                        Spacer(modifier = Modifier.width(30.dp))
+                ListDataItem(item, store, itemController, listItem, viewModel)
 
-                        Text(text = item.price.toString())
-                        Spacer(modifier = Modifier.width(25.dp))
-
-                        Button(onClick = { itemQuantity-- }) { Text(text = "-") }
-                        Spacer(modifier = Modifier.width(30.dp))
-
-                        Text(text = itemQuantity.toString())
-                        Spacer(modifier = Modifier.width(30.dp))
-
-                        Button(onClick = { itemQuantity++ }) { Text(text = "+") }
-                    }
-
-
-                }
 
             }
+
+
 
         }
 
@@ -209,7 +185,6 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
 
                 Spacer(modifier = Modifier.width(20.dp))
 
-                // TODO: add item
                 Button(
                     onClick = { showDialogAddItem = true}, modifier = Modifier
                         .fillMaxWidth()
@@ -229,6 +204,8 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                         )
                     }
                 }
+
+
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -237,6 +214,65 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
 
 }
 
+}
+
+@Composable
+private fun ListDataItem(
+    item: Item,
+    store: Store?,
+    itemController: ItemController,
+    listItem: SnapshotStateList<Item>,
+    viewModel: SharedViewModel
+) {
+    var showDialogEditItem by remember { mutableStateOf(false) }
+    var itemQuantity by remember { mutableStateOf(0) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .padding(7.dp)
+            .clickable { showDialogEditItem = true }
+    ) {
+        Row(
+            modifier = Modifier.padding(5.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = item.name)
+            Spacer(modifier = Modifier.width(30.dp))
+
+            Text(text = item.price.toString())
+            Spacer(modifier = Modifier.width(25.dp))
+
+            Button(onClick = {
+                if (itemQuantity > 0) {
+                    itemQuantity--
+                } else {
+                }
+            }) { Text(text = "-") }
+            Spacer(modifier = Modifier.width(30.dp))
+
+            Text(text = itemQuantity.toString())
+            Spacer(modifier = Modifier.width(30.dp))
+
+            Button(onClick = { itemQuantity++ }) { Text(text = "+") }
+        }
+
+
+        if (showDialogEditItem) {
+            if (store != null) {
+                PopUpEditItem(
+                    itemObject = item,
+                    storeId = store.id,
+                    itemController = itemController,
+                    onDismiss = { showDialogEditItem = false },
+                    itemList = listItem,
+                    viewModel = viewModel
+                )
+            }
+        }
+
+    }
 }
 
 @Composable
@@ -323,5 +359,84 @@ fun PopUpAddItem(itemController: ItemController, onDismiss: () -> Unit, storeId:
     )
 
 }
+
+
+@Composable
+fun PopUpEditItem(itemObject: Item, storeId: String, itemController: ItemController, onDismiss: () -> Unit, itemList: SnapshotStateList<Item>, viewModel: SharedViewModel) {
+    var itemName by remember { mutableStateOf("") }
+    var itemPrice by remember { mutableStateOf(0f) }
+    // var itemDescription by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Edit Item") },
+        text = {
+            Column {
+                TextField(
+                    value = itemName,
+                    onValueChange = { itemName = it },
+                    label = { Text("Item Name") }
+                )
+                TextField(
+                    // TextField works with String values, but your itemPrice is a MutableState<Float>, so mismatches
+                    value = itemPrice.toString(), // Converts the Float to String for displaying.
+                    onValueChange = { itemPrice = it.toFloatOrNull() ?: 0f }, // Safely parses the string input to Float, avoiding crashes.
+                    label = { Text("Item Price") }
+                )
+                /*
+                TextField(
+                    value = itemDescription,
+                    onValueChange = { itemDescription = it },
+                    label = { Text("Item Description") }
+                )
+
+                 */
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+
+                    runBlocking {
+                        itemController.updateItem(itemObject.id,
+                            Item(
+                                id = UUID.randomUUID().toString(),
+                                name = itemName,
+                                price = itemPrice,
+                                storeId = storeId
+                            )
+                        )
+                    }
+
+                    runBlocking {
+                        itemList.clear()
+
+                        // load items based on store id
+                        storeId.let { itemController.getItemListBasedStoreId(it) }.let { itemList.addAll(it) }
+
+                        // viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it) })
+                        viewModel.setItemList(storeId.let { itemController.getItemListBasedStoreId(it).toMutableList() })
+
+                    }
+
+                    // println("User edited: ${storeObject.id} $storeName $storeAddress $storeDescription") // Handle input
+
+                    onDismiss()
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+
+}
+
 
 
