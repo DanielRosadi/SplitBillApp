@@ -17,7 +17,7 @@ class ItemController {
     }
 
     suspend fun getItemListBasedStoreId(storeId : String) : List<Item> {
-        return emptyList()
+        return this.itemRepo.getItemsByStoreId(storeId)
     }
 
     suspend fun addItem(storeId : String, itemName : String, itemPrice : Float) {
@@ -31,6 +31,24 @@ class ItemController {
 
     suspend fun searchItem(searchItemName : String, storeId : String) : Item? {
         return itemRepo.searchByNameAndStore(storeId, searchItemName)
+    }
+
+    suspend fun updateItem(itemId : String, itemUpdate : Item) {
+        var item: Item? = this.itemRepo.getById(itemId) ?: return
+
+        if(itemUpdate.name != item?.name) {
+            item?.name = itemUpdate.name
+        }
+
+        if(itemUpdate.price != item?.price) {
+            item?.price = itemUpdate.price
+        }
+
+        if (item != null) {
+            this.itemRepo.update(itemId, item)
+        }
+
+        return
     }
 
 }
