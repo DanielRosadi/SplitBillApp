@@ -17,7 +17,7 @@ class ItemController {
     }
 
     suspend fun getItemListBasedStoreId(storeId : String) : List<Item> {
-        return emptyList()
+        return this.itemRepo.getItemsByStoreId(storeId)
     }
 
     suspend fun addItem(storeId : String, itemName : String, itemPrice : Float) {

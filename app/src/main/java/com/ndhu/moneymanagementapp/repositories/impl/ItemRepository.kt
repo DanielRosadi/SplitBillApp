@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.ndhu.moneymanagementapp.enums.Collection
+import com.ndhu.moneymanagementapp.models.BillItemDetail
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.repositories.IItemRepository
 import kotlinx.coroutines.tasks.await
@@ -46,5 +47,23 @@ class ItemRepository : Repositories<Item>(Item::class.java), IItemRepository{
 
     override suspend fun getById(id : String) : Item? {
         return this.getById(Collection.ITEM.collection, id, Item::class.java)
+    }
+
+    override suspend fun getItemsByStoreId(storeId : String) : List<Item> {
+        var itemList = mutableListOf<Item>()
+        val querySnapshot = firestore.collection(Collection.ITEM.collection)
+            .whereEqualTo("storeId", storeId)
+            .get()
+            .await()
+
+        if(!querySnapshot.isEmpty){
+            for(document in querySnapshot.documents) {
+                document.toObject(Item::class.java)?.let {
+                    itemList.add(it)
+                }
+            }
+        }
+
+        return itemList
     }
 }
