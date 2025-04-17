@@ -148,6 +148,8 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
                         if (selectedUser != null) {
                             // save bill owner data for the bill
                             viewModel.setBillOwner(selectedUser)
+                            // save bill participants (bill owner + chosen friends/contacts (i.e possible owners/owner candidates)
+                            viewModel.billParticipants = listPossibleOwners
                             // navigate to next page
                             navController.navigate(route = AppScreens.AssignSplitsScreen.name)
                         } else {

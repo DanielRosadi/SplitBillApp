@@ -42,6 +42,8 @@ class SharedViewModel : ViewModel() {
     // bill owner of the bill
     private var billOwner: User? = null
 
+    // bill owner + chosen friends/contacts
+    var billParticipants: MutableList<User?> = mutableListOf()
 
     // to contains information of one bill (1 store, items, friends, 1 bill owner, item assigns)
     var bill: Bill? = null
