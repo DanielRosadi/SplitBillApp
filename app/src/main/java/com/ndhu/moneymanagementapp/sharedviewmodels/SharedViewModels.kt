@@ -6,6 +6,7 @@ import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
+import com.ndhu.moneymanagementapp.payloads.ItemDetail
 
 // ignore this for
 /*
@@ -31,6 +32,9 @@ class SharedViewModel : ViewModel() {
 
     // list of items for the bill
     private var itemList: MutableList<Item>? = null
+
+    // list of items for bill with quantity
+    var itemDetailList : MutableList<ItemDetail> = mutableListOf()
 
     // list of friends/contacts participating in the bill
     private var friendList: List<Contact>? = null

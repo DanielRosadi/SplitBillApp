@@ -192,7 +192,8 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                     }
 
                     // TODO: what to do with result? e.g onDoneClicked(result)
-                    // TODO: save the items for Assign Split
+                    // save the items for Assign_Split page
+                    viewModel.itemDetailList = result.toMutableList()
 
                     // TODO: should notify user if there is item with 0 quantity (that is, the item is unassign)
                           },
