@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
+import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 
 @Composable
@@ -45,14 +46,18 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
 
     val splitBillController = SplitBillController()
 
+//    val listParticipants = List(7) { "User ${it + 1}" } // Example: 7 items
+//    val listItems = List(5) { "Item ${it + 1}" } // Example: 5 items
+
     val listParticipants = List(7) { "User ${it + 1}" } // Example: 7 items
-    val listItems = List(5) { "Item ${it + 1}" } // Example: 5 items
+    val listItems = viewModel.itemDetailList
+
 
     ComposeAssignSplits(context, listParticipants, listItems, navController, splitBillController, viewModel)
 }
 
 @Composable
-fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listItems: List<String>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel){
+fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listItems: MutableList<ItemDetail>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel){
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -132,7 +137,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listIt
 }
 
 @Composable
-fun ListItemSplits(item: String){
+fun ListItemSplits(itemDetail: ItemDetail){
     Card (
         modifier = Modifier
             .fillMaxWidth()
@@ -143,7 +148,7 @@ fun ListItemSplits(item: String){
     ) {
         Row () {
             Text(
-            text = item,
+            text = itemDetail.name,
             fontSize = 18.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge)
@@ -151,7 +156,13 @@ fun ListItemSplits(item: String){
             // TODO: implement selected users here
 
             Text(
-                text = "{quantity x price}",
+                text = itemDetail.qty.toString() + "x",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyLarge)
+
+            Text(
+                text = itemDetail.price.toString(),
                 fontSize = 18.sp,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge)
