@@ -44,47 +44,69 @@ import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.ItemController
 import com.ndhu.moneymanagementapp.models.Item
+import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
+/*
+To pay attention when performing change in item data (database or UI):
+- loading data when screen is initially load (ListOfItemPage func) (using uiItems now, and listItems still there)
+- listing data (ComposeListItem func via items() ) (using uiItems now)
+
+- item quantity changes should also reflect in UI items (ListDataItem func) (using uiItems now)
+
+- adding, editing item data so that the item data is really changed (PopUpAdd, PopUpEdit func) (using uiItems now, but listItems still there)
+- deleting item data so that the item data is really changed (NEED other attention since delete item done via dashboard)
+
+- reflect changes automatically when add/edit item are performed (PopUpAdd, PopUpEdit func) (using uiItems now, but listItems still there)
+- reflect changes automatically when delete item are performed (NEED other attention since delete item done via dashboard)
+
+Also, if you fetch data and it comes as duplicates, consider:
+- uses list.clear()
+- use LaunchedEffect() instead of runBlocking()
+It might be due to the nature of Composables recompose often (on state changes, navigation, LiveData observers, etc),
+this runBlocking block is not protected and will keep running.
+
+ */
+
 @Composable
 fun ListOfItemPage(context : Context, navController: NavController, storeId: String?, viewModel: SharedViewModel){
-    // val listItem = listOf("Item 1", "Item 2", "Item 3")
 
     val itemController = ItemController()
 
     val items = remember { mutableStateListOf<Item>() }
+    // val onDoneClicked: (MutableList<ItemDetail>) -> Unit
 
-    // items = itemController.getItemList(storeId)
+    val uiItems = remember { mutableStateListOf<UIItem>() }
 
     // TODO: may try LaunchedEffect if runBlocking makes the app loading
     runBlocking {
         Log.d("LaunchTag", "DEBUG. Accessing Item List.")  // Prints in Logcat
 
-        // clear stores list and add data from database into the stores list
+        // clear items list and add data from database into the stores list (this helps to avoid multiple/duplicate data being taken/shown. use clear() for similar operation)
         items.clear()
-        // storeId?.let { itemController.getItemListBasedStoreId(it) }?.let { items.addAll(it) }
-
-        // TODO: remove if code above works
-        /*
-        if (storeId != null) {
-            val itemList = itemController.getItemListBasedStoreId(storeId)
-                ?: throw IllegalStateException("getItemListBasedStoreId() returned null for storeId: $storeId")
-
-            items.addAll(itemList)
-        } else {
-            Log.e("ItemLoader", "storeId is null. Cannot load items.")
-        }
-        */
 
         // load items based on store id
         storeId?.let { itemController.getItemListBasedStoreId(it) }?.let { items.addAll(it) }
 
+        // for tracking Item data in the UI (with quantity)
+
+        storeId?.let {
+            itemController.getItemListBasedStoreId(it).map { dbItem->
+                UIItem(item = dbItem, quantity = 0) // initialise UI Item with quantity of 0
+            }
+        }?.let {
+            // clear items list and add data from database into the stores list (this helps to avoid multiple/duplicate data being taken/shown. use clear() for similar operation)
+            uiItems.clear()
+            // add UI Item to the list uiItems
+            uiItems.addAll(
+                it
+            )
+        }
+
         // viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it) })
         viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it).toMutableList() })
-
-    // = storeController.getListOfStores().toMutableList()
 
     }
 
@@ -92,15 +114,14 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
     val store = storeId?.let { viewModel.getStoreById(it) }
     viewModel.setSelectedStore(store)
 
-    ComposeListItem(context, items, store, navController, itemController, viewModel)
+    ComposeListItem(context, items, uiItems, store, navController, itemController, viewModel)
 
 }
 
 @Composable
-private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>, store: Store?, navController: NavController, itemController: ItemController, viewModel: SharedViewModel) {
+private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>, uiItems:SnapshotStateList<UIItem>, store: Store?, navController: NavController, itemController: ItemController, viewModel: SharedViewModel) {
 
     var showDialogAddItem by remember { mutableStateOf(false) }
-    // var showDialogEditItem by remember { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
@@ -145,13 +166,10 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
             contentPadding = PaddingValues(5.dp)
         ) {
 
-            items(listItem) { item ->
-                ListDataItem(item, store, itemController, listItem, viewModel)
-
+            items(uiItems) { uiItem ->
+                ListDataItem(uiItem, store, itemController, listItem, viewModel, uiItems)
 
             }
-
-
 
         }
 
@@ -162,7 +180,22 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
 
             Button(
                 // TODO: need to pass item list
-                onClick = { navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update*/ },
+                onClick = {
+                    navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
+                    val result = uiItems.map {
+                        ItemDetail(
+                            id = it.item.id,
+                            name = it.item.name,
+                            price = it.item.price,
+                            qty = it.quantity
+                        )
+                    }
+
+                    // TODO: what to do with result? e.g onDoneClicked(result)
+                    // TODO: save the items for Assign Split
+
+                    // TODO: should notify user if there is item with 0 quantity (that is, the item is unassign)
+                          },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
@@ -201,7 +234,8 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                             onDismiss = {showDialogAddItem = false},
                             storeId = store.id,
                             itemList = listItem,
-                            viewModel = viewModel
+                            viewModel = viewModel,
+                            uiItems = uiItems
                         )
                     }
                 }
@@ -219,14 +253,23 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
 
 @Composable
 private fun ListDataItem(
-    item: Item,
+    // item: Item,
+    uiItem: UIItem,
     store: Store?,
     itemController: ItemController,
     listItem: SnapshotStateList<Item>,
-    viewModel: SharedViewModel
+    viewModel: SharedViewModel,
+    uiItems: SnapshotStateList<UIItem>
 ) {
     var showDialogEditItem by remember { mutableStateOf(false) }
-    var itemQuantity by remember { mutableStateOf(0) }
+    // var itemQuantity by remember { mutableStateOf(0) }
+    var itemQuantity by remember { mutableStateOf(uiItem.quantity) }
+
+    // inner function only for updating item quantity
+    fun updateItemQuantity(newItemQuantity: Int){
+        itemQuantity = newItemQuantity
+        uiItem.quantity = newItemQuantity
+    }
 
     Card(
         modifier = Modifier
@@ -239,16 +282,15 @@ private fun ListDataItem(
             modifier = Modifier.padding(8.dp),
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = item.name)
+            Text(text = uiItem.item.name)
             Spacer(modifier = Modifier.width(20.dp))
 
-            Text(text = item.price.toString())
+            Text(text = uiItem.item.price.toString())
             Spacer(modifier = Modifier.width(25.dp))
 
             Button(onClick = {
                 if (itemQuantity > 0) {
-                    itemQuantity--
-                } else {
+                    updateItemQuantity(itemQuantity - 1)
                 }
             }) { Text(text = "-") }
             Spacer(modifier = Modifier.width(30.dp))
@@ -256,19 +298,20 @@ private fun ListDataItem(
             Text(text = itemQuantity.toString())
             Spacer(modifier = Modifier.width(20.dp))
 
-            Button(onClick = { itemQuantity++ }) { Text(text = "+") }
+            Button(onClick = { updateItemQuantity(itemQuantity + 1) }) { Text(text = "+") }
         }
 
 
         if (showDialogEditItem) {
             if (store != null) {
                 PopUpEditItem(
-                    itemObject = item,
+                    itemObject = uiItem.item,
                     storeId = store.id,
                     itemController = itemController,
                     onDismiss = { showDialogEditItem = false },
                     itemList = listItem,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    uiItems = uiItems
                 )
             }
         }
@@ -277,7 +320,7 @@ private fun ListDataItem(
 }
 
 @Composable
-fun PopUpAddItem(itemController: ItemController, onDismiss: () -> Unit, storeId: String, itemList: SnapshotStateList<Item>, viewModel: SharedViewModel) {
+fun PopUpAddItem(itemController: ItemController, onDismiss: () -> Unit, storeId: String, itemList: SnapshotStateList<Item>, viewModel: SharedViewModel, uiItems: SnapshotStateList<UIItem>) {
     var itemName by remember { mutableStateOf("") }
     var itemPrice by remember { mutableStateOf(0f) }
 
@@ -334,13 +377,11 @@ fun PopUpAddItem(itemController: ItemController, onDismiss: () -> Unit, storeId:
 
                         // add item to SharedViewModel
                         viewModel.setItemList(itemController.getItemListBasedStoreId(storeId).toMutableList())
-                    }
 
-                    // TODO: to remove if above works as intended
-                    // add item to SharedViewModel
-                    // viewModel.setItemList(itemController.getItemListBasedStoreId(storeId).toMutableList())
-                    // viewModel.addItem(item)
-                    // viewModel.itemList?.add(Store(storeName, itemPrice, itemDescription))
+                        // sync data addition from database to observed UI Items
+                        syncUiItemsFromDb(itemController.getItemListBasedStoreId(storeId), uiItems)
+
+                    }
 
                     // println("User entered: $itemName $itemPrice") // Handle input
 
@@ -363,7 +404,7 @@ fun PopUpAddItem(itemController: ItemController, onDismiss: () -> Unit, storeId:
 
 
 @Composable
-fun PopUpEditItem(itemObject: Item, storeId: String, itemController: ItemController, onDismiss: () -> Unit, itemList: SnapshotStateList<Item>, viewModel: SharedViewModel) {
+fun PopUpEditItem(itemObject: Item, storeId: String, itemController: ItemController, onDismiss: () -> Unit, itemList: SnapshotStateList<Item>, viewModel: SharedViewModel, uiItems: SnapshotStateList<UIItem>) {
     var itemName by remember { mutableStateOf("") }
     var itemPrice by remember { mutableStateOf(0f) }
     // var itemDescription by remember { mutableStateOf("") }
@@ -418,6 +459,9 @@ fun PopUpEditItem(itemObject: Item, storeId: String, itemController: ItemControl
                         // viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it) })
                         viewModel.setItemList(storeId.let { itemController.getItemListBasedStoreId(it).toMutableList() })
 
+                        // sync data addition from database to observed UI Items
+                        syncUiItemsFromDb(itemController.getItemListBasedStoreId(storeId), uiItems)
+
                     }
 
                     // println("User edited: ${storeObject.id} $storeName $storeAddress $storeDescription") // Handle input
@@ -438,6 +482,26 @@ fun PopUpEditItem(itemObject: Item, storeId: String, itemController: ItemControl
     )
 
 }
+
+// whenever we add/edit item data, the current observed UI items need to also sync with the database changes
+// we do NOT implement delete changes to this sync yet, due to agreed implementation of delete item to be via dashboard
+fun syncUiItemsFromDb(
+    newDbItems: List<Item>,
+    currentUiItems: SnapshotStateList<UIItem>
+) {
+    val newUiItems = newDbItems.map { dbItem ->
+        val existing = currentUiItems.find { it.item.id == dbItem.id }
+        UIItem(
+            item = dbItem,
+            quantity = existing?.quantity ?: 0 // preserve qty if exists
+        )
+    }
+
+    currentUiItems.clear()
+    currentUiItems.addAll(newUiItems)
+}
+
+
 
 
 
