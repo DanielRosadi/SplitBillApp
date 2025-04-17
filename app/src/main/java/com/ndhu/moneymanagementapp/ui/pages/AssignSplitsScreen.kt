@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
+import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 
@@ -49,7 +50,7 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
 //    val listParticipants = List(7) { "User ${it + 1}" } // Example: 7 items
 //    val listItems = List(5) { "Item ${it + 1}" } // Example: 5 items
 
-    val listParticipants = List(7) { "User ${it + 1}" } // Example: 7 items
+    val listParticipants = viewModel.billParticipants
     val listItems = viewModel.itemDetailList
 
 
@@ -57,7 +58,7 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
 }
 
 @Composable
-fun ComposeAssignSplits(context: Context, listParticipants: List<String>, listItems: MutableList<ItemDetail>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel){
+fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItems: MutableList<ItemDetail>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel){
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -156,7 +157,13 @@ fun ListItemSplits(itemDetail: ItemDetail){
             // TODO: implement selected users here
 
             Text(
-                text = itemDetail.qty.toString() + "x",
+                text = itemDetail.qty.toString(),
+                fontSize = 18.sp,
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyLarge)
+
+            Text(
+                text = "x",
                 fontSize = 18.sp,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge)
@@ -172,7 +179,7 @@ fun ListItemSplits(itemDetail: ItemDetail){
 }
 
 @Composable
-fun ListBillParticipants(participant: String){
+fun ListBillParticipants(participant: User?){
     Card (
         modifier = Modifier
             .size(90.dp)
@@ -183,7 +190,7 @@ fun ListBillParticipants(participant: String){
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
         Text(
-            text = participant,
+            text = participant?.username ?: "Unknown User", // if participant is not null, execute participant.username else put "Unknown User"
             fontSize = 18.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge
