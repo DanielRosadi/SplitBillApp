@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
@@ -109,7 +110,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
             LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
                 items(data) { item ->
-                    ListDataStore(storeController, item, navController)
+                    ListDataStore(storeController, item, navController, data, viewModel)
                 }
 
             }
@@ -117,12 +118,15 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
             Spacer(modifier = Modifier.height(30.dp))
 
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                // we no longer need delete item, keep it for possible future change
+                /*
                 Button(onClick = {navController.navigate(route = AppScreens.DeleteStoresScreen.name)}, modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
                     .weight(1f)) {
-                    Text(text = "Delete")
+                    Text(text = "Delete (Temp)")
                 }
+                 */
 
                 Button(onClick = { showDialogAddStore = true },
                     modifier = Modifier
@@ -149,11 +153,10 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
     }
 
 
-
 }
 
 @Composable
-fun ListDataStore(storeController: StoreController, storeObject: Store, navController: NavController) {
+fun ListDataStore(storeController: StoreController, storeObject: Store, navController: NavController, data: SnapshotStateList<Store>, viewModel: SharedViewModel) {
     var showDialogEditStore by remember { mutableStateOf(false) }
 
     Card (
@@ -200,7 +203,7 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
         }
         if (showDialogEditStore){
             PopUpEditStore(storeObject = storeObject, storeController = storeController,
-                onDismiss = {showDialogEditStore = false}
+                onDismiss = {showDialogEditStore = false}, storeList = data, viewModel = viewModel
             )
         }
     }
@@ -253,10 +256,14 @@ fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, store
                             runBlocking {
                                 storeList.clear()
                                 storeList.addAll(storeController.getListOfStores())
+                                viewModel.storeList = storeController.getListOfStores().toMutableList()
+
                             }
 
                             // add store to SharedViewModel
-                            viewModel.storeList?.add(Store(storeName, storeAddress, storeDescription))
+                            // TODO: need to check for possibility of having different Store object.
+                            // TODO: if yes, then need to use the same Store object created at the top.
+                            // viewModel.storeList?.add(Store(storeName, storeAddress, storeDescription))
 
                             // println("User entered: $storeName $storeAddress $storeDescription") // Handle input
 
@@ -279,7 +286,7 @@ fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, store
 
 
 @Composable
-fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismiss: () -> Unit) {
+fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedViewModel) {
     var storeName by remember { mutableStateOf("") }
     var storeAddress by remember { mutableStateOf("") }
     var storeDescription by remember { mutableStateOf("") }
@@ -318,6 +325,15 @@ fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismi
                             storeDescription
                         )
                     }
+
+
+                    runBlocking {
+                        storeList.clear()
+                        storeList.addAll(storeController.getListOfStores())
+                        viewModel.storeList = storeController.getListOfStores().toMutableList()
+
+                    }
+
 
                     // println("User edited: ${storeObject.id} $storeName $storeAddress $storeDescription") // Handle input
 
