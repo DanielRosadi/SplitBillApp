@@ -1,6 +1,9 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,8 +29,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +69,9 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
 
 @Composable
 fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItems: MutableList<ItemDetail>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel){
+    val userColors = remember { mutableStateMapOf<User?, Color>() }
+    var selectedUser by remember { mutableStateOf<User?>(null) }
+
     UniformDesignScaffold(
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
@@ -83,7 +96,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text(text = "Now Selecting: {User x}")
+                Text(text = "Now Selecting: {${selectedUser?.username}}" ?: "No User Selected")
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -101,7 +114,8 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                 LazyRow () {
                     items(listParticipants) { participant ->
-                        ListBillParticipants(participant)
+
+                        ListBillParticipants(participant = participant, userColors = userColors, selectedUser = selectedUser, onUserSelected = { selectedUser = it} )
                     }
                 }
 
@@ -179,15 +193,32 @@ fun ListItemSplits(itemDetail: ItemDetail){
 }
 
 @Composable
-fun ListBillParticipants(participant: User?){
+fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User) -> Unit){
+    val color = userColors.getOrPut(participant) {
+        randomLightColor()
+    }
+    val borderColor = if (participant == selectedUser) Color.Black else Color.Transparent
+
     Card (
         modifier = Modifier
             .size(90.dp)
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(5.dp)
+            .clickable {
+                if (participant != null) {
+                    onUserSelected(participant)
+                }
+            },
+
         shape = CircleShape, // Makes it round
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        border = BorderStroke(2.dp, borderColor),
+        // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(
+            containerColor = if (participant == selectedUser) color else Color.White
+        )
+
+
     ) {
         Text(
             text = participant?.username ?: "Unknown User", // if participant is not null, execute participant.username else put "Unknown User"
@@ -196,4 +227,12 @@ fun ListBillParticipants(participant: User?){
             style = MaterialTheme.typography.bodyLarge
         )
     }
+}
+
+// Helper: Generate a random light color
+fun randomLightColor(): Color {
+    val red = (150..255).random()
+    val green = (150..255).random()
+    val blue = (150..255).random()
+    return Color(red, green, blue)
 }
