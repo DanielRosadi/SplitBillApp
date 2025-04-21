@@ -96,6 +96,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // update current user selected text
                 Text(text = "Now Selecting: {${selectedUser?.username}}" ?: "No User Selected")
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -115,7 +116,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 LazyRow () {
                     items(listParticipants) { participant ->
 
-                        ListBillParticipants(participant = participant, userColors = userColors, selectedUser = selectedUser, onUserSelected = { selectedUser = it} )
+                        ListBillParticipants(participant = participant, userColors = userColors, selectedUser = selectedUser, onUserSelected = { selectedUser = it}, listParticipants = listParticipants)
                     }
                 }
 
@@ -193,10 +194,12 @@ fun ListItemSplits(itemDetail: ItemDetail){
 }
 
 @Composable
-fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User) -> Unit){
+fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User) -> Unit, listParticipants: MutableList<User?>){
+    val index = listParticipants.indexOf(participant) // get participant index in the list
     val color = userColors.getOrPut(participant) {
-        randomLightColor()
+        generateDistinctColor(index, listParticipants.size)
     }
+    // update border color
     val borderColor = if (participant == selectedUser) Color.Black else Color.Transparent
 
     Card (
@@ -206,6 +209,8 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
             .padding(5.dp)
             .clickable {
                 if (participant != null) {
+                    // apply selection, this function is required because we are passing state into a child function
+                    // otherwise, error may occur
                     onUserSelected(participant)
                 }
             },
@@ -214,6 +219,7 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
         elevation = CardDefaults.cardElevation(4.dp),
         border = BorderStroke(2.dp, borderColor),
         // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        // update card color based on user (according to distinct color generator)
         colors = CardDefaults.cardColors(
             containerColor = if (participant == selectedUser) color else Color.White
         )
@@ -228,6 +234,15 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
         )
     }
 }
+
+fun generateDistinctColor(index: Int, total: Int): Color {
+    // using list participants index and list size, we can generate distinct colors
+
+    // use the Hue component in HSL (Hue-Saturation-Lightness) to evenly space colors.
+    val hue = (index * (360f / total)) % 360f
+    return Color.hsl(hue, 0.6f, 0.85f)
+}
+
 
 // Helper: Generate a random light color
 fun randomLightColor(): Color {
