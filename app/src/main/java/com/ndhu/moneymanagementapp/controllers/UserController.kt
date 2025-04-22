@@ -13,16 +13,15 @@ class UserController {
 
     private val userRepo : IUserRepository = UserRepository()
 
-    suspend fun registerUser(username : String, email : String, password : String) {
+    suspend fun registerUser(username : String, email : String, password : String, bio : String) {
 
         userRepo.add(
             User(
                 UUID.randomUUID().toString(),
                 username,
-                0,
                 email,
                 Util.passwordEncryption(password),
-                Timestamp.now(),
+                bio
             )
         )
 
