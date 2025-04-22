@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.controllers
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.repositories.IUserRepository
@@ -26,6 +27,22 @@ class UserController {
             )
         )
 
+    }
+
+    suspend fun updateUserInformation(context: Context, username: String, email: String, bio: String){
+        val user = getOnboardUser(context)
+        Log.d("DEBUG", "Updating user with ID: ${user?.id}")
+        userRepo.update(
+            user!!.id,
+            User(
+                user.id,
+                username,
+                user.balance,
+                email,
+                user.password,
+                user.createdAt,
+            )
+        )
     }
 
     suspend fun loginUser(context : Context, identify : String, password : String) : User? {
@@ -67,4 +84,6 @@ class UserController {
     suspend fun searchUserByUserId(context: Context, userId: String): User?{
         return userRepo.getById(userId)
     }
+
+
 }
