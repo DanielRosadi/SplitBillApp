@@ -67,6 +67,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx") // ✅ Correct Firestore module
     implementation("com.google.firebase:firebase-analytics-ktx") // ✅ (Optional) Analytics
     implementation("at.favre.lib:bcrypt:0.10.2")
+    implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
+    implementation("com.google.mlkit:text-recognition:16.0.1")
 
     val nav_version = "2.8.8"
     implementation("androidx.navigation:navigation-compose:$nav_version")
