@@ -20,6 +20,7 @@ import com.ndhu.moneymanagementapp.ui.pages.Home
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
 import com.ndhu.moneymanagementapp.ui.pages.LogIn
+import com.ndhu.moneymanagementapp.ui.pages.PendingRequestScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectBillOwnerScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
 import com.ndhu.moneymanagementapp.ui.pages.SignUp
@@ -89,6 +90,10 @@ fun AppNavigation(context : Context){
         // Contact screen
         composable(AppScreens.ContactScreen.name){
             ContactPage(context, navController = navController)
+        }
+
+        composable(AppScreens.PendingRequestScreen.name){
+            PendingRequestScreen(context, navController = navController)
         }
 
         // Account screen
