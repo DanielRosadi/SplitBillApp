@@ -181,10 +181,12 @@ fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userCo
             elevation = CardDefaults.cardElevation(4.dp),
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
         ) {
+
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(9.dp),
                 verticalAlignment = Alignment.CenterVertically, //  center content vertically
                 horizontalArrangement = Arrangement.SpaceBetween // space between 3 main sections
             ) {
@@ -194,7 +196,7 @@ fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userCo
                     // modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
-                        .weight(1f) //  allow flexible width
+                        .weight(1.3f) //  allow flexible width
                         .padding(end = 8.dp)
                 )
 
@@ -211,9 +213,9 @@ fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userCo
                     // Display selected users as colored dots
                     LazyRow(
                         modifier = Modifier
-                            .weight(2f) // take up most space
+                            .weight(1.6f) // take up most space
                             .height(32.dp), // Adjust height for good dot fit
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         items(itemWithUsers.owners) { user ->
@@ -250,13 +252,14 @@ fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userCo
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .weight(1f) // share width evenly with item name
-                        .padding(start = 8.dp),
+                        .weight(1.9f) // share width evenly with item name
+                        .padding(start = 4.dp),
                     horizontalArrangement = Arrangement.Center
                 ){
 
                     Text(
-                        text = itemWithUsers.item.qty.toString() + "x" + itemWithUsers.item.price.toString(),
+                        // TODO: omit additional float 0 on price
+                        text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
                         fontSize = 18.sp,
                         modifier = Modifier.padding(16.dp),
                         style = MaterialTheme.typography.bodyLarge
