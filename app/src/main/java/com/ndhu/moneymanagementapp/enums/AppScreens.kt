@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.enums
 
+import com.ndhu.moneymanagementapp.ui.pages.PendingRequestScreen
 import java.lang.IllegalArgumentException
 
 enum class AppScreens{
@@ -13,6 +14,7 @@ enum class AppScreens{
     SelectBillOwnerScreen,
     AssignSplitsScreen,
     ContactScreen,
+    PendingRequestScreen,
     AccountScreen,
     EditProfileScreen,
     FirstLoginScreen,
@@ -35,6 +37,7 @@ enum class AppScreens{
             SelectBillOwnerScreen.name -> SelectBillOwnerScreen
             AssignSplitsScreen.name -> AssignSplitsScreen
             ContactScreen.name -> ContactScreen
+            PendingRequestScreen.name -> PendingRequestScreen
             AccountScreen.name -> AccountScreen
             EditProfileScreen.name -> EditProfileScreen
             FirstLoginScreen.name -> FirstLoginScreen
