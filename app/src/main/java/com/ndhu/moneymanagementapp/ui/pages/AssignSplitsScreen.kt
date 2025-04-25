@@ -2,8 +2,11 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -163,80 +167,126 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 }
 
 @Composable
-fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit){
-    Card (
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .padding(5.dp)
-            .clickable { // Handle click on the entire card to toggle user
-                selectedUser?.let { onToggleUser(it) }
-            }
-        ,
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
-    ) {
-        Row () {
-            Text(
-            text = itemWithUsers.item.name,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(16.dp),
-            style = MaterialTheme.typography.bodyLarge)
+fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit) {
 
-            // TODO: implement selected users here
 
-            // Display selected users as colored dots
-            LazyRow {
-                items(itemWithUsers.owners) { user ->
-                    val color = userColors[user] ?: Color.Gray
-                    UserDot(user = user, color = color)
-                }
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(5.dp)
+                .clickable { // Handle click on the entire card to toggle user
+                    selectedUser?.let { onToggleUser(it) }
+                },
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically, //  center content vertically
+                horizontalArrangement = Arrangement.SpaceBetween // space between 3 main sections
+            ) {
+                Text(
+                    text = itemWithUsers.item.name,
+                    fontSize = 18.sp,
+                    // modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .weight(1f) //  allow flexible width
+                        .padding(end = 8.dp)
+                )
 
-                // If a user is selected, show a "plus" slot
-                if (selectedUser != null && !itemWithUsers.owners.contains(selectedUser)) {
-                    item {
-                        val alreadySelected = itemWithUsers.owners.contains(selectedUser)
-                        if (!alreadySelected) {
-                            Card(
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .padding(end = 4.dp)
-                                    .clickable { onToggleUser(selectedUser) },
-                                shape = CircleShape,
-                                colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-                                elevation = CardDefaults.cardElevation(2.dp)
-                            ) {
-                                Text(
-                                    "+",
-                                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                                    fontSize = 14.sp
-                                )
+                // TODO: implement selected users here
+
+                /*
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(), // full width container
+                    contentAlignment = Alignment.Center //  center contents
+                ) {
+
+                   */
+                    // Display selected users as colored dots
+                    LazyRow(
+                        modifier = Modifier
+                            .weight(2f) // take up most space
+                            .height(32.dp), // Adjust height for good dot fit
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(itemWithUsers.owners) { user ->
+                            val color = userColors[user] ?: Color.Gray
+                            UserDot(user = user, color = color)
+                        }
+
+                        // If a user is selected, show a "plus" slot
+                        if (selectedUser != null && !itemWithUsers.owners.contains(selectedUser)) {
+                            item {
+                                val alreadySelected = itemWithUsers.owners.contains(selectedUser)
+                                if (!alreadySelected) {
+                                    Card(
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .padding(end = 4.dp)
+                                            .clickable { onToggleUser(selectedUser) },
+                                        shape = CircleShape,
+                                        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+                                        elevation = CardDefaults.cardElevation(2.dp)
+                                    ) {
+                                        Text(
+                                            "+",
+                                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
+                //}
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .weight(1f) // share width evenly with item name
+                        .padding(start = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ){
+
+                    Text(
+                        text = itemWithUsers.item.qty.toString() + "x" + itemWithUsers.item.price.toString(),
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
                 }
+
+
+
+                /*
+                Text(
+                    text = "x",
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Text(
+                    text = itemWithUsers.item.price.toString(),
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                 */
             }
 
-            Text(
-                text = itemWithUsers.item.qty.toString(),
-                fontSize = 18.sp,
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyLarge)
-
-            Text(
-                text = "x",
-                fontSize = 18.sp,
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyLarge)
-
-            Text(
-                text = itemWithUsers.item.price.toString(),
-                fontSize = 18.sp,
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyLarge)
         }
 
-    }
+
 }
 
 @Composable
@@ -283,13 +333,19 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
 
 @Composable
 fun UserDot(user: User, color: Color) {
-    Card(
+    Box(
         modifier = Modifier
             .size(24.dp)
-            .padding(end = 4.dp),
-        shape = CircleShape,
-        colors = CardDefaults.cardColors(containerColor = color),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            // .padding(end = 4.dp)
+            .background(color = color, shape = CircleShape) //  perfect circle
+            .border(1.dp, Color.Black, shape = CircleShape),
+        contentAlignment = Alignment.Center
+
+
+        ,
+        //shape = CircleShape,
+        //colors = CardDefaults.cardColors(containerColor = color),
+        //elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {}
 }
 

@@ -26,7 +26,7 @@ fun TestingScreen(context: Context, navController: NavController){
         // might need to change to FRIEND manually in firebase
 
         // uncomment when not used
-        // var contactsName = listOf("user9", "user8", "user1")
+        // var contactsName = listOf("user9", "user8", "user1", "user2", "user3", "user4", "user5")
         var contactsName = emptyList<String>()
         Button(onClick = { populateContact(context, contactsName) },
             modifier = Modifier.width(180.dp).height(70.dp)){

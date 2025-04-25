@@ -61,13 +61,14 @@ fun Home(context: Context, navController: NavController) {
             }
         }
 
-        /*
+/*
         Button(onClick = { navController.navigate(route = AppScreens.TestingScreen.name) },
             modifier = Modifier.width(180.dp).height(70.dp)){
             Text(text = "Testing Screen (Temp)")
         }
 
-         */
+ */
+
 
 
         Column(
