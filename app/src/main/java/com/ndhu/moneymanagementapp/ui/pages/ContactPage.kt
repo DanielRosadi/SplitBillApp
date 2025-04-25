@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,11 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.enums.AppScreens
 
 @Composable
 fun ContactPage(context: Context, navController: NavController) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -45,31 +49,34 @@ fun ContactPage(context: Context, navController: NavController) {
                     modifier = Modifier.size(32.dp)
                 )
             }
+
             Spacer(modifier = Modifier.width(8.dp))
+
             Text(text = "Contacts", fontSize = 22.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Search Box
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-                .padding(12.dp)
-        ) {
-            Text (text = "Username", fontSize = 18.sp)
-        }
+        SearchBox()
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Contact List (temporary)
         val contacts = listOf("Contact 1", "Contact 2", "Contact 3")
 
-        LazyColumn(contentPadding = PaddingValues(5.dp)) {
-            items(contacts) { contact ->
-                ContactItem(name = contact)
-                Spacer(modifier = Modifier.height(8.dp))
+        // Use Card to make rounded corner for LazyColumn
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFBDBDBD)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            LazyColumn(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(contacts) { contact ->
+                    ContactItem(contact)
+                }
             }
         }
 
@@ -84,15 +91,14 @@ fun ContactPage(context: Context, navController: NavController) {
 
         // Pending Request Button
         Button(
-            onClick = { /* TODO: Go to Pending Request Screen */ },
+            onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
-                .border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
+                .height(55.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black
+                containerColor = Color(0xFF009669),
+                contentColor = Color.White
             )
         ) {
             Text(text = "Pending Request", fontSize = 16.sp)
@@ -105,12 +111,11 @@ fun ContactPage(context: Context, navController: NavController) {
             onClick = { /* TODO: Pop Up Add Friend  */ },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
-                .border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
+                .height(55.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black
+                containerColor = Color(0xFF009669),
+                contentColor = Color.White
             )
         ) {
             Text(text = "Add New Contact", fontSize = 16.sp)
@@ -121,29 +126,28 @@ fun ContactPage(context: Context, navController: NavController) {
 @Composable
 fun ContactItem(name: String) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(Color.White),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier.fillMaxWidth().height(80.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
+            modifier = Modifier.fillMaxSize().padding(20.dp)
         ) {
             Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
+                modifier = Modifier.size(32.dp).clip(CircleShape)
             ) {
+                // Temporary Icon -> will change to image later
                 Icon(
                     Icons.Filled.Person,
                     contentDescription = "Profile Picture",
-                    modifier = Modifier.size(50.dp),
+                    modifier = Modifier.size(40.dp),
                     tint = Color.Gray
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = name, fontSize = 18.sp)
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
         }
     }
 }

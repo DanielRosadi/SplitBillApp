@@ -102,7 +102,8 @@ fun SignUp(context : Context, navController: NavController) {
                     controller.registerUser(
                         username.text.toString(),
                         email.text.toString(),
-                        userPassword.text.toString()
+                        userPassword.text.toString(),
+                        ""
                     )
                     username = TextFieldValue("")
                     email = TextFieldValue("")

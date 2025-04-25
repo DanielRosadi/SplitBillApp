@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.seeds
 
+import androidx.collection.buildIntObjectMap
 import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.models.Store
@@ -25,10 +26,9 @@ object Seeders {
             User(
                 id = UUID.randomUUID().toString(),
                 username = "user${index + 1}",
-                balance = (1000..5000).random(),
+                bio = "Hi my name is user${index+1}",
                 email = "user${index + 1}@example.com",
                 password = Util.passwordEncryption("test_1234"),
-                createdAt = Timestamp.now()
             )
         }
 
