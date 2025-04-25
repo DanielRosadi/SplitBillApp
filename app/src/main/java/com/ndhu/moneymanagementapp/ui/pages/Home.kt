@@ -66,7 +66,9 @@ fun Home(context: Context, navController: NavController) {
             modifier = Modifier.width(180.dp).height(70.dp)){
             Text(text = "Testing Screen (Temp)")
         }
+
          */
+
 
         Column(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),

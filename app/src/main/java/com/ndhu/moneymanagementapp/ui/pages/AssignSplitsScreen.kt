@@ -2,7 +2,6 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,11 +29,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,7 +47,6 @@ import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.models.User
-import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 
 @Composable
@@ -63,13 +63,18 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
     val listParticipants = viewModel.billParticipants
     val listItems = viewModel.itemDetailList
 
+    var itemAndUsersList = listItems.map { item ->
+        ItemWithUsersList(item = item, owners = mutableStateListOf())
+    }.toMutableStateList()
 
-    ComposeAssignSplits(context, listParticipants, listItems, navController, splitBillController, viewModel)
+    val userColors = remember { mutableStateMapOf<User?, Color>() } // <-- HOISTED
+
+    ComposeAssignSplits(context, listParticipants, itemAndUsersList, navController, splitBillController, viewModel, userColors)
 }
 
 @Composable
-fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItems: MutableList<ItemDetail>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel){
-    val userColors = remember { mutableStateMapOf<User?, Color>() }
+fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItemsAndOwners: MutableList<ItemWithUsersList>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel, userColors: SnapshotStateMap<User?, Color>){
+    // val userColors = remember { mutableStateMapOf<User?, Color>() }
     var selectedUser by remember { mutableStateOf<User?>(null) }
 
     UniformDesignScaffold(
@@ -105,8 +110,13 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                     // chunked groups items into sets of 3 for each row
                     // it also automatically handles when the list is not perfectly divisible by 3
-                    items(listItems) { item ->
-                        ListItemSplits(item)
+                    items(listItemsAndOwners) { itemAndUsers ->
+                        ListItemSplits(
+                            itemWithUsers = itemAndUsers,
+                            selectedUser = selectedUser,
+                            userColors = userColors,
+                            onToggleUser = { user -> toggleUser(user, itemAndUsers) }
+                        )
                     }
 
                 }
@@ -153,26 +163,62 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 }
 
 @Composable
-fun ListItemSplits(itemDetail: ItemDetail){
+fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit){
     Card (
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
-            .padding(5.dp),
+            .padding(5.dp)
+            .clickable { // Handle click on the entire card to toggle user
+                selectedUser?.let { onToggleUser(it) }
+            }
+        ,
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
     ) {
         Row () {
             Text(
-            text = itemDetail.name,
+            text = itemWithUsers.item.name,
             fontSize = 18.sp,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge)
 
             // TODO: implement selected users here
 
+            // Display selected users as colored dots
+            LazyRow {
+                items(itemWithUsers.owners) { user ->
+                    val color = userColors[user] ?: Color.Gray
+                    UserDot(user = user, color = color)
+                }
+
+                // If a user is selected, show a "plus" slot
+                if (selectedUser != null && !itemWithUsers.owners.contains(selectedUser)) {
+                    item {
+                        val alreadySelected = itemWithUsers.owners.contains(selectedUser)
+                        if (!alreadySelected) {
+                            Card(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .padding(end = 4.dp)
+                                    .clickable { onToggleUser(selectedUser) },
+                                shape = CircleShape,
+                                colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+                                elevation = CardDefaults.cardElevation(2.dp)
+                            ) {
+                                Text(
+                                    "+",
+                                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             Text(
-                text = itemDetail.qty.toString(),
+                text = itemWithUsers.item.qty.toString(),
                 fontSize = 18.sp,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge)
@@ -184,7 +230,7 @@ fun ListItemSplits(itemDetail: ItemDetail){
                 style = MaterialTheme.typography.bodyLarge)
 
             Text(
-                text = itemDetail.price.toString(),
+                text = itemWithUsers.item.price.toString(),
                 fontSize = 18.sp,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge)
@@ -234,6 +280,29 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
         )
     }
 }
+
+@Composable
+fun UserDot(user: User, color: Color) {
+    Card(
+        modifier = Modifier
+            .size(24.dp)
+            .padding(end = 4.dp),
+        shape = CircleShape,
+        colors = CardDefaults.cardColors(containerColor = color),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {}
+}
+
+
+fun toggleUser(user: User, item: ItemWithUsersList) {
+    if (item.owners.contains(user)) {
+        item.owners.remove(user)
+    } else {
+        item.owners.add(user)
+    }
+}
+
+
 
 fun generateDistinctColor(index: Int, total: Int): Color {
     // using list participants index and list size, we can generate distinct colors
