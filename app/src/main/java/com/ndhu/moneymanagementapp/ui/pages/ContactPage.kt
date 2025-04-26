@@ -18,8 +18,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,11 +55,14 @@ fun ContactPage(context: Context, navController: NavController) {
         listFriends.addAll(contactsFromDb) // Add fresh new data
     }
 
-    ComposeContactScreen(context, navController, userController, listFriends)
+    ComposeContactScreen(context, navController, contactController, userController, listFriends)
 }
 
 @Composable
-fun ComposeContactScreen(context: Context, navController: NavController, userController: UserController, contacts: List<Contact>) {
+fun ComposeContactScreen(context: Context, navController: NavController, contactController: ContactController, userController: UserController, contacts: SnapshotStateList<Contact>) {
+
+    var showDialogAddFriend by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,7 +97,7 @@ fun ComposeContactScreen(context: Context, navController: NavController, userCon
         Card(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFBDBDBD)),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().height(400.dp)
         ) {
             LazyColumn(
                 modifier = Modifier.padding(16.dp),
@@ -129,7 +137,7 @@ fun ComposeContactScreen(context: Context, navController: NavController, userCon
 
         // Add Friend Button
         Button(
-            onClick = { /* TODO: Pop Up Add Friend  */ },
+            onClick = { showDialogAddFriend = true },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(55.dp),
@@ -140,6 +148,10 @@ fun ComposeContactScreen(context: Context, navController: NavController, userCon
             )
         ) {
             Text(text = "Add New Contact", fontSize = 16.sp)
+        }
+
+        if (showDialogAddFriend) {
+            PopUpAddFriend(context = context, contactController = contactController, userController = userController, onDismiss = { showDialogAddFriend = false }, listFriends = contacts)
         }
     }
 }
@@ -181,3 +193,51 @@ fun ContactItem(context: Context, contact: Contact, userController: UserControll
         }
     } // Card
 }
+
+/*
+@Composable
+fun PopUpAddContact(context: Context, contactController: ContactController, userController: UserController, onDismiss: () -> Unit, listFriends: SnapshotStateList<Contact>) {
+    var userName by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Username") },
+        text = {
+            Column {
+                TextField(
+                    value = userName,
+                    onValueChange = { userName = it },
+                    label = { /*Text("Username")*/ }
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    // TODO: try rememberCoroutineScope(), coroutineScope.launch{}
+                    runBlocking {
+                        userController.searchUserByUserName(context, userName)
+                            ?.let { contactController.addContact(context = context, it.id) }
+                    }
+
+                    runBlocking {
+                        listFriends.clear()
+                        listFriends.addAll(contactController.getCurrUserLoginContact(context))
+                    }
+
+                    onDismiss()
+                },
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+ */
