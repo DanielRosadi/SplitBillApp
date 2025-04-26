@@ -24,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -182,8 +181,8 @@ fun ContactItem(context: Context, contact: Contact, userController: UserControll
             Spacer(modifier = Modifier.width(16.dp))
             // Text(text = contact.userId2, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
 
-            var userId = contact.userId2
-            var userObject = runBlocking{
+            val userId = contact.userId2
+            val userObject = runBlocking{
                 userController.searchUserByUserId(context, userId)
             }
 
