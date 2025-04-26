@@ -1,8 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +17,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,20 +29,43 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
+import com.ndhu.moneymanagementapp.controllers.ContactController
+import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.models.Contact
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun ContactPage(context: Context, navController: NavController) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
+
+    val contactController = ContactController()
+    val userController = UserController()
+    val listFriends = remember { mutableStateListOf<Contact>() }
+
+    // Fetch user's contacts from Firebase and display them when the screen is launched
+    // Unit = "key" to make LaunchedEffect run only once
+    LaunchedEffect(Unit) {
+        val contactsFromDb = contactController.getCurrUserLoginContact(context)
+        listFriends.clear() // Clear old data
+        listFriends.addAll(contactsFromDb) // Add fresh new data
+    }
+
+    ComposeContactScreen(context, navController, userController, listFriends)
+}
+
+@Composable
+fun ComposeContactScreen(context: Context, navController: NavController, userController: UserController, contacts: List<Contact>) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
             IconButton(
-                onClick = { navController.navigate(route = AppScreens.HomeScreen.name )}
+                onClick = { navController.navigate(route = AppScreens.HomeScreen.name) }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -61,9 +85,6 @@ fun ContactPage(context: Context, navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Contact List (temporary)
-        val contacts = listOf("Contact 1", "Contact 2", "Contact 3")
-
         // Use Card to make rounded corner for LazyColumn
         Card(
             shape = RoundedCornerShape(24.dp),
@@ -75,7 +96,7 @@ fun ContactPage(context: Context, navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(contacts) { contact ->
-                    ContactItem(contact)
+                    ContactItem(context, contact, userController)
                 }
             }
         }
@@ -124,7 +145,7 @@ fun ContactPage(context: Context, navController: NavController) {
 }
 
 @Composable
-fun ContactItem(name: String) {
+fun ContactItem(context: Context, contact: Contact, userController: UserController) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(Color.White),
@@ -138,7 +159,7 @@ fun ContactItem(name: String) {
             Box(
                 modifier = Modifier.size(32.dp).clip(CircleShape)
             ) {
-                // Temporary Icon -> will change to image later
+                // TODO: Change Icon to Image later
                 Icon(
                     Icons.Filled.Person,
                     contentDescription = "Profile Picture",
@@ -147,7 +168,16 @@ fun ContactItem(name: String) {
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
+            // Text(text = contact.userId2, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
+
+            var userId = contact.userId2
+            var userObject = runBlocking{
+                userController.searchUserByUserId(context, userId)
+            }
+
+            if (userObject != null) {
+                Text(text = userObject.username, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
+            }
         }
-    }
+    } // Card
 }
