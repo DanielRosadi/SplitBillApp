@@ -49,6 +49,10 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +66,10 @@ fun EditProfile(context: Context, navController: NavController) {
 
     LaunchedEffect(Unit) {
         user = userController.getOnboardUser(context)
+        if (user != null) {
+            username = TextFieldValue(user!!.username)
+            email = TextFieldValue(user!!.email)
+        }
     }
 
     Column(
@@ -154,8 +162,17 @@ fun EditProfile(context: Context, navController: NavController) {
 
             Button(
                 onClick = {
-                    //TODO: Modify pop back stack with the logic of saving the username, email and bio into the database.
-                    navController.popBackStack()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        userController.updateUserInformation(
+                            context,
+                            username.text,
+                            email.text,
+                            bio.text
+                        )
+                        withContext(Dispatchers.Main) {
+                            navController.popBackStack()
+                        }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
                 shape = RoundedCornerShape(8.dp),
