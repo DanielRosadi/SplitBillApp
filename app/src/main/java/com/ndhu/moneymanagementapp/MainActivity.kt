@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                 // ListStoresPage()
                 // AccountScreen()
                 AppNavigation(context)
-//                LogIn(context, NavController(context))
+                // LogIn(context, NavController(context))
             }
         }
     }
