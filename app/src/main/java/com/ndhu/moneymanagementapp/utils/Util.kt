@@ -5,6 +5,11 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import at.favre.lib.crypto.bcrypt.BCrypt
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.util.Log
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 object Util {
 
@@ -41,6 +46,25 @@ object Util {
         val sharedPreferences: SharedPreferences =
             context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         sharedPreferences.edit().remove(KEY_USER_ID).apply()
+    }
+
+    fun processImage(scannedText : String, photoBitmap: Bitmap) : String {
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+        val image = photoBitmap.let {
+            InputImage.fromBitmap(it, 0)
+        }
+
+        var result = ""
+
+        image.let {
+            recognizer.process(it).addOnSuccessListener { scannedText ->
+                result = scannedText.text
+            }.addOnFailureListener { exception ->
+                Log.e("KEY", exception.toString())
+            }
+        }
+        return result
     }
 
 }
