@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -51,7 +50,10 @@ import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.models.User
+import com.ndhu.moneymanagementapp.payloads.ItemAndOwner
+import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AssignSplitsScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
@@ -148,6 +150,19 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                         splitBillController.addSplitBill(context = context, request = splitBillRequest)
                     }
                      */
+
+                    // TODO: need to discuss on qty for ItemAndOwner
+                    val itemIdAndOwners = mapItemsToItemAndOwners(listItemsAndOwners)
+
+
+                    val splitBillRequest = SplitBillRequest(
+                        billOwnerId = viewModel.getBillOwnerId(),
+                        itemIdAndOwners = itemIdAndOwners
+                    )
+
+                    runBlocking {
+                        splitBillController.addSplitBill(context = context, request = splitBillRequest)
+                    }
 
                 },
                     modifier = Modifier
@@ -333,6 +348,21 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
         )
     }
 }
+
+fun mapItemsToItemAndOwners(items: List<ItemWithUsersList>): List<ItemAndOwner> {
+    // flatMap transform one item into many items. in our case, one item produces multiple ItemAndOwner.
+    // and then flatMap flatten all produced items into one list
+    return items.flatMap { itemWithUsers ->
+        itemWithUsers.owners.map { user ->
+            ItemAndOwner(
+                itemId = itemWithUsers.item.id,
+                ownerId = user.id,
+                qty = itemWithUsers.item.qty
+            )
+        }
+    }
+}
+
 
 @Composable
 fun UserDot(user: User, color: Color) {
