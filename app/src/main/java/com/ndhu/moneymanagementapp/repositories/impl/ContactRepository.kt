@@ -30,7 +30,7 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
 
     override suspend fun getUserContact(userId : String) : List<Contact> {
         val contacts = mutableListOf<Contact>()
-        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).whereEqualTo("userId1", userId).get().await()
+        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).whereEqualTo("userId1", userId).whereEqualTo("friendStatus", FriendStatus.FRIEND.name).get().await()
         if(!querySnapshot.isEmpty) {
             for (document in querySnapshot.documents) {
                 document.toObject(Contact::class.java)?.let { contacts.add(it) }
