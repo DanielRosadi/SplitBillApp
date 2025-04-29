@@ -2,13 +2,17 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.AlertDialog
@@ -37,11 +42,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
@@ -49,8 +62,19 @@ import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.*
 
+
 @Composable
 fun ListStorePage(context : Context, navController: NavController, viewModel: SharedViewModel){
+    // Get the actual window size (container size)
+    val windowInfo = LocalWindowInfo.current
+    val screenWidthPx = windowInfo?.containerSize?.width ?: 0
+    val screenHeightPx = windowInfo?.containerSize?.height ?: 0
+
+    // Convert pixels to Dp
+    val screenWidth = with(LocalDensity.current) { screenWidthPx.toDp() }
+    val screenHeight = with(LocalDensity.current) { screenHeightPx.toDp() }
+
+
     GetStoreListFromDatabase(context, navController, viewModel)
 }
 
@@ -83,71 +107,125 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
     var showDialogAddStore by remember { mutableStateOf(false) }
 
     Scaffold (
-        topBar = {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
-                }
-                Spacer(modifier = Modifier.width(50.dp))
-                Text("List of Store", fontSize = 40.sp, fontWeight = FontWeight.Bold)
-            }
-        }
     )
     { paddingValues ->
 
-        Column (modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(paddingValues)
-            .padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Box (
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
 
-            Spacer(modifier = Modifier.height(10.dp))
+            // Background Image
+            BackgroundImage()
 
-            SearchBox()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(paddingValues)
+                    .padding(10.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            Spacer(modifier = Modifier.height(10.dp))
+                TitleText()
 
-            LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
+                Spacer(modifier = Modifier.height(60.dp))
 
-                items(data) { item ->
-                    ListDataStore(storeController, item, navController, data, viewModel)
+                // White Box (Content Card)
+                Column (modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                    .background(Color(0xFFF0F0F0))
+
+
+                ) {// TODO: Search func
+
+                    // Content Top Bar
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.Start,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        IconButton(onClick = { navController.popBackStack() }) {
+//                            Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+//                        }
+//                        Spacer(modifier = Modifier.width(10.dp))
+//
+//                        Column (
+//                            modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight(),
+//                            verticalArrangement = Arrangement.Center,
+//                            horizontalAlignment = Alignment.CenterHorizontally
+//                        ) {
+//                            Text("List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+//                            SearchBox()
+//                        }
+//
+//                    }
+
+                    // Content
+                    Column(modifier = Modifier.weight(1f)
+                        .fillMaxSize()
+                        .background(Color(0xFFD9D9D9))
+
+                    ){
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        LazyColumn(
+                            modifier = Modifier.weight(2f).fillMaxWidth().fillMaxHeight(),
+                            contentPadding = PaddingValues(5.dp)) {
+
+                            items(data) { item ->
+                                ListDataStore(storeController, item, navController, data, viewModel)
+                            }
+
+                        }
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            // we no longer need delete item, keep it for possible future change
+                            /*
+                            Button(onClick = {navController.navigate(route = AppScreens.DeleteStoresScreen.name)}, modifier = Modifier
+                                .height(60.dp)
+                                .fillMaxWidth()
+                                .weight(1f)) {
+                                Text(text = "Delete (Temp)")
+                            }
+                             */
+
+                            Button(
+                                onClick = { showDialogAddStore = true },
+                                modifier = Modifier
+                                    .height(60.dp)
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
+                                Text(text = "Add Store")
+                            }
+
+                            if (showDialogAddStore) {
+                                PopUpAddStore(
+                                    storeController = storeController,
+                                    onDismiss = { showDialogAddStore = false },
+                                    data,
+                                    viewModel
+                                )
+                            }
+
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+
+
                 }
 
             }
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                // we no longer need delete item, keep it for possible future change
-                /*
-                Button(onClick = {navController.navigate(route = AppScreens.DeleteStoresScreen.name)}, modifier = Modifier
-                    .height(60.dp)
-                    .fillMaxWidth()
-                    .weight(1f)) {
-                    Text(text = "Delete (Temp)")
-                }
-                 */
-
-                Button(onClick = { showDialogAddStore = true },
-                    modifier = Modifier
-                    .height(60.dp)
-                    .fillMaxWidth()
-                    .weight(1f)) {
-                    Text(text = "Add Store")
-                }
-
-                if (showDialogAddStore){
-                    PopUpAddStore(storeController = storeController,
-                        onDismiss = {showDialogAddStore = false},
-                        data,
-                        viewModel
-                    )
-                }
-
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
         }
 
     }
