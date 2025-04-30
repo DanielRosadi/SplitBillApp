@@ -98,7 +98,142 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
     }
 
     // perform UI composition
-    ComposeListStore(storeController, stores, navController, viewModel)
+    // ComposeListStore(storeController, stores, navController, viewModel)
+    IncrementalDesignTest(storeController, stores, navController, viewModel)
+}
+
+@Composable
+fun IncrementalDesignTest(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel) {
+    var showDialogAddStore by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        // Background Image
+        BackgroundImage()
+
+        // Full Page
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+            //.fillMaxHeight()
+            // .padding(paddingValues)
+            //.padding(10.dp)
+            ,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(30.dp))
+
+            TitleText()
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // White Box
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                    .background(Color(0xFFF0F0F0))
+            )
+            {
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // Content Top Bar
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+                        SearchBox()
+                    }
+
+                    Spacer(modifier = Modifier.width(50.dp))
+
+                }
+
+
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth().weight(4f),
+                    contentPadding = PaddingValues(5.dp)
+                ) {
+
+                    // items(data) { item ->
+                    items(data) { item ->
+                        ListDataStore(storeController, item, navController, data, viewModel)
+                    }
+
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // we no longer need delete item, keep it for possible future change
+                    /*
+                Button(onClick = {navController.navigate(route = AppScreens.DeleteStoresScreen.name)}, modifier = Modifier
+                    .height(60.dp)
+                    .fillMaxWidth()
+                    .weight(1f)) {
+                    Text(text = "Delete (Temp)")
+                }
+                 */
+
+                    Button(
+                        onClick = { showDialogAddStore = true },
+                        modifier = Modifier
+                            .height(60.dp)
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        Text(text = "Add Store")
+                    }
+
+                    if (showDialogAddStore) {
+                        PopUpAddStore(
+                            storeController = storeController,
+                            onDismiss = { showDialogAddStore = false },
+                            data,
+                            viewModel
+                        )
+                    }
+
+                }
+            }
+    }
+}
+}
+
+@Composable
+fun LazyColumnTest(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel){
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+        contentPadding = PaddingValues(5.dp)) {
+
+        // items(data) { item ->
+        items(data) { item ->
+            ListDataStore(storeController, item, navController, data, viewModel)
+        }
+
+    }
 }
 
 @Composable
@@ -106,24 +241,29 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
 
     var showDialogAddStore by remember { mutableStateOf(false) }
 
+    /*
     Scaffold (
     )
     { paddingValues ->
+        */
 
-        Box (
+        Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .fillMaxHeight()
         ) {
 
             // Background Image
             BackgroundImage()
 
+            // Full Page
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(paddingValues)
-                    .padding(10.dp),
+                    //.fillMaxHeight()
+                    // .padding(paddingValues)
+                    //.padding(10.dp)
+                ,
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -135,7 +275,8 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                 // White Box (Content Card)
                 Column (modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    // .fillMaxHeight()
+                    //.weight(1f)
                     .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                     .background(Color(0xFFF0F0F0))
 
@@ -143,39 +284,42 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                 ) {// TODO: Search func
 
                     // Content Top Bar
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.Start,
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        IconButton(onClick = { navController.popBackStack() }) {
-//                            Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
-//                        }
-//                        Spacer(modifier = Modifier.width(10.dp))
-//
-//                        Column (
-//                            modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight(),
-//                            verticalArrangement = Arrangement.Center,
-//                            horizontalAlignment = Alignment.CenterHorizontally
-//                        ) {
-//                            Text("List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-//                            SearchBox()
-//                        }
-//
-//                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Column (
+                            modifier = Modifier.fillMaxWidth().weight(1f),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+                            SearchBox()
+                        }
+
+                    }
 
                     // Content
-                    Column(modifier = Modifier.weight(1f)
-                        .fillMaxSize()
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        //.fillMaxHeight()
+                        // .weight(1f)
                         .background(Color(0xFFD9D9D9))
 
                     ){
                         Spacer(modifier = Modifier.height(10.dp))
 
                         LazyColumn(
-                            modifier = Modifier.weight(2f).fillMaxWidth().fillMaxHeight(),
+                            modifier = Modifier.fillMaxWidth().weight(1f),
                             contentPadding = PaddingValues(5.dp)) {
 
+                            // items(data) { item ->
                             items(data) { item ->
                                 ListDataStore(storeController, item, navController, data, viewModel)
                             }
@@ -228,7 +372,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
             }
         }
 
-    }
+    //}
 
 
 }
