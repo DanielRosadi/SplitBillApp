@@ -72,15 +72,14 @@ import kotlinx.coroutines.*
 
 @Composable
 fun ListStorePage(context : Context, navController: NavController, viewModel: SharedViewModel){
-    // Get the actual window size (container size)
-    val windowInfo = LocalWindowInfo.current
-    val screenWidthPx = windowInfo?.containerSize?.width ?: 0
-    val screenHeightPx = windowInfo?.containerSize?.height ?: 0
-
-    // Convert pixels to Dp
-    val screenWidth = with(LocalDensity.current) { screenWidthPx.toDp() }
-    val screenHeight = with(LocalDensity.current) { screenHeightPx.toDp() }
-
+//    // Get the actual window size (container size)
+//    val windowInfo = LocalWindowInfo.current
+//    val screenWidthPx = windowInfo?.containerSize?.width ?: 0
+//    val screenHeightPx = windowInfo?.containerSize?.height ?: 0
+//
+//    // Convert pixels to Dp
+//    val screenWidth = with(LocalDensity.current) { screenWidthPx.toDp() }
+//    val screenHeight = with(LocalDensity.current) { screenHeightPx.toDp() }
 
     GetStoreListFromDatabase(context, navController, viewModel)
 }
@@ -105,12 +104,11 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
     }
 
     // perform UI composition
-    // ComposeListStore(storeController, stores, navController, viewModel)
-    IncrementalDesignTest(storeController, stores, navController, viewModel)
+    ComposeListStore(storeController, stores, navController, viewModel)
 }
 
 @Composable
-fun IncrementalDesignTest(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel) {
+fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel) {
     var showDialogAddStore by remember { mutableStateOf(false) }
 
     Box(
@@ -149,11 +147,9 @@ fun IncrementalDesignTest(storeController: StoreController, data: SnapshotStateL
             )
             {
 
-                Spacer(modifier = Modifier.height(0.dp))
-
                 // Content Top Bar
+                // TODO: search func
                 ContentTopBar(navController = navController, topBarText = "List of Store")
-
 
                 Column(
                     modifier = Modifier
@@ -247,153 +243,7 @@ fun LazyColumnTest(storeController: StoreController, data: SnapshotStateList<Sto
 
     }
 }
-/*
-@Composable
-fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel){
 
-    var showDialogAddStore by remember { mutableStateOf(false) }
-
-    /*
-    Scaffold (
-    )
-    { paddingValues ->
-        */
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-        ) {
-
-            // Background Image
-            BackgroundImage()
-
-            // Full Page
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    //.fillMaxHeight()
-                    // .padding(paddingValues)
-                    //.padding(10.dp)
-                ,
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                TitleText()
-
-                Spacer(modifier = Modifier.height(60.dp))
-
-                // White Box (Content Card)
-                Column (modifier = Modifier
-                    .fillMaxWidth()
-                    // .fillMaxHeight()
-                    //.weight(1f)
-                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                    .background(Color(0xFFF0F0F0))
-
-
-                ) {// TODO: Search func
-
-                    // Content Top Bar
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
-                        }
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                        Column (
-                            modifier = Modifier.fillMaxWidth().weight(1f),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text("List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-                            SearchBox()
-                        }
-
-                    }
-
-                    // Content
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        //.fillMaxHeight()
-                        // .weight(1f)
-                        .background(Color(0xFFD9D9D9))
-
-                    ){
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth().weight(1f).background(Color.White),
-                            contentPadding = PaddingValues(5.dp)) {
-
-                            // items(data) { item ->
-                            items(data) { item ->
-                                ListDataStore(storeController, item, navController, data, viewModel)
-                            }
-
-                        }
-
-                        Spacer(modifier = Modifier.height(30.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                //.fillMaxHeight()
-                            ,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            // we no longer need delete item, keep it for possible future change
-                            /*
-                            Button(onClick = {navController.navigate(route = AppScreens.DeleteStoresScreen.name)}, modifier = Modifier
-                                .height(60.dp)
-                                .fillMaxWidth()
-                                .weight(1f)) {
-                                Text(text = "Delete (Temp)")
-                            }
-                             */
-
-                            Button(
-                                onClick = { showDialogAddStore = true },
-                                modifier = Modifier
-                                    //  .height(60.dp)
-                                    .fillMaxWidth()
-                                    .weight(1f)
-                            ) {
-                                Text(text = "Add Store")
-                            }
-
-                            if (showDialogAddStore) {
-                                PopUpAddStore(
-                                    storeController = storeController,
-                                    onDismiss = { showDialogAddStore = false },
-                                    data,
-                                    viewModel
-                                )
-                            }
-
-                        }
-
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-
-
-                }
-
-            }
-        }
-
-    //}
-
-
-}
-
- */
 
 @Composable
 fun ListDataStore(storeController: StoreController, storeObject: Store, navController: NavController, data: SnapshotStateList<Store>, viewModel: SharedViewModel) {
@@ -468,6 +318,7 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
     }
 }
 
+// TODO: rework design
 @Composable
 fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedViewModel) {
     var storeName by remember { mutableStateOf("") }
@@ -543,7 +394,7 @@ fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, store
 
 }
 
-
+// TODO: rework design
 @Composable
 fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedViewModel) {
     var storeName by remember { mutableStateOf("") }

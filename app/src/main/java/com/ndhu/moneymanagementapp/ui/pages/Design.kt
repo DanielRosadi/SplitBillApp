@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -178,20 +179,19 @@ fun ContentTopBar(navController: NavController, topBarText: String) {
 
 /*
 @Composable
-fun ContentCard(){
+fun ContentCard( content: @Composable ColumnScope.() -> Unit){
     // White Box
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .weight(0.8f)
-            .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-            .background(Color(0xFFF0F0F0))
-            .padding(start = 24.dp, top = 48.dp, bottom = 48.dp, end = 24.dp)
+            .fillMaxHeight()
+            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            .background(Color(0xFFD9D9D9))
+            .padding(10.dp)
     ) {
 
     }
 
 }
-
 
  */
