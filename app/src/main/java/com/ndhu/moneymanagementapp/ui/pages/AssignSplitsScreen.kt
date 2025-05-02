@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
@@ -49,6 +50,7 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
+import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemAndOwner
 import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
@@ -118,6 +120,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                     // it also automatically handles when the list is not perfectly divisible by 3
                     items(listItemsAndOwners) { itemAndUsers ->
                         ListItemSplits(
+                            navController = navController,
                             itemWithUsers = itemAndUsers,
                             selectedUser = selectedUser,
                             userColors = userColors,
@@ -182,8 +185,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 }
 
 @Composable
-fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit) {
-
+fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit) {
 
         Card(
             modifier = Modifier
@@ -271,6 +273,14 @@ fun ListItemSplits(itemWithUsers: ItemWithUsersList, selectedUser: User?, userCo
                         .padding(start = 4.dp),
                     horizontalArrangement = Arrangement.Center
                 ){
+                    // TODO: rework design for custom quantity (move to rightmost, use pencil icon)
+                    Button(
+                        onClick = { navController.navigate(route = AppScreens.SplitItemScreen.name) },
+                        modifier = Modifier.width(70.dp).height(70.dp),
+                        shape = RoundedCornerShape(50.dp)
+                    ) {
+                        Text(text = "C", fontSize = 30.sp) // Custom quantity
+                    }
 
                     Text(
                         // TODO: omit additional float 0 on price
