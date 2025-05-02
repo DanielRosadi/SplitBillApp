@@ -50,6 +50,10 @@ val sensationLightFont = FontFamily(
     Font(R.font.sensation_light, FontWeight.Light)
 )
 
+val surannaFont = FontFamily(
+    Font(R.font.suranna_regular, FontWeight.Normal),
+)
+
 // Background Image used in most pages
 @Composable
 fun BackgroundImage() {
@@ -87,7 +91,7 @@ fun TitleText(){
         )
     }
 }
-
+/*
 @Composable
 fun ContentTopBar(navController: NavController, topBarText: String){
     Row(
@@ -109,6 +113,58 @@ fun ContentTopBar(navController: NavController, topBarText: String){
             SearchBox()
         }
 
+    }
+}
+ */
+
+
+@Composable
+fun ContentTopBar(navController: NavController, topBarText: String) {
+    /*
+    Content Top Bar
+    */
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(55.dp))
+
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+            }
+        }
+
+        Spacer(modifier = Modifier.width(5.dp))
+
+        Column(
+            modifier = Modifier.weight(10f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = topBarText,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = surannaFont
+            )
+            SearchBox()
+        }
+
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.width(40.dp))
+        }
     }
 }
 

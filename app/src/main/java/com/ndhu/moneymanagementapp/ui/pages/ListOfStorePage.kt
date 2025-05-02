@@ -144,28 +144,7 @@ fun IncrementalDesignTest(storeController: StoreController, data: SnapshotStateL
                 Spacer(modifier = Modifier.width(10.dp))
 
                 // Content Top Bar
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
-                    }
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("List of Store", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-                        SearchBox()
-                    }
-
-                    Spacer(modifier = Modifier.width(50.dp))
-
-                }
+                ContentTopBar(navController = navController, topBarText = "List of Store")
 
 
 
@@ -221,6 +200,7 @@ fun IncrementalDesignTest(storeController: StoreController, data: SnapshotStateL
     }
 }
 }
+
 
 @Composable
 fun LazyColumnTest(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel){
