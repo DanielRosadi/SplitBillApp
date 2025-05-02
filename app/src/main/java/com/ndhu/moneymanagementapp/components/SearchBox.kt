@@ -35,7 +35,7 @@ fun SearchBox() {
     Box(
         modifier = Modifier
             .width(300.dp)
-            .padding(8.dp) // <-- CHANGES: padding here instead
+            .padding(8.dp)
     ){
         TextField(
             value = query,

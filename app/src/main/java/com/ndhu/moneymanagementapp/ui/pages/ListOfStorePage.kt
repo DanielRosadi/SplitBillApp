@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -43,7 +45,12 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -136,35 +143,50 @@ fun IncrementalDesignTest(storeController: StoreController, data: SnapshotStateL
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                    .background(Color(0xFFF0F0F0))
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color(0xFFD9D9D9))
+                    .padding(10.dp)
             )
             {
 
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.height(0.dp))
 
                 // Content Top Bar
                 ContentTopBar(navController = navController, topBarText = "List of Store")
 
 
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(7f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(darkGrey)
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth().weight(4f),
-                    contentPadding = PaddingValues(5.dp)
-                ) {
+                ){
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        contentPadding = PaddingValues(5.dp)
+                    ) {
 
-                    // items(data) { item ->
-                    items(data) { item ->
-                        ListDataStore(storeController, item, navController, data, viewModel)
+                        // items(data) { item ->
+                        items(data) { item ->
+                            ListDataStore(storeController, item, navController, data, viewModel)
+                        }
+
                     }
 
                 }
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.fillMaxHeight()
+                        .weight(1f)
+                        .padding(2.dp)
+                    ,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // we no longer need delete item, keep it for possible future change
                     /*
@@ -179,9 +201,19 @@ fun IncrementalDesignTest(storeController: StoreController, data: SnapshotStateL
                     Button(
                         onClick = { showDialogAddStore = true },
                         modifier = Modifier
-                            .height(60.dp)
+                            //.height(60.dp)
                             .fillMaxWidth()
-                            .weight(1f)
+                            .fillMaxHeight()
+
+                            //.weight(1f)
+                        ,
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonColors(
+                            containerColor = green,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.White
+                        )
                     ) {
                         Text(text = "Add Store")
                     }
@@ -215,7 +247,7 @@ fun LazyColumnTest(storeController: StoreController, data: SnapshotStateList<Sto
 
     }
 }
-
+/*
 @Composable
 fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel){
 
@@ -296,7 +328,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                         Spacer(modifier = Modifier.height(10.dp))
 
                         LazyColumn(
-                            modifier = Modifier.fillMaxWidth().weight(1f),
+                            modifier = Modifier.fillMaxWidth().weight(1f).background(Color.White),
                             contentPadding = PaddingValues(5.dp)) {
 
                             // items(data) { item ->
@@ -309,7 +341,11 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                         Spacer(modifier = Modifier.height(30.dp))
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                //.fillMaxHeight()
+                            ,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             // we no longer need delete item, keep it for possible future change
@@ -325,7 +361,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                             Button(
                                 onClick = { showDialogAddStore = true },
                                 modifier = Modifier
-                                    .height(60.dp)
+                                    //  .height(60.dp)
                                     .fillMaxWidth()
                                     .weight(1f)
                             ) {
@@ -357,6 +393,8 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
 
 }
 
+ */
+
 @Composable
 fun ListDataStore(storeController: StoreController, storeObject: Store, navController: NavController, data: SnapshotStateList<Store>, viewModel: SharedViewModel) {
     var showDialogEditStore by remember { mutableStateOf(false) }
@@ -364,32 +402,51 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
     Card (
         modifier = Modifier
             .fillMaxWidth()
-            .height(130.dp)
+            .height(90.dp)
             .padding(5.dp)
+            //.background(Color.White)
             // pass respective storeId to the screen
             .clickable { navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + storeObject.id) },
+        shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Card(
+        // pressable text
+        Column(
             modifier = Modifier
                 .wrapContentSize()
                 .padding(10.dp)
                 // pass respective storeId to the screen
-                .clickable { showDialogEditStore = true },
+                .clickable { showDialogEditStore = true }
+                .background(Color.White),
             // elevation = CardDefaults.cardElevation(4.dp),
             // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
-
+            //colors = CardDefaults.cardColors(Color.White),
+            // shape = RoundedCornerShape(10.dp),
         ) {
+
             Text(
                 text = storeObject.name,
-                fontSize = 30.sp,
+                // TODO: add shadow text via other approach if this does not work
+                /*
+                modifier = Modifier
+                    .shadow(4.dp, shape = RectangleShape, clip = false)
+                    .graphicsLayer {
+                        // Adjusting shadow to only show below the text by modifying offset
+                        translationY = 2.dp.toPx() // Moves the shadow downward
+                    },
+
+                 */
+                color = green,
+                fontSize = 20.sp,
+                fontFamily = alexandriaFont,
                 //modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
                 text = storeObject.address,
-                fontSize = 20.sp,
+                fontSize = 15.sp,
+                fontFamily = surannaFont,
                 //modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge
             )

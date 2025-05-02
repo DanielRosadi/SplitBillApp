@@ -38,7 +38,7 @@ import com.ndhu.moneymanagementapp.components.SearchBox
 
 // to store repeatable/repetitive/common composables function design
 
-
+// Fonts
 val syncopateFont = FontFamily(
     Font(R.font.syncopate_regular, FontWeight.Normal),
     Font(R.font.syncopate_bold, FontWeight.Bold)
@@ -53,6 +53,14 @@ val sensationLightFont = FontFamily(
 val surannaFont = FontFamily(
     Font(R.font.suranna_regular, FontWeight.Normal),
 )
+
+val alexandriaFont = FontFamily(
+    Font(R.font.alexandria_semibold, FontWeight.SemiBold)
+)
+
+// Colors
+val green = Color(0xFF009669)
+val darkGrey = Color(0xFF9D9D9D)
 
 // Background Image used in most pages
 @Composable
