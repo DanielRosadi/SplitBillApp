@@ -1,160 +1,253 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.R
+import kotlinx.coroutines.runBlocking
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun Home(context: Context, navController: NavController) {
+    val loginUser = runBlocking {
+        UserController().getOnboardUser(context = context)?.username ?: "{FAIL-LOGIN}"
+    }
+    val syncopateFont = FontFamily(
+        Font(R.font.syncopate_regular, FontWeight.Normal),
+        Font(R.font.syncopate_bold, FontWeight.Bold)
+    )
+    val kronaOneFont = FontFamily(
+        Font(R.font.krona_one_regular, FontWeight.Normal)
+    )
+    val sensationLightFont = FontFamily(
+        Font(R.font.sensation_light, FontWeight.Light)
+    )
 
-    var loginUser = "{NOT-registered}"
-    var userController =  UserController()
-    loginUser = runBlocking { userController.getOnboardUser(context = context)?.username ?: "{FAIL-LOGIN}" }
-
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        Text(
-            text = "Split Bill App",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        // Background Image
+        Image(
+            painter = painterResource(id = R.drawable.background_dark),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Hello ${loginUser}, Welcome!",
-            fontSize = 20.sp,
-            modifier = Modifier
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row (modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
-            Button(onClick = { navController.navigate(route = AppScreens.SignUpScreen.name) },
-                modifier = Modifier.width(180.dp).height(70.dp)){
-                Text(text = "Sign Up (Temp)")
-            }
-            Button(onClick = { navController.navigate(route = AppScreens.LogInScreen.name) },
-                modifier = Modifier.width(180.dp).height(70.dp)){
-                Text(text = "Log In (Temp)")
-            }
-        }
-
-        /*
-        Button(onClick = { navController.navigate(route = AppScreens.TestingScreen.name) },
-            modifier = Modifier.width(180.dp).height(70.dp)){
-            Text(text = "Testing Screen (Temp)")
-        }
-         */
 
         Column(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // "WE SPLIT" Title Text
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "WE",
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontFamily = kronaOneFont,
+                    fontSize = 12.sp,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "SPLIT",
+                    color = Color(0xFF009669), // Green color
+                    style = MaterialTheme.typography.titleLarge,
+                    fontFamily = kronaOneFont,
+                    fontSize = 12.sp,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(36.dp))
+
+            // Profile Section
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .weight(0.2f)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.profile_picture),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .aspectRatio(1f)
+                        .clip(CircleShape)
+                        .background(Color.Gray, shape = CircleShape)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.weight(0.8f)
+                ) {
+                    Text(
+                        text = "Hello",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = sensationLightFont,
+                        fontSize = 12.sp
+                    )
+                    Text(
+                        text = loginUser,
+                        color = Color.hsv(43f, 1f, 1f),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontFamily = syncopateFont,
+                        fontSize = 24.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(60.dp))
+
+            // White Box
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.8f)
+                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                    .background(Color(0xFFF0F0F0))
+                    .padding(start = 24.dp, top = 48.dp, bottom = 48.dp, end = 24.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    HomeButton(
+                        iconResId = R.drawable.icon_split_bill,
+                        text = "Split Bill",
+                        textFontSize = 24,
+                        onClick = { navigateToSplitBillScreen(navController) },
+                        modifier = Modifier
+                            .weight(3f)
+                            .fillMaxHeight()
+                    )
+                    Column(
+                        modifier = Modifier
+                            .weight(2f)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        HomeButton(
+                            iconResId = R.drawable.icon_history,
+                            text = "Bill History",
+                            textFontSize = 16,
+                            onClick = { navigateToBillHistoryScreen(navController) },
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                        )
+                        HomeButton(
+                            iconResId = R.drawable.icon_contact,
+                            text = "Contact",
+                            textFontSize = 20,
+                            onClick = { navigateToContactScreen(navController) },
+                            modifier = Modifier
+                                .weight(2f)
+                                .fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun HomeButton(
+    iconResId: Int,
+    text: String,
+    textFontSize: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val surannaFont = FontFamily(
+        Font(R.font.suranna_regular, FontWeight.Normal),
+    )
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFF4CAF50))
+            .clickable { onClick() }
+    ) {
+        // Background image inside button
+        Image(
+            painter = painterResource(id = R.drawable.button_background),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            colorFilter = ColorFilter.tint(
+                color = Color(0xFF009669),
+                blendMode = BlendMode.Multiply
+            ),
+            modifier = Modifier.matchParentSize()
+        )
+
+        // Icon and Text
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = { navigateToSplitBillScreen(navController) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text(text = "Split Bill")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { navigateToBillHistoryScreen(navController) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text(text = "Bill History")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { navigateToContactScreen(navController) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text(text = "Contacts")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { navigateToAccountScreen(navController) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text(text = "Account")
-            }
-        } // Button Column
-    } // Outer Column
+            Image(
+                painter = painterResource(id = iconResId),
+                contentDescription = text,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = text,
+                color = Color.White,
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = textFontSize.sp,
+                fontFamily = surannaFont,
+            )
+        }
+    }
 }
 
 fun navigateToSplitBillScreen(navController: NavController) {
     navController.navigate(route = AppScreens.ListStoresScreen.name)
 }
 
-//TODO: Make the navigation to one function only, as this function can be reused
 fun navigateToBillHistoryScreen(navController: NavController) {
     navController.navigate(route = AppScreens.BillHistoryScreen.name)
 }
 
 fun navigateToContactScreen(navController: NavController) {
     navController.navigate(route = AppScreens.ContactScreen.name)
-}
-
-fun navigateToAccountScreen(navController: NavController) {
-    navController.navigate(route = AppScreens.AccountScreen.name)
 }

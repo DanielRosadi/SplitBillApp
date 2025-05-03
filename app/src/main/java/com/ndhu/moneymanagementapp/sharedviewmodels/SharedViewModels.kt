@@ -84,7 +84,7 @@ class SharedViewModel : ViewModel() {
         return friendList
     }
 
-    fun getBillOwner(): String{
+    fun getBillOwnerId(): String{
         return billOwner?.id ?: "Unknown Bill Owner"
     }
 

@@ -24,6 +24,7 @@ import com.ndhu.moneymanagementapp.ui.pages.PendingRequestScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectBillOwnerScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
 import com.ndhu.moneymanagementapp.ui.pages.SignUp
+import com.ndhu.moneymanagementapp.ui.pages.SplitItemScreen
 import com.ndhu.moneymanagementapp.ui.pages.TestingScreen
 
 @Composable
@@ -85,6 +86,11 @@ fun AppNavigation(context : Context){
         // AssignSplits screen
         composable(AppScreens.AssignSplitsScreen.name){
             AssignSplitsScreen(context, navController = navController, viewModel = sharedViewModel)
+        }
+
+        // SplitNonEqualScreen screen
+        composable(AppScreens.SplitItemScreen.name){
+            SplitItemScreen(context, navController = navController, viewModel = sharedViewModel)
         }
 
         // Contact screen
