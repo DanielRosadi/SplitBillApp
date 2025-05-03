@@ -182,13 +182,15 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                 // TODO: need to pass item list
                 onClick = {
                     navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
-                    val result = uiItems.map {
-                        ItemDetail(
-                            id = it.item.id,
-                            name = it.item.name,
-                            price = it.item.price,
-                            qty = it.quantity
-                        )
+                    val result = uiItems
+                        .filter { uiItem -> uiItem.quantity > 0 } // we don't send items data that are not in the transaction
+                        .map { uiItem ->
+                            ItemDetail(
+                            id = uiItem.item.id,
+                            name = uiItem.item.name,
+                            price = uiItem.item.price,
+                            qty = uiItem.quantity
+                            )
                     }
 
                     // TODO: what to do with result? e.g onDoneClicked(result)
