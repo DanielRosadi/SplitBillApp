@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -88,7 +89,7 @@ fun Home(context: Context, navController: NavController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(64.dp))
 
             // Profile Section
             Row(
@@ -129,7 +130,7 @@ fun Home(context: Context, navController: NavController) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(78.dp))
 
             // White Box
             Box(
@@ -137,7 +138,7 @@ fun Home(context: Context, navController: NavController) {
                     .fillMaxWidth()
                     .weight(0.8f)
                     .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                    .background(Color(0xFFF0F0F0))
+                    .background(Color(0xFFD9D9D9))
                     .padding(start = 24.dp, top = 48.dp, bottom = 48.dp, end = 24.dp)
             ) {
                 Row(
@@ -200,41 +201,44 @@ fun HomeButton(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFF4CAF50))
+            .background(Color(0xFFB2DFDB)) // Lighter green-teal tone
             .clickable { onClick() }
     ) {
-        // Background image inside button
+        // Background image with transparency
         Image(
             painter = painterResource(id = R.drawable.button_background),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(
-                color = Color(0xFF009669),
+                color = Color(0xFF009669), // Light color tint
                 blendMode = BlendMode.Multiply
             ),
-            modifier = Modifier.matchParentSize()
+            modifier = Modifier
+                .matchParentSize()
+                .alpha(0.8f) // Image transparency
         )
 
-        // Icon and Text
-        Column(
+        // Text top-left, image center
+        Box(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(12.dp)
         ) {
-            Image(
-                painter = painterResource(id = iconResId),
-                contentDescription = text,
-                modifier = Modifier.size(48.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = text,
                 color = Color.White,
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = textFontSize.sp,
                 fontFamily = surannaFont,
+                modifier = Modifier.align(Alignment.TopStart)
+            )
+
+            Image(
+                painter = painterResource(id = iconResId),
+                contentDescription = text,
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(Alignment.Center)
             )
         }
     }
