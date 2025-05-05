@@ -1,20 +1,19 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,14 +31,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.Contact
 import kotlinx.coroutines.runBlocking
-
 @Composable
+
 fun ContactPage(context: Context, navController: NavController) {
 
     val contactController = ContactController()
@@ -54,107 +52,121 @@ fun ContactPage(context: Context, navController: NavController) {
         listFriends.addAll(contactsFromDb) // Add fresh new data
     }
 
-    ComposeContactScreen(context, navController, contactController, userController, listFriends)
+    ComposeContactScreen(context, navController, listFriends, contactController, userController)
 }
 
 @Composable
-fun ComposeContactScreen(context: Context, navController: NavController, contactController: ContactController, userController: UserController, contacts: SnapshotStateList<Contact>) {
-
+fun ComposeContactScreen(
+    context: Context,
+    navController: NavController,
+    contacts: SnapshotStateList<Contact>,
+    contactController: ContactController,
+    userController: UserController
+) {
     var showDialogAddFriend by remember { mutableStateOf(false) }
 
-    Column(
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+            .fillMaxWidth()
+            .fillMaxHeight()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(
-                onClick = { navController.navigate(route = AppScreens.HomeScreen.name) }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+        // Background Image
+        BackgroundImage()
 
-            Spacer(modifier = Modifier.width(8.dp))
+        // Full Page
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Spacer(modifier = Modifier.height(30.dp))
+            TitleText()
+            Spacer(modifier = Modifier.height(30.dp))
 
-            Text(text = "Contacts", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        }
+            // White Box
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color(0xFFD9D9D9))
+                    .padding(10.dp)
+            )
+            {
+                // Content Top Bar
+                // TODO: search func
+                ContentTopBar(navController = navController, topBarText = "Contacts")
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SearchBox()
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Use Card to make rounded corner for LazyColumn
-        Card(
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFBDBDBD)),
-            modifier = Modifier.fillMaxWidth().height(400.dp)
-        ) {
-            LazyColumn(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(contacts) { contact ->
-                    ContactItem(context, contact, userController)
+                // Use Card to make rounded corner for LazyColumn
+                Card(
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFBDBDBD)),
+                    modifier = Modifier.fillMaxWidth().weight(3f)
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(contacts) { contact ->
+                            ContactItem(context, contact, userController)
+                        }
+                    }
                 }
-            }
-        }
 
-        /*
-        contacts.forEachIndexed { _, contact ->
-            ContactItem(name = contact)
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        */
+                Spacer(modifier = Modifier.height(20.dp))
 
-        Spacer(modifier = Modifier.height(20.dp))
+                Column(modifier = Modifier.fillMaxWidth().weight(1f))
+                {
+                    // Pending Request Button
+                    Button(
+                        onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF009669),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(text = "Pending Request", fontSize = 16.sp)
+                    }
 
-        // Pending Request Button
-        Button(
-            onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(55.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF009669),
-                contentColor = Color.White
-            )
-        ) {
-            Text(text = "Pending Request", fontSize = 16.sp)
-        }
+                    Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(10.dp))
+                    // Add Friend Button
+                    Button(
+                        onClick = { showDialogAddFriend = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF009669),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(text = "Add New Contact", fontSize = 16.sp)
+                    }
+                }
 
-        // Add Friend Button
-        Button(
-            onClick = { showDialogAddFriend = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(55.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF009669),
-                contentColor = Color.White
-            )
-        ) {
-            Text(text = "Add New Contact", fontSize = 16.sp)
-        }
+                Spacer(modifier = Modifier.height(20.dp))
 
-        if (showDialogAddFriend) {
-            PopUpAddFriend(context = context, contactController = contactController, userController = userController, onDismiss = { showDialogAddFriend = false }, listFriends = contacts)
-        }
-    }
+                if (showDialogAddFriend) {
+                    PopUpAddFriend(
+                        context = context,
+                        contactController = contactController,
+                        userController = userController,
+                        onDismiss = { showDialogAddFriend = false },
+                        listFriends = contacts
+                    )
+                }
+
+            } // White Box
+        } // Full Page
+    } // Outer Box
 }
 
+// Card Item inside Lazy Column containing Contact information
 @Composable
 fun ContactItem(context: Context, contact: Contact, userController: UserController) {
     Card(
@@ -167,10 +179,11 @@ fun ContactItem(context: Context, contact: Contact, userController: UserControll
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxSize().padding(20.dp)
         ) {
+            // Box (canvas) to show profile picture
             Box(
                 modifier = Modifier.size(32.dp).clip(CircleShape)
             ) {
-                // TODO: Change Icon to Image later
+                // TODO: Change Icon -> Image later
                 Icon(
                     Icons.Filled.Person,
                     contentDescription = "Profile Picture",
@@ -178,65 +191,17 @@ fun ContactItem(context: Context, contact: Contact, userController: UserControll
                     tint = Color.Gray
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            // Text(text = contact.userId2, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
 
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Show friend's username
             val userId = contact.userId2
             val userObject = runBlocking{
                 userController.searchUserByUserId(context, userId)
             }
-
             if (userObject != null) {
                 Text(text = userObject.username, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
             }
         }
     } // Card
 }
-
-/*
-@Composable
-fun PopUpAddContact(context: Context, contactController: ContactController, userController: UserController, onDismiss: () -> Unit, listFriends: SnapshotStateList<Contact>) {
-    var userName by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Username") },
-        text = {
-            Column {
-                TextField(
-                    value = userName,
-                    onValueChange = { userName = it },
-                    label = { /*Text("Username")*/ }
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    // TODO: try rememberCoroutineScope(), coroutineScope.launch{}
-                    runBlocking {
-                        userController.searchUserByUserName(context, userName)
-                            ?.let { contactController.addContact(context = context, it.id) }
-                    }
-
-                    runBlocking {
-                        listFriends.clear()
-                        listFriends.addAll(contactController.getCurrUserLoginContact(context))
-                    }
-
-                    onDismiss()
-                },
-            ) {
-                Text("Save")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss
-            ) {
-                Text("Cancel")
-            }
-        }
-    )
-}
- */
