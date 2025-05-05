@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -64,7 +65,7 @@ fun Home(context: Context, navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // "WE SPLIT" Title Text
+            // "WE SPLIT"
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +89,7 @@ fun Home(context: Context, navController: NavController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(64.dp))
 
             // Profile Section
             Row(
@@ -97,6 +98,9 @@ fun Home(context: Context, navController: NavController) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .weight(0.2f)
+                    .clickable(onClick = {
+                        navController.navigate(AppScreens.AccountScreen.name)
+                    })
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.profile_picture),
@@ -105,7 +109,6 @@ fun Home(context: Context, navController: NavController) {
                         .weight(0.2f)
                         .aspectRatio(1f)
                         .clip(CircleShape)
-                        .background(Color.Gray, shape = CircleShape)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(
@@ -129,15 +132,15 @@ fun Home(context: Context, navController: NavController) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(78.dp))
 
-            // White Box
+            // Greyish color Box
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.8f)
                     .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                    .background(Color(0xFFF0F0F0))
+                    .background(Color(0xFFD9D9D9))
                     .padding(start = 24.dp, top = 48.dp, bottom = 48.dp, end = 24.dp)
             ) {
                 Row(
@@ -200,41 +203,44 @@ fun HomeButton(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFF4CAF50))
+            .background(Color(0xFFB2DFDB))
             .clickable { onClick() }
     ) {
-        // Background image inside button
+        // Background for button
         Image(
             painter = painterResource(id = R.drawable.button_background),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(
-                color = Color(0xFF009669),
+                color = Color(0xFF009669), // Light color tint
                 blendMode = BlendMode.Multiply
             ),
-            modifier = Modifier.matchParentSize()
+            modifier = Modifier
+                .matchParentSize()
+                .alpha(0.8f)
         )
 
-        // Icon and Text
-        Column(
+        // Button
+        Box(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(12.dp)
         ) {
-            Image(
-                painter = painterResource(id = iconResId),
-                contentDescription = text,
-                modifier = Modifier.size(48.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = text,
                 color = Color.White,
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = textFontSize.sp,
                 fontFamily = surannaFont,
+                modifier = Modifier.align(Alignment.TopStart)
+            )
+
+            Image(
+                painter = painterResource(id = iconResId),
+                contentDescription = text,
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(Alignment.Center)
             )
         }
     }
