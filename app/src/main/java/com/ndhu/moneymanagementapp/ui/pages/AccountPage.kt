@@ -1,17 +1,13 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
-import android.util.Log
 import com.ndhu.moneymanagementapp.R
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
-import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -112,7 +108,7 @@ fun AccountPage(context: Context, navController: NavController) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(65.dp))
+                Spacer(modifier = Modifier.height(55.dp))
 
                 // Profile Image
                 Image(
@@ -123,15 +119,16 @@ fun AccountPage(context: Context, navController: NavController) {
                         .clip(CircleShape)
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
                     text = user?.username ?: "Daniel Rosadi",
-                    fontSize = 22.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = syncopateFont,
                     color = Color(0xFFF5C542), // golden yellow
                 )
-
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = "Be Believer",
                     fontSize = 14.sp,
@@ -140,7 +137,7 @@ fun AccountPage(context: Context, navController: NavController) {
             }
         }
 
-        // Bottom Section: Settings
+        // Bottom Section
         Surface(
             color = Color(0xFFF5F5F5),
             modifier = Modifier
@@ -150,19 +147,28 @@ fun AccountPage(context: Context, navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 12.dp, vertical = 20.dp),
+                    .padding(horizontal = 20.dp, vertical = 40.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text("Settings", fontSize = 18.sp, color = Color.Gray)
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(30.dp)) {
+                    ColoredSettingsButton("Edit Profile", Color(0xFF009669)) {
+                        navigateToEditAccountScreen(navController)
+                    }
 
-                ColoredSettingsButton("Edit Profile", Color(0xFF009B77)) {
-                    navigateToEditAccountScreen(navController)
-                }
-                ColoredSettingsButton("Delete Account", Color(0xFF8B0000)) {
-                    showClearUserDataDialog = true
-                }
-                ColoredSettingsButton("Log Out", Color(0xFF009B77)) {
-                    showLogOutDialog = true
+                    Spacer(modifier=Modifier.height(20.dp))
+
+                    ColoredSettingsButton("Delete Account", Color(0xFF8B0000)) {
+                        showClearUserDataDialog = true
+                    }
+
+                    Spacer(modifier=Modifier.height(20.dp))
+
+                    ColoredSettingsButton("Log Out", Color(0xFF009669)) {
+                        showLogOutDialog = true
+                    }
                 }
             }
         }
@@ -223,11 +229,11 @@ fun ColoredSettingsButton(text: String, backgroundColor: Color, onClick: () -> U
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(70.dp)
             .shadow(4.dp, shape = RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text)
+        Text(text, fontSize = 20.sp, fontFamily = surannaFont)
     }
 }
 
