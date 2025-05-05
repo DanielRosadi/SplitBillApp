@@ -65,7 +65,7 @@ fun Home(context: Context, navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // "WE SPLIT" Title Text
+            // "WE SPLIT"
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,6 +98,9 @@ fun Home(context: Context, navController: NavController) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .weight(0.2f)
+                    .clickable(onClick = {
+                        navController.navigate(AppScreens.AccountScreen.name)
+                    })
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.profile_picture),
@@ -106,7 +109,6 @@ fun Home(context: Context, navController: NavController) {
                         .weight(0.2f)
                         .aspectRatio(1f)
                         .clip(CircleShape)
-                        .background(Color.Gray, shape = CircleShape)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(
@@ -132,7 +134,7 @@ fun Home(context: Context, navController: NavController) {
 
             Spacer(modifier = Modifier.height(78.dp))
 
-            // White Box
+            // Greyish color Box
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,10 +203,10 @@ fun HomeButton(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFB2DFDB)) // Lighter green-teal tone
+            .background(Color(0xFFB2DFDB))
             .clickable { onClick() }
     ) {
-        // Background image with transparency
+        // Background for button
         Image(
             painter = painterResource(id = R.drawable.button_background),
             contentDescription = null,
@@ -215,10 +217,10 @@ fun HomeButton(
             ),
             modifier = Modifier
                 .matchParentSize()
-                .alpha(0.8f) // Image transparency
+                .alpha(0.8f)
         )
 
-        // Text top-left, image center
+        // Button
         Box(
             modifier = Modifier
                 .fillMaxSize()
