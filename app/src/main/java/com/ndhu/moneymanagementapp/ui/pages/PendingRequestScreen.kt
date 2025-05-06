@@ -1,26 +1,21 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
@@ -29,39 +24,42 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
-import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.Contact
 import kotlinx.coroutines.runBlocking
 
-/*TODO:
-*  - tampilin list Pending
-*  - finish design UI
-*  - function button acc all and reject all*/
+/*
+TODO:
+    - tampilin list Pending
+    - finish design UI
+    - function button acc all and reject all
+    - Ganti font
+    - Ganti image
+    - Search
+*/
 
 @Composable
 fun PendingRequestScreen (context: Context, navController: NavController)
 {
-    var contactController = ContactController()
-    var userController = UserController()
-    var listPending = remember { mutableStateListOf<Contact>() }
+    val contactController = ContactController()
+    val userController = UserController()
+    val listPending = remember { mutableStateListOf<Contact>() }
 
     LaunchedEffect(Unit) {
         val pendingContactsFromDb = contactController.getPendingUserListContact(context)
-        listPending.clear() // Clear old data
-        listPending.addAll(pendingContactsFromDb) // Add fresh new data
+        Log.d("PendingScreen", "Fetched ${pendingContactsFromDb.size} pending contacts")
+        listPending.clear()
+        listPending.addAll(pendingContactsFromDb)
     }
 
     // Compose UI
-    ComposePendingRequest(listPending, context, navController, contactController, userController)
+    ComposePendingRequest(listPending, context, navController, userController)
 }
 
 @Composable
@@ -69,7 +67,6 @@ private fun ComposePendingRequest(
     contacts: SnapshotStateList<Contact>,
     context: Context,
     navController: NavController,
-    contactController: ContactController,
     userController: UserController
 ) {
 
@@ -148,8 +145,6 @@ private fun ComposePendingRequest(
                         Text(text = "Reject All", fontSize = 16.sp)
                     }
 
-                    // Spacer(modifier = Modifier.width(20.dp))
-
                     // Accept All
                     Button(
                         onClick = { /* TODO: Accept All Request  */ },
@@ -173,7 +168,7 @@ private fun ComposePendingRequest(
     } // Box
 }
 
-// Card Item inside Lazy Column containing Contact information
+// Card Item inside Lazy Column containing Pending Contact information
 @Composable
 fun PendingCard(contact: Contact, context: Context, userController: UserController) {
     Card(
@@ -202,10 +197,56 @@ fun PendingCard(contact: Contact, context: Context, userController: UserControll
             Spacer(modifier = Modifier.width(16.dp))
 
             // Show username of pending user
+            val userId = contact.userId2
+            val userObject = runBlocking{
+                userController.searchUserByUserId(context, userId)
+            }
+            if (userObject != null) {
+                Text(text = userObject.username, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
+            }
 
-            // Reject Button
+            /*
+            // Button Section
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                //.padding(10.dp)
+            ) {
+                // Reject All
+                Button(
+                    onClick = { *//* TODO: Reject All Request  *//* },
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .padding(10.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF961400), // Red
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(text = "Reject All", fontSize = 16.sp)
+                }
 
-            // Accept Button
+                // Accept All
+                Button(
+                    onClick = { *//* TODO: Accept All Request  *//* },
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .padding(10.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF009669), // Green
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(text = "Accept All", fontSize = 16.sp)
+                }
+            } // Buttons
+            */
 
         }
     } // Card
