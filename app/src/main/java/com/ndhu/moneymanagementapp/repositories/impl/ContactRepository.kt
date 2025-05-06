@@ -43,7 +43,7 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         val contacts = mutableListOf<Contact>()
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
             whereEqualTo("userId2", userId).
-            whereEqualTo("friendStatus", FriendStatus.PENDING).
+            whereEqualTo("friendStatus", FriendStatus.PENDING.name).
             get().await()
         if(!querySnapshot.isEmpty) {
             for (document in querySnapshot.documents) {
