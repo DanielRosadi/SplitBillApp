@@ -1,7 +1,9 @@
 package com.ndhu.moneymanagementapp.controllers
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.Timestamp
+import com.ndhu.moneymanagementapp.enums.UserStatus
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.repositories.IUserRepository
 import com.ndhu.moneymanagementapp.repositories.impl.UserRepository
@@ -20,6 +22,7 @@ class UserController {
                 UUID.randomUUID().toString(),
                 username,
                 email,
+                UserStatus.ACTIVE,
                 Util.passwordEncryption(password),
                 bio
             )
@@ -35,7 +38,7 @@ class UserController {
             user = userRepo.getUserByUsername(identify)
         }
         val pass = user?.let { Util.verifyPassword(password, it.password) }
-        if(pass==true) {
+        if(pass==true && user?.status==UserStatus.ACTIVE) {
             if(user != null){
                 Util.saveUserId(context, user.id)
             }
@@ -65,5 +68,20 @@ class UserController {
 
     suspend fun searchUserByUserId(context: Context, userId: String): User?{
         return userRepo.getById(userId)
+    }
+
+    suspend fun deleteCurrUser(context: Context) {
+        val userId = Util.getUserId(context)
+        if(userId != null) {
+            val user = userRepo.getById(userId)
+            if (user != null) {
+                user.status = UserStatus.DELETED
+                Util.clearUserId(context)
+                userRepo.update(user.id, user)
+                return
+            }
+        }
+        Log.d("INFO", "USER NOT FOUND")
+        return
     }
 }
