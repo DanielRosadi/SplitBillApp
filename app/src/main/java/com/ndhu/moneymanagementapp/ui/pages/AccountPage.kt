@@ -3,6 +3,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 import android.content.Context
 import com.ndhu.moneymanagementapp.R
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -168,7 +171,7 @@ fun AccountPage(context: Context, navController: NavController) {
 
                     ColoredSettingsButton(
                         text = "Delete Account",
-                        backgroundColor = Color(0xFF8B0000),
+                        backgroundColor = Color(0xFF961400),
                         modifier = Modifier.weight(0.3f)
                     ) {
                         showClearUserDataDialog = true
@@ -187,44 +190,24 @@ fun AccountPage(context: Context, navController: NavController) {
     }
 
     if (showClearUserDataDialog) {
-        AlertDialog(
-            onDismissRequest = { showClearUserDataDialog = false },
-            title = { Text("Delete account?") },
-            confirmButton = {
-                Button(onClick = {
-                    coroutine.launch { userController.logout(context) }
-                    navController.navigate(AppScreens.LogInScreen.name) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }) {
-                    Text("Yes")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showClearUserDataDialog = false }) {
-                    Text("No")
+        DeleteAccountDialog(
+            onDismiss = { showClearUserDataDialog = false },
+            onConfirm = {
+                coroutine.launch { userController.logout(context) }
+                navController.navigate(AppScreens.LogInScreen.name) {
+                    popUpTo(0) { inclusive = true }
                 }
             }
         )
     }
 
     if (showLogOutDialog) {
-        AlertDialog(
-            onDismissRequest = { showLogOutDialog = false },
-            title = { Text("Log out?") },
-            confirmButton = {
-                Button(onClick = {
-                    coroutine.launch { userController.logout(context) }
-                    navController.navigate(AppScreens.LogInScreen.name) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }) {
-                    Text("Yes")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showLogOutDialog = false }) {
-                    Text("No")
+        LogoutDialog(
+            onDismiss = { showLogOutDialog = false },
+            onConfirm = {
+                coroutine.launch { userController.logout(context) }
+                navController.navigate(AppScreens.LogInScreen.name) {
+                    popUpTo(0) { inclusive = true }
                 }
             }
         )
@@ -250,6 +233,178 @@ fun ColoredSettingsButton(
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(text, fontSize = 20.sp, fontFamily = surannaFont)
+    }
+}
+
+@Composable
+fun DeleteAccountDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.3f))
+            .wrapContentSize(Alignment.Center)
+    ) {
+        Box(
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 30.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                shape = RoundedCornerShape(20.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier.padding(top = 40.dp, bottom = 20.dp, start = 16.dp, end = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Are you sure you want to delete your account?",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black,
+                        maxLines = 1
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "This action cannot be undone",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.DarkGray
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF009669),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                "Cancel",
+                                fontSize = 18.sp,
+                                fontFamily = surannaFont,
+                                maxLines = 1,
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Button(
+                            onClick = onConfirm,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF961400),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                "Delete Account",
+                                fontSize = 18.sp,
+                                fontFamily = surannaFont,
+                                maxLines = 1,
+                            )
+                        }
+                    }
+                }
+            }
+
+            // "!" Logo symbol
+            Box(
+                modifier = Modifier
+                    .offset(y = (-25).dp)
+                    .size(50.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF8B0000)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("!", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+fun LogoutDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.3f))
+            .wrapContentSize(Alignment.Center)
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 30.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(20.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier.padding(vertical = 24.dp, horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Are you sure you want to log out?",
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF009669),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Cancel", fontSize = 18.sp, fontFamily = surannaFont)
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        onClick = onConfirm,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF961400),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Log Out", fontSize = 18.sp, fontFamily = surannaFont)
+                    }
+                }
+            }
+        }
     }
 }
 
