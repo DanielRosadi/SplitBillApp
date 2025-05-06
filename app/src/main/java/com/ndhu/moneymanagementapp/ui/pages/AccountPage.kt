@@ -52,7 +52,7 @@ fun AccountPage(context: Context, navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(0.5f)
         ) {
             // Background image
             Image(
@@ -142,31 +142,43 @@ fun AccountPage(context: Context, navController: NavController) {
             color = Color(0xFFF5F5F5),
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(0.5f)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp, vertical = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(30.dp)
             ) {
                 Text("Settings", fontSize = 18.sp, color = Color.Gray)
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(30.dp)) {
-                    ColoredSettingsButton("Edit Profile", Color(0xFF009669)) {
+                Spacer(modifier = Modifier.weight(0.1f))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 30.dp),
+                    verticalArrangement = Arrangement.spacedBy(30.dp)
+                ) {
+                    ColoredSettingsButton(
+                        text = "Edit Profile",
+                        backgroundColor = Color(0xFF009669),
+                        modifier = Modifier.weight(0.3f)
+                    ) {
                         navigateToEditAccountScreen(navController)
                     }
 
-                    Spacer(modifier=Modifier.height(20.dp))
-
-                    ColoredSettingsButton("Delete Account", Color(0xFF8B0000)) {
+                    ColoredSettingsButton(
+                        text = "Delete Account",
+                        backgroundColor = Color(0xFF8B0000),
+                        modifier = Modifier.weight(0.3f)
+                    ) {
                         showClearUserDataDialog = true
                     }
 
-                    Spacer(modifier=Modifier.height(20.dp))
-
-                    ColoredSettingsButton("Log Out", Color(0xFF009669)) {
+                    ColoredSettingsButton(
+                        text = "Log Out",
+                        backgroundColor = Color(0xFF009669),
+                        modifier = Modifier.weight(0.3f)
+                    ) {
                         showLogOutDialog = true
                     }
                 }
@@ -220,16 +232,20 @@ fun AccountPage(context: Context, navController: NavController) {
 }
 
 @Composable
-fun ColoredSettingsButton(text: String, backgroundColor: Color, onClick: () -> Unit) {
+fun ColoredSettingsButton(
+    text: String,
+    backgroundColor: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
             contentColor = Color.White
         ),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(70.dp)
             .shadow(4.dp, shape = RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp)
     ) {
