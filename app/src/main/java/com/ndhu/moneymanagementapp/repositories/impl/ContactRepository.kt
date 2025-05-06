@@ -42,7 +42,7 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
     override suspend fun getPendingContact(userId : String) : List<Contact> {
         val contacts = mutableListOf<Contact>()
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-            whereEqualTo("userId2", userId).
+            whereEqualTo("userId1", userId).
             whereEqualTo("friendStatus", FriendStatus.PENDING.name).
             get().await()
         if(!querySnapshot.isEmpty) {
