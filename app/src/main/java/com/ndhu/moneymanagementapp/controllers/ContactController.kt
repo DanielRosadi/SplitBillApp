@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.firebase.firestore.local.LocalStore
 import com.ndhu.moneymanagementapp.enums.FriendStatus
 import com.ndhu.moneymanagementapp.models.Contact
+import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.repositories.IContactRepository
 import com.ndhu.moneymanagementapp.repositories.impl.ContactRepository
 import com.ndhu.moneymanagementapp.utils.Util
@@ -16,12 +17,8 @@ class ContactController {
     val contactRepository : IContactRepository = ContactRepository()
 
     suspend fun addContact(context : Context, userId : String) {
-        contactRepository.add(Contact(
-            id = UUID.randomUUID().toString(),
-            userId1 = Util.getUserId(context).toString(),
-            userId2 = userId,
-            friendStatus = FriendStatus.PENDING.name
-        ))
+        makeFriend(Util.getUserId(context).toString(), userId)
+        makeFriend(userId, Util.getUserId(context).toString())
     }
 
     suspend fun getCurrUserLoginContact(context : Context) : List<Contact> {
@@ -33,30 +30,43 @@ class ContactController {
     }
 
     suspend fun acceptFriend(context : Context, userId : String)  {
-        val userId2 = Util.getUserId(context).toString()
-        var contact = contactRepository.getContactFromUsers(userId, userId2)
+        acceptFriend(Util.getUserId(context).toString(), userId)
+        acceptFriend(userId, Util.getUserId(context).toString())
+    }
+
+    suspend fun rejectFriend(context : Context, userId : String) {
+        rejectFriend(Util.getUserId(context).toString(), userId)
+        rejectFriend(userId, Util.getUserId(context).toString())
+    }
+
+    private suspend fun makeFriend(user1 : String, user2 : String) {
+        contactRepository.add(Contact(
+            id = UUID.randomUUID().toString(),
+            userId1 = user1,
+            userId2 = user2,
+            friendStatus = FriendStatus.PENDING.name
+        ))
+    }
+
+    private suspend fun acceptFriend(user1 : String, user2 : String) {
+        var contact = contactRepository.getContactFromUsers(user1, user2)
         if(contact.friendStatus == FriendStatus.PENDING.name) {
-            //update status from userId1
             contact.friendStatus = FriendStatus.FRIEND.name
             contactRepository.update(contact.id, contact)
-
             var contact2 = Contact(
                 id = UUID.randomUUID().toString(),
-                userId1 = userId2,
-                userId2 = userId2,
+                userId1 = user1,
+                userId2 = user2,
                 friendStatus = FriendStatus.FRIEND.name
             )
             contactRepository.add(contact2)
             return
         }
-        Log.w("INFO", "ckptw sih gak ada contact")
     }
 
-    suspend fun rejectFriend(context : Context, userId : String) {
-        val userId2 = Util.getUserId(context).toString()
-        var contact = contactRepository.getContactFromUsers(userId, userId2)
+    private suspend fun rejectFriend(user1 : String, user2 : String) {
+        var contact = contactRepository.getContactFromUsers(user1, user2)
         if(contact.friendStatus == FriendStatus.PENDING.name) {
-            //update status from userId1
             contact.friendStatus = FriendStatus.REJECT.name
             contactRepository.update(contact.id, contact)
             Log.w("INFO", "YAHAHAHAHHA KENA REJECT")
