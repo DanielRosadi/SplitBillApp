@@ -21,10 +21,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -52,10 +53,7 @@ import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.User
-import com.ndhu.moneymanagementapp.payloads.ItemAndOwner
-import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AssignSplitsScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
@@ -71,6 +69,7 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
     val listParticipants = viewModel.billParticipants
     val listItems = viewModel.itemDetailList
 
+    // TODO: need to re-load data after coming back from SplitItemScreen
     var itemAndUsersList = listItems.map { item ->
         ItemWithUsersList(item = item, ownership = mutableStateListOf())
     }.toMutableStateList()
@@ -84,6 +83,9 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
 fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItemsAndOwners: MutableList<ItemWithUsersList>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel, userColors: SnapshotStateMap<User?, Color>){
     // val userColors = remember { mutableStateMapOf<User?, Color>() }
     var selectedUser by remember { mutableStateOf<User?>(null) }
+
+    // save/cache the item and user quantities data
+    viewModel.listItemAndUserQuantities = listItemsAndOwners
 
     UniformDesignScaffold(
         topAppBar = {
@@ -120,11 +122,13 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                     // it also automatically handles when the list is not perfectly divisible by 3
                     items(listItemsAndOwners) { itemAndUsers ->
                         ListItemSplits(
+                            listItemAndUserQuantities = listItemsAndOwners,
                             navController = navController,
                             itemWithUsers = itemAndUsers,
                             selectedUser = selectedUser,
                             userColors = userColors,
-                            onToggleUser = { user -> toggleUser(user, itemAndUsers) }
+                            onToggleUser = { user -> toggleUser(user, itemAndUsers) },
+                            viewModel = viewModel
                         )
                     }
 
@@ -186,7 +190,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 }
 
 @Composable
-fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit) {
+fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit, viewModel: SharedViewModel) {
 
         Card(
             modifier = Modifier
@@ -206,16 +210,17 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                     .fillMaxWidth()
                     .padding(9.dp),
                 verticalAlignment = Alignment.CenterVertically, //  center content vertically
-                horizontalArrangement = Arrangement.SpaceBetween // space between 3 main sections
+                // horizontalArrangement = Arrangement.SpaceBetween // space between 3 main sections
+                horizontalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = itemWithUsers.item.name,
-                    fontSize = 18.sp,
+                    fontSize = 15.sp, // 18.sp
                     // modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
-                        .weight(1.3f) //  allow flexible width
-                        .padding(end = 8.dp)
+                        .weight(0.5f) //  allow flexible width
+                        .padding(end = 7.dp)
                 )
 
                 // TODO: implement selected users here
@@ -231,7 +236,7 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                     // Display selected users as colored dots
                     LazyRow(
                         modifier = Modifier
-                            .weight(1.6f) // take up most space
+                            .weight(0.7f) // take up most space
                             .height(32.dp), // Adjust height for good dot fit
                         horizontalArrangement = Arrangement.spacedBy(2.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -271,11 +276,13 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .weight(1.9f) // share width evenly with item name
-                        .padding(start = 4.dp),
+                        .weight(1.0f) // share width evenly with item name
+                        .padding(start = 2.dp),
                     horizontalArrangement = Arrangement.Center
+                    // horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     // TODO: rework design for custom quantity (move to rightmost, use pencil icon)
+                    /*
                     Button(
                         onClick = { navController.navigate(route = AppScreens.SplitItemScreen.name) },
                         modifier = Modifier.width(70.dp).height(70.dp),
@@ -284,13 +291,23 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                         Text(text = "C", fontSize = 30.sp) // Custom quantity
                     }
 
+                     */
+
                     Text(
                         // TODO: omit additional float 0 on price
                         text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
-                        fontSize = 18.sp,
-                        modifier = Modifier.padding(16.dp),
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(8.dp),
                         style = MaterialTheme.typography.bodyLarge
                     )
+
+                    TransparentEditButton {
+                        // save/cache the item and user quantities data
+                        viewModel.listItemAndUserQuantities = listItemAndUserQuantities
+                        viewModel.currentItemAndUserQuantities = itemWithUsers
+                        viewModel.currentItem = itemWithUsers.item // passing current item detail
+                        navController.navigate(route = AppScreens.SplitItemScreen.name)
+                    }
 
                 }
 
@@ -361,6 +378,51 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
     }
 }
 
+@Composable
+fun TransparentEditButton(clickEvent: () -> Unit) {
+    Button(
+        onClick = clickEvent,
+        modifier = Modifier
+            .padding(4.dp)
+            .size(40.dp), // Make it small and square-ish
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = green, // Visible color (blue)
+            contentColor = Color.White
+        ),
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Edit,
+            contentDescription = "Edit",
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+
+/*
+@Composable
+fun TransparentEditButton( clickEvent: () -> Unit ) {
+    Button(
+        onClick = clickEvent,
+        modifier = Modifier.padding(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            // containerColor = Color.Transparent,  // Make button background transparent
+            containerColor = Color.Blue,
+            contentColor = Color.Black          // Set the icon and text color
+        )
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Edit, // Pencil/Edit icon
+            contentDescription = "Edit",
+            modifier = Modifier.padding(end = 8.dp) // Space between icon and text
+        )
+        Text(text = "Edit")
+    }
+}
+*/
+
 /*
 // TODO: need to adapt this code with new logic
 fun mapItemsToItemAndOwners(items: List<ItemWithUsersList>): List<ItemAndOwner> {
@@ -416,7 +478,7 @@ fun toggleUser(user: User, item: ItemWithUsersList) {
     if (existingOwnership != null) {
         ownership.remove(existingOwnership)  // Remove the ItemOwnership object
     } else {
-        ownership.add(ItemOwnership(owner = user, itemQuantity = 0))  // Add with default quantity
+        ownership.add(ItemOwnership(owner = user, itemQuantity = 1))  // Add with default quantity (by one)
     }
 }
 

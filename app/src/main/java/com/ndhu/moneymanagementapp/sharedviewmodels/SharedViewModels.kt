@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.sharedviewmodels
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.Contact
@@ -7,6 +8,7 @@ import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
+import com.ndhu.moneymanagementapp.ui.pages.ItemWithUsersList
 
 // ignore this for
 /*
@@ -24,6 +26,8 @@ And pass respective dataId to find specific database record/row/document
  */
 
 class SharedViewModel : ViewModel() {
+
+    // --------------- class variables/fields
 
     var storeList: MutableList<Store>? = null
 
@@ -48,9 +52,16 @@ class SharedViewModel : ViewModel() {
     // to contains information of one bill (1 store, items, friends, 1 bill owner, item assigns)
     var bill: Bill? = null
 
+    // act as a data backup/"cache" between AssignSplitsScreen and SplitItemScreen
+    var listItemAndUserQuantities: MutableList<ItemWithUsersList> = mutableListOf()
 
+    // current item with users/owners list
+    var currentItemAndUserQuantities: ItemWithUsersList = ItemWithUsersList(ItemDetail(), mutableStateListOf())
 
+    // current item highlighted for SplitItemScreen
+    var currentItem: ItemDetail = ItemDetail()
 
+    // --------------- functions (getters, setters)
 
     fun getStoreById(id: String): Store? {
         return storeList?.find { it.id == id }

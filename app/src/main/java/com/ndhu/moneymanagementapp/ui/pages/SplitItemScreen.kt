@@ -1,7 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,17 +36,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 
 @Composable
 fun SplitItemScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
-    ComposeSplitItem(context = context, navController = navController)
+    ComposeSplitItem(context = context, navController = navController, viewModel = viewModel)
 }
 
 @Composable
-fun ComposeSplitItem(context: Context, navController: NavController){
+fun ComposeSplitItem(context: Context, navController: NavController, viewModel: SharedViewModel){
 
     Column (
         modifier = Modifier.fillMaxWidth().fillMaxHeight()
@@ -65,21 +63,21 @@ fun ComposeSplitItem(context: Context, navController: NavController){
         ) {
             // Header Text
             // TODO: Replace with real data
-            Text(text = "Item 1", fontSize = 30.sp)
+            Text(text = viewModel.currentItem.name, fontSize = 30.sp)
             Text(text = "You can adjust quantity of assigned items to friends.", fontSize = 15.sp)
             Text(text = "Decimal number is allowed. For example: 0.5 defines half portion, or other decimal number based on agreement.", fontSize = 15.sp)
             Text(text = "Price will be calculated based on quantity assigned.", fontSize = 15.sp)
 
-            // TODO: make it responsive
-            Text(text = "Total Item Quantity: x")
-            Text(text = "Fully Assigned Item Quantity: y")
+            // TODO: make it responsive (cannot add more if exceed. cannot save if is NOT fully assigned)
+            Text(text = "Total Item Quantity: " + viewModel.currentItem.qty, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Fully Assigned Item Quantity: y", fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
             // Body
             LazyColumn (
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(listOf("User 1", "User 2", "User 3", "User 4", "User 5")){ user ->
-                    ListSplitItemNonEqual(user = user)
+                items( viewModel.currentItemAndUserQuantities.ownership ){ ownership ->
+                    ListSplitItemNonEqual(user = ownership.owner, itemWithUsers = viewModel.currentItemAndUserQuantities)
 
                 }
             }
@@ -91,9 +89,12 @@ fun ComposeSplitItem(context: Context, navController: NavController){
         Column (
             modifier = Modifier.fillMaxWidth().weight(1f)
         ) {
-            // TODO: Save data
+            // TODO: Save data, need to save quantities
             Button(
-                onClick = {},
+                onClick = {
+                    // viewModel.listItemAndUserQuantities.
+
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Save")
@@ -162,7 +163,8 @@ fun SplitItemTopBar(navController: NavController){
 
 
 @Composable
-fun ListSplitItemNonEqual(user: String){
+fun ListSplitItemNonEqual(user: User, itemWithUsers: ItemWithUsersList){
+    // TODO: need to pass the real itemWithUsers, and update the quantities on the data variable so we can save it
     var initialQuantity by remember { mutableStateOf("1.0") }
 
     Card(
@@ -178,13 +180,14 @@ fun ListSplitItemNonEqual(user: String){
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Text(text = user, modifier = Modifier.weight(2f))
+            Text(text = user.username, modifier = Modifier.weight(2f))
 
 
             Button(onClick = {
                 val qty = initialQuantity.toFloatOrNull() ?: 0f
                 val newQty = (qty - 1f).coerceAtLeast(0f) // Prevent going below 0
                 initialQuantity = "%.2f".format(newQty)
+                // TODO: decrement quantity from itemWithUsers
             },
                 modifier = Modifier.weight(1f)
             ) {
@@ -208,6 +211,7 @@ fun ListSplitItemNonEqual(user: String){
             Button(onClick = {
                 val qty = initialQuantity.toFloatOrNull() ?: 0f
                 initialQuantity = "%.2f".format(qty + 1f)
+                // TODO: increment quantity from itemWithUsers
             },
                 modifier = Modifier.weight(1f)
             ) {
