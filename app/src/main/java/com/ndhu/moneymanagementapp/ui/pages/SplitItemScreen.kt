@@ -70,6 +70,10 @@ fun ComposeSplitItem(context: Context, navController: NavController){
             Text(text = "Decimal number is allowed. For example: 0.5 defines half portion, or other decimal number based on agreement.", fontSize = 15.sp)
             Text(text = "Price will be calculated based on quantity assigned.", fontSize = 15.sp)
 
+            // TODO: make it responsive
+            Text(text = "Total Item Quantity: x")
+            Text(text = "Fully Assigned Item Quantity: y")
+
             // Body
             LazyColumn (
                 modifier = Modifier.fillMaxWidth()

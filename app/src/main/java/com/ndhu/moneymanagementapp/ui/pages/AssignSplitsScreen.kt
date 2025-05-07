@@ -72,7 +72,7 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
     val listItems = viewModel.itemDetailList
 
     var itemAndUsersList = listItems.map { item ->
-        ItemWithUsersList(item = item, owners = mutableStateListOf())
+        ItemWithUsersList(item = item, ownership = mutableStateListOf())
     }.toMutableStateList()
 
     val userColors = remember { mutableStateMapOf<User?, Color>() } // <-- HOISTED
@@ -147,14 +147,12 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                     // TODO: if done, create list of itemIdAndOwners
 
                     // TODO: then, submit bill data to database (with list of itemIdAndOwners)
-                    // val splitBillRequest = SplitBillRequest(billOwnerId = viewModel.getBillOwner(), itemIdAndOwners = )
-                    /*
-                    runBlocking {
-                        splitBillController.addSplitBill(context = context, request = splitBillRequest)
-                    }
-                     */
+                    // *******
 
                     // TODO: need to discuss on qty for ItemAndOwner
+                    // TODO: need to recheck if there is changes since we are implementing additional logic
+
+                    /*
                     val itemIdAndOwners = mapItemsToItemAndOwners(listItemsAndOwners)
 
 
@@ -163,9 +161,12 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                         itemIdAndOwners = itemIdAndOwners
                     )
 
+
                     runBlocking {
                         splitBillController.addSplitBill(context = context, request = splitBillRequest)
                     }
+
+                     */
 
                 },
                     modifier = Modifier
@@ -235,15 +236,16 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                         horizontalArrangement = Arrangement.spacedBy(2.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(itemWithUsers.owners) { user ->
-                            val color = userColors[user] ?: Color.Gray
-                            UserDot(user = user, color = color)
+                        items(itemWithUsers.ownership) { ownership ->
+                            // user == ownership.owner
+                            val color = userColors[ownership.owner] ?: Color.Gray
+                            UserDot(user = ownership.owner, color = color)
                         }
 
                         // If a user is selected, show a "plus" slot
-                        if (selectedUser != null && !itemWithUsers.owners.contains(selectedUser)) {
+                        if (selectedUser != null && !itemWithUsers.ownership.any{ it.owner == selectedUser }) {
                             item {
-                                val alreadySelected = itemWithUsers.owners.contains(selectedUser)
+                                val alreadySelected = itemWithUsers.ownership.any{ it.owner == selectedUser }
                                 if (!alreadySelected) {
                                     Card(
                                         modifier = Modifier
@@ -359,11 +361,13 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
     }
 }
 
+/*
+// TODO: need to adapt this code with new logic
 fun mapItemsToItemAndOwners(items: List<ItemWithUsersList>): List<ItemAndOwner> {
     // flatMap transform one item into many items. in our case, one item produces multiple ItemAndOwner.
     // and then flatMap flatten all produced items into one list
     return items.flatMap { itemWithUsers ->
-        itemWithUsers.owners.map { user ->
+        itemWithUsers.ownership.map { user ->
             ItemAndOwner(
                 itemId = itemWithUsers.item.id,
                 ownerId = user.id,
@@ -372,6 +376,8 @@ fun mapItemsToItemAndOwners(items: List<ItemWithUsersList>): List<ItemAndOwner> 
         }
     }
 }
+
+ */
 
 
 @Composable
@@ -392,14 +398,28 @@ fun UserDot(user: User, color: Color) {
     ) {}
 }
 
-
+/*
 fun toggleUser(user: User, item: ItemWithUsersList) {
-    if (item.owners.contains(user)) {
-        item.owners.remove(user)
+    if (item.ownership.any{it.owner == user}) {
+        item.ownership.remove(user)
     } else {
-        item.owners.add(user)
+        item.ownership.add(user)
     }
 }
+
+ */
+
+fun toggleUser(user: User, item: ItemWithUsersList) {
+    val ownership = item.ownership
+    val existingOwnership = ownership.find { it.owner == user }
+
+    if (existingOwnership != null) {
+        ownership.remove(existingOwnership)  // Remove the ItemOwnership object
+    } else {
+        ownership.add(ItemOwnership(owner = user, itemQuantity = 0))  // Add with default quantity
+    }
+}
+
 
 
 
