@@ -219,7 +219,19 @@ fun SplitItemTopBar(navController: NavController, viewModel: SharedViewModel){
 @Composable
 fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
     // TODO: need to pass the real itemWithUsers, and update the quantities on the data variable so we can save it
-    var initialQuantity by remember { mutableStateOf("1.0") }
+    //var initialQuantity by remember { mutableStateOf( viewModel.tempItemAndUserQuantities.ownership.find { it.owner == user }?.itemQuantity ) }
+
+    var initialQuantity by remember {
+        mutableStateOf(
+            viewModel.tempItemAndUserQuantities.ownership
+                .find { it.owner == user }
+                ?.itemQuantity
+                ?.let { "%.2f".format(it) } ?: ""
+        )
+    }
+
+
+    // var initialQuantity by remember { mutableStateOf("1.0") } // this initial quantity needs to change
 
     var tempItemAndUserQuantities = viewModel.tempItemAndUserQuantities
 
@@ -244,7 +256,8 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
 
             Button(onClick = {
                 val qty = initialQuantity.toFloatOrNull() ?: 0f
-                val newQty = (qty - 1f).coerceAtLeast(0f) // Prevent going below 0
+                // val qty = initialQuantity
+                val newQty = (qty - 1f ).coerceAtLeast(0f) // Prevent going below 0
                 initialQuantity = "%.2f".format(newQty)
                 // TODO: decrement quantity from itemWithUsers
                 if (index != -1) {
@@ -261,7 +274,7 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
             TextField(
 
                 value = initialQuantity,
-                onValueChange = {input ->
+                onValueChange = {input: String ->
                     // Allow only digits and at most one dot
                     if (input.isEmpty() || input.matches(Regex("""\d*\.?\d*"""))) {
                         initialQuantity = input
@@ -290,8 +303,8 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
                 // TODO: increment quantity from itemWithUsers
                 if (index != -1) {
                     val currentOwnership = tempItemAndUserQuantities.ownership[index]
-                    // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = newQty)
-                    tempItemAndUserQuantities.ownership[index] = ItemOwnership(user, newQty) // tried new object
+                    tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = newQty)
+                    // tempItemAndUserQuantities.ownership[index] = ItemOwnership(user, newQty) // tried new object
                 }
             },
                 modifier = Modifier.weight(1f)
