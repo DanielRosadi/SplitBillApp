@@ -61,6 +61,10 @@ class SharedViewModel : ViewModel() {
     // current item highlighted for SplitItemScreen
     var currentItem: ItemDetail = ItemDetail()
 
+    // copy of current item with users/owners list (temp)
+    // this is used to save data and only applies if the user really saves the data. otherwise, if user press cancels, we will not use this
+    var tempItemAndUserQuantities: ItemWithUsersList = ItemWithUsersList(ItemDetail(), mutableStateListOf())
+
     // --------------- functions (getters, setters)
 
     fun getStoreById(id: String): Store? {

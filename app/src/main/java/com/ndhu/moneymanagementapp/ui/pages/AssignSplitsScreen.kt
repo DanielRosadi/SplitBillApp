@@ -70,13 +70,23 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
     val listItems = viewModel.itemDetailList
 
     // TODO: need to re-load data after coming back from SplitItemScreen
+    /*
     var itemAndUsersList = listItems.map { item ->
         ItemWithUsersList(item = item, ownership = mutableStateListOf())
     }.toMutableStateList()
 
+     */
+
+    /*
+    viewModel.listItemAndUserQuantities = listItems.map { item ->
+        ItemWithUsersList(item = item, ownership = mutableStateListOf())
+    }.toMutableStateList()
+
+     */
+
     val userColors = remember { mutableStateMapOf<User?, Color>() } // <-- HOISTED
 
-    ComposeAssignSplits(context, listParticipants, itemAndUsersList, navController, splitBillController, viewModel, userColors)
+    ComposeAssignSplits(context, listParticipants, viewModel.listItemAndUserQuantities, navController, splitBillController, viewModel, userColors)
 }
 
 @Composable
@@ -478,7 +488,7 @@ fun toggleUser(user: User, item: ItemWithUsersList) {
     if (existingOwnership != null) {
         ownership.remove(existingOwnership)  // Remove the ItemOwnership object
     } else {
-        ownership.add(ItemOwnership(owner = user, itemQuantity = 1))  // Add with default quantity (by one)
+        ownership.add(ItemOwnership(owner = user, itemQuantity = 1.0f))  // Add with default quantity (by one)
     }
 }
 

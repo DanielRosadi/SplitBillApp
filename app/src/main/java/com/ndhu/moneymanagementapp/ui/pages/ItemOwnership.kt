@@ -4,5 +4,5 @@ import com.ndhu.moneymanagementapp.models.User
 
 data class ItemOwnership(
     val owner: User,
-    val itemQuantity: Int
+    val itemQuantity: Float
 )

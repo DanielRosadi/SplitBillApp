@@ -33,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -140,6 +141,11 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                     onClick = {
                         navController.navigate(route = AppScreens.SelectBillOwnerScreen.name)
                         viewModel.setFriendList(selectedFriends) // save the list of friends in SharedViewModel
+
+                        // load and save item and users data for next screen (AssignSplitScreen)
+                        viewModel.listItemAndUserQuantities = viewModel.itemDetailList.map { item ->
+                            ItemWithUsersList(item = item, ownership = mutableStateListOf())
+                        }.toMutableStateList()
                               },
                     modifier = Modifier.fillMaxWidth().height(60.dp)) {
                     Text(text = "Done")
