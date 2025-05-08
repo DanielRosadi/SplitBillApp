@@ -303,6 +303,13 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
 
                      */
 
+                    // TODO: delete when not needed, temporary for debugging
+                    if (viewModel.currentItemAndUserQuantities.ownership.isNotEmpty()){
+                        Text(text = "user: " + viewModel.currentItemAndUserQuantities.ownership[0].owner.username.toString() +
+                                ", itemQuantity" + viewModel.currentItemAndUserQuantities.ownership[0].itemQuantity.toString())
+                    }
+
+
                     Text(
                         // TODO: omit additional float 0 on price
                         text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
@@ -488,6 +495,7 @@ fun toggleUser(user: User, item: ItemWithUsersList) {
     if (existingOwnership != null) {
         ownership.remove(existingOwnership)  // Remove the ItemOwnership object
     } else {
+        // TODO: update according to latest viewModel
         ownership.add(ItemOwnership(owner = user, itemQuantity = 1.0f))  // Add with default quantity (by one)
     }
 }

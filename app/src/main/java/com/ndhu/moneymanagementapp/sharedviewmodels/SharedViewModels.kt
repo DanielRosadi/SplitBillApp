@@ -8,6 +8,7 @@ import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
+import com.ndhu.moneymanagementapp.ui.pages.ItemOwnership
 import com.ndhu.moneymanagementapp.ui.pages.ItemWithUsersList
 
 // ignore this for
@@ -57,6 +58,12 @@ class SharedViewModel : ViewModel() {
 
     // current item with users/owners list
     var currentItemAndUserQuantities: ItemWithUsersList = ItemWithUsersList(ItemDetail(), mutableStateListOf())
+        /*
+    var currentItemAndUserQuantities: ItemWithUsersList = ItemWithUsersList(ItemDetail(), mutableStateListOf(ItemOwnership(
+        User(id = "xxxxxxxxx", username = "user_debug", "email", "lol")
+        , 1.0f)))
+
+         */
 
     // current item highlighted for SplitItemScreen
     var currentItem: ItemDetail = ItemDetail()
