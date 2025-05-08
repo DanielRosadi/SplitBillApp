@@ -26,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,7 +37,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.common.collect.Iterables.addAll
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
@@ -50,6 +48,8 @@ fun SplitItemScreen(context: Context, navController: NavController, viewModel: S
 
 @Composable
 fun ComposeSplitItem(context: Context, navController: NavController, viewModel: SharedViewModel){
+    // TODO: try debug viewModel real time to observe the data changes
+    /*
     var copyCurrentItemAndUserQuantities by remember{
         mutableStateOf(
             viewModel.currentItemAndUserQuantities.copy(
@@ -60,8 +60,10 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
         ))
     }
 
+     */
+
     // copy of current item with users/owners list (temp)
-    // viewModel.tempItemAndUserQuantities
+    viewModel.tempItemAndUserQuantities = deepCopyItemWithUsersList(viewModel.currentItemAndUserQuantities)
 
     /*
     var copyCurrentItemAndUserQuantities = viewModel.currentItemAndUserQuantities.copy()
@@ -104,7 +106,7 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
             ) {
                 items( viewModel.currentItemAndUserQuantities.ownership ){ ownership ->
 
-                    ListSplitItemNonEqual(user = ownership.owner, viewModel = viewModel, copyCurrentItemAndUserQuantities = copyCurrentItemAndUserQuantities)
+                    ListSplitItemNonEqual(user = ownership.owner, viewModel = viewModel)
 
                 }
             }
@@ -119,7 +121,11 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
             // TODO: Save data, need to save quantities
             Button(
                 onClick = {
-                    viewModel.currentItemAndUserQuantities = copyCurrentItemAndUserQuantities
+                    // viewModel.currentItemAndUserQuantities = viewModel.tempItemAndUserQuantities
+                    viewModel.currentItemAndUserQuantities.ownership.clear()
+                    viewModel.currentItemAndUserQuantities.ownership.addAll(viewModel.tempItemAndUserQuantities.ownership)
+
+
                     // viewModel.listItemAndUserQuantities.
                     navController.navigate(route = AppScreens.AssignSplitsScreen.name)
                     // if save, then on;y we save the changes from copied copyCurrentItemAndUserQuantities
@@ -134,6 +140,24 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
 
     }
 
+}
+
+@Composable
+fun deepCopyItemWithUsersList(itemWithUsersList: ItemWithUsersList): ItemWithUsersList {
+    // TODO: need to try to instantiate new object instead of .copy()
+    // Deep copy the ItemDetail object (this makes a copy of the `item` field)
+    val copiedItem = itemWithUsersList.item.copy()  // Deep copy of ItemDetail
+
+    // Deep copy the ownership list (this creates a new list with deep copies of ItemOwnership)
+    val newOwnership = itemWithUsersList.ownership.map { itemOwnership ->
+        itemOwnership.copy()  // Deep copy of each ItemOwnership object
+    }.toMutableStateList() // Convert back to SnapshotStateList
+
+    // Return the deep copy of the entire ItemWithUsersList object
+    return itemWithUsersList.copy(
+        item = copiedItem,  // Assign the deep copied item
+        ownership = newOwnership  // Assign the deep copied ownership list
+    )
 }
 
 @Composable
@@ -193,14 +217,14 @@ fun SplitItemTopBar(navController: NavController, viewModel: SharedViewModel){
 
 
 @Composable
-fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel, copyCurrentItemAndUserQuantities: ItemWithUsersList){
+fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
     // TODO: need to pass the real itemWithUsers, and update the quantities on the data variable so we can save it
     var initialQuantity by remember { mutableStateOf("1.0") }
 
-    var itemWithUsers = copyCurrentItemAndUserQuantities
+    var tempItemAndUserQuantities = viewModel.tempItemAndUserQuantities
 
     // find the owner/user in itemWithUsers
-    val index = itemWithUsers.ownership.indexOfFirst { it.owner == user }
+    val index = tempItemAndUserQuantities.ownership.indexOfFirst { it.owner == user }
 
     Card(
         modifier = Modifier
@@ -224,9 +248,9 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel, copyCurrentIte
                 initialQuantity = "%.2f".format(newQty)
                 // TODO: decrement quantity from itemWithUsers
                 if (index != -1) {
-                    val currentOwnership = itemWithUsers.ownership[index]
+                    val currentOwnership = tempItemAndUserQuantities.ownership[index]
                     // use .copy() to create a modified version of the object and replace it in the list (shallow copy)
-                    itemWithUsers.ownership[index] = currentOwnership.copy(itemQuantity = newQty)
+                    tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = newQty)
                 }
             },
                 modifier = Modifier.weight(1f)
@@ -242,14 +266,15 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel, copyCurrentIte
                     if (input.isEmpty() || input.matches(Regex("""\d*\.?\d*"""))) {
                         initialQuantity = input
 
-                        val updatedList = copyCurrentItemAndUserQuantities.ownership.toMutableStateList() // deep copy
-                        val idx = updatedList.indexOfFirst { it.owner == user }
+                        //val updatedList = tempItemAndUserQuantities.ownership.toMutableStateList() // deep copy
+                        //val idx = updatedList.indexOfFirst { it.owner == user }
                         if (index != -1) {
-                            updatedList[idx] = updatedList[idx].copy(itemQuantity = input.toFloatOrNull() ?: 0f) // deep copy
-                            copyCurrentItemAndUserQuantities = copyCurrentItemAndUserQuantities.copy(ownership = updatedList) // deep copy
+                            //updatedList[idx] = updatedList[idx].copy(itemQuantity = input.toFloatOrNull() ?: 0f) // deep copy
+                            //tempItemAndUserQuantities = tempItemAndUserQuantities.copy(ownership = updatedList) // deep copy
 
-                            val currentOwnership = itemWithUsers.ownership[index]
-                            itemWithUsers.ownership[index] = currentOwnership.copy(itemQuantity = input.toFloatOrNull() ?: 0f) // provides a fallback value (0.0f).
+                            val currentOwnership = tempItemAndUserQuantities.ownership[index]
+                            tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = input.toFloatOrNull() ?: 0f) // provides a fallback value (0.0f).
+
                         }
                     }
                 },
@@ -264,8 +289,9 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel, copyCurrentIte
                 initialQuantity = "%.2f".format(newQty)
                 // TODO: increment quantity from itemWithUsers
                 if (index != -1) {
-                    val currentOwnership = itemWithUsers.ownership[index]
-                    itemWithUsers.ownership[index] = currentOwnership.copy(itemQuantity = newQty)
+                    val currentOwnership = tempItemAndUserQuantities.ownership[index]
+                    // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = newQty)
+                    tempItemAndUserQuantities.ownership[index] = ItemOwnership(user, newQty) // tried new object
                 }
             },
                 modifier = Modifier.weight(1f)

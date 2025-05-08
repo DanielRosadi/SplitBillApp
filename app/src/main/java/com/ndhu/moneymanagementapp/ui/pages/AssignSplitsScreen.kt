@@ -94,8 +94,8 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
     // val userColors = remember { mutableStateMapOf<User?, Color>() }
     var selectedUser by remember { mutableStateOf<User?>(null) }
 
-    // save/cache the item and user quantities data
-    viewModel.listItemAndUserQuantities = listItemsAndOwners
+    // save/cache the item and user quantities data initially (no need, already done in selectfriendpage)
+    // viewModel.listItemAndUserQuantities = listItemsAndOwners
 
     UniformDesignScaffold(
         topAppBar = {
