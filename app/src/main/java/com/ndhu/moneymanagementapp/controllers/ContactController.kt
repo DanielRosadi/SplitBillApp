@@ -17,8 +17,9 @@ class ContactController {
     val contactRepository : IContactRepository = ContactRepository()
 
     suspend fun addContact(context : Context, userId : String) {
-        makeFriend(Util.getUserId(context).toString(), userId)
-        makeFriend(userId, Util.getUserId(context).toString())
+        var requestBy = Util.getUserId(context).toString()
+        makeFriend(Util.getUserId(context).toString(), userId, requestBy)
+        makeFriend(userId, Util.getUserId(context).toString(), requestBy)
     }
 
     suspend fun getCurrUserLoginContact(context : Context) : List<Contact> {
@@ -39,12 +40,17 @@ class ContactController {
         rejectFriend(userId, Util.getUserId(context).toString())
     }
 
-    private suspend fun makeFriend(user1 : String, user2 : String) {
+    private suspend fun makeFriend(user1 : String, user2 : String, requestBy : String) {
+        var contact = contactRepository.getContactFromUsers(user1, user2)
+        if(contact != null && contact.friendStatus == FriendStatus.REJECT.name) {
+            contactRepository.delete(contact.id)
+        }
         contactRepository.add(Contact(
             id = UUID.randomUUID().toString(),
             userId1 = user1,
             userId2 = user2,
-            friendStatus = FriendStatus.PENDING.name
+            friendStatus = FriendStatus.PENDING.name,
+            requestedBy = requestBy
         ))
     }
 
@@ -53,13 +59,6 @@ class ContactController {
         if(contact.friendStatus == FriendStatus.PENDING.name) {
             contact.friendStatus = FriendStatus.FRIEND.name
             contactRepository.update(contact.id, contact)
-            var contact2 = Contact(
-                id = UUID.randomUUID().toString(),
-                userId1 = user1,
-                userId2 = user2,
-                friendStatus = FriendStatus.FRIEND.name
-            )
-            contactRepository.add(contact2)
             return
         }
     }
