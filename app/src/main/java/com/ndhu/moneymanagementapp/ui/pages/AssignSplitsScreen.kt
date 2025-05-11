@@ -306,11 +306,10 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
                     Column(modifier = Modifier.fillMaxHeight()){
 
                         // TODO: delete when not needed, temporary for debugging
-                        if (viewModel.currentItemAndUserQuantities.ownership.isNotEmpty()){
-                            Text(text = "user: " + viewModel.currentItemAndUserQuantities.ownership[0].owner.username.toString() +
-                                    ", itemQuantity" + viewModel.currentItemAndUserQuantities.ownership[0].itemQuantity.toString(),  fontSize = 7.sp,)
+                        val firstOwnership = viewModel.currentItemAndUserQuantities.ownership.getOrNull(0)
+                        if (firstOwnership != null){
+                            Text(text = "user: ${firstOwnership.owner.username}, itemQuantity: ${firstOwnership.itemQuantity.value}",  fontSize = 7.sp,)
                         }
-
 
                         Text(
                             // TODO: omit additional float 0 on price
@@ -503,7 +502,7 @@ fun toggleUser(user: User, item: ItemWithUsersList) {
     } else {
         // TODO: update according to latest viewModel
         // TODO: need to turn off toggle? maybe toggle on causes it to reset to 1.0f item quantity
-        ownership.add(ItemOwnership(owner = user, itemQuantity = 1.0f))  // Add with default quantity (by one)
+        ownership.add(ItemOwnership(owner = user, itemQuantity = mutableStateOf(1.0f)))  // Add with default quantity (by one)
     }
 }
 

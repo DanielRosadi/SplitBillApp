@@ -226,7 +226,7 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
             viewModel.tempItemAndUserQuantities.ownership
                 .find { it.owner == user }
                 ?.itemQuantity
-                ?.let { "%.2f".format(it) } ?: ""
+                ?.let { "%.2f".format(it.value) } ?: ""
         )
     }
 
@@ -263,7 +263,8 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
                 if (index != -1) {
                     val currentOwnership = tempItemAndUserQuantities.ownership[index]
                     // use .copy() to create a modified version of the object and replace it in the list (shallow copy)
-                    tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = newQty)
+                    tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
+                    // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
                 }
             },
                 modifier = Modifier.weight(1f)
@@ -286,9 +287,10 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
                             //tempItemAndUserQuantities = tempItemAndUserQuantities.copy(ownership = updatedList) // deep copy
 
                             val currentOwnership = tempItemAndUserQuantities.ownership[index]
-                            tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = input.toFloatOrNull() ?: 0f) // provides a fallback value (0.0f).
-
+                            tempItemAndUserQuantities.ownership[index].itemQuantity.value = input.toFloatOrNull() ?: 0f // provides a fallback value (0.0f).
+                            // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(input.toFloatOrNull() ?: 0f)) // provides a fallback value (0.0f).
                         }
+                        // Added MutableState to itemQuantity of ItemOwnership class and change itemQuantity of User from ownership list through state, to allow correct data observation
                     }
                 },
                 label = { Text("Qty") },
@@ -303,7 +305,8 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
                 // TODO: increment quantity from itemWithUsers
                 if (index != -1) {
                     val currentOwnership = tempItemAndUserQuantities.ownership[index]
-                    tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = newQty)
+                    tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
+                    //  tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
                     // tempItemAndUserQuantities.ownership[index] = ItemOwnership(user, newQty) // tried new object
                 }
             },
