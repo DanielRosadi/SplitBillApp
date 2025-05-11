@@ -5,7 +5,7 @@ import com.ndhu.moneymanagementapp.models.User
 
 data class ItemOwnership(
     val owner: User,
-    val itemQuantity: MutableState<Float>
+    val itemQuantity: MutableState<Float> // // Added MutableState to itemQuantity of ItemOwnership class required for correct data observation
 ){
     val quantity: Float
         get() = itemQuantity.value

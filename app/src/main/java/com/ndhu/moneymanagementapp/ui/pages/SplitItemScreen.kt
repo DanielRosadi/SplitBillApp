@@ -262,7 +262,7 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
                 // TODO: decrement quantity from itemWithUsers
                 if (index != -1) {
                     val currentOwnership = tempItemAndUserQuantities.ownership[index]
-                    // use .copy() to create a modified version of the object and replace it in the list (shallow copy)
+                    // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
                     tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
                     // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
                 }
@@ -287,10 +287,11 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
                             //tempItemAndUserQuantities = tempItemAndUserQuantities.copy(ownership = updatedList) // deep copy
 
                             val currentOwnership = tempItemAndUserQuantities.ownership[index]
+                            // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
                             tempItemAndUserQuantities.ownership[index].itemQuantity.value = input.toFloatOrNull() ?: 0f // provides a fallback value (0.0f).
                             // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(input.toFloatOrNull() ?: 0f)) // provides a fallback value (0.0f).
                         }
-                        // Added MutableState to itemQuantity of ItemOwnership class and change itemQuantity of User from ownership list through state, to allow correct data observation
+
                     }
                 },
                 label = { Text("Qty") },
@@ -305,6 +306,7 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
                 // TODO: increment quantity from itemWithUsers
                 if (index != -1) {
                     val currentOwnership = tempItemAndUserQuantities.ownership[index]
+                    // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
                     tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
                     //  tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
                     // tempItemAndUserQuantities.ownership[index] = ItemOwnership(user, newQty) // tried new object

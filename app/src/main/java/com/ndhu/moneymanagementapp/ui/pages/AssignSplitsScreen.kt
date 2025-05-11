@@ -93,6 +93,7 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
 fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItemsAndOwners: MutableList<ItemWithUsersList>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel, userColors: SnapshotStateMap<User?, Color>){
     // val userColors = remember { mutableStateMapOf<User?, Color>() }
     var selectedUser by remember { mutableStateOf<User?>(null) }
+    // var selectedUser by remember { mutableStateOf<User?>("No User Selected") }
 
     // save/cache the item and user quantities data initially (no need, already done in selectfriendpage)
     // viewModel.listItemAndUserQuantities = listItemsAndOwners
@@ -122,7 +123,8 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 // update current user selected text
-                Text(text = "Now Selecting: {${selectedUser?.username}}" ?: "No User Selected")
+                // Text(text = "Now Selecting: {${selectedUser?.username}}" ?: "No User Selected")
+                Text(text = selectedUser?.let { selectedUser -> "Now Selecting: ${selectedUser.username}" } ?: "No User Selected")
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -359,7 +361,7 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
 }
 
 @Composable
-fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User) -> Unit, listParticipants: MutableList<User?>){
+fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User?) -> Unit, listParticipants: MutableList<User?>){
     val index = listParticipants.indexOf(participant) // get participant index in the list
     val color = userColors.getOrPut(participant) {
         generateDistinctColor(index, listParticipants.size)
@@ -373,7 +375,11 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
             .fillMaxWidth()
             .padding(5.dp)
             .clickable {
-                if (participant != null) {
+                // Toggle selection of the same user card
+                if (participant == selectedUser) {
+                    onUserSelected(null)  // Deselect if the same user is clicked again
+                }
+                else {
                     // apply selection, this function is required because we are passing state into a child function
                     // otherwise, error may occur
                     onUserSelected(participant)
