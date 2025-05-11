@@ -308,6 +308,10 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
                     Column(modifier = Modifier.fillMaxHeight()){
 
                         // TODO: delete when not needed, temporary for debugging
+
+                        // This ensures:
+                        // You only check and access once.
+                        // You avoid inconsistencies between the two ownership[0] calls during recomposition.
                         val firstOwnership = viewModel.currentItemAndUserQuantities.ownership.getOrNull(0)
                         if (firstOwnership != null){
                             Text(text = "user: ${firstOwnership.owner.username}, itemQuantity: ${firstOwnership.itemQuantity.value}",  fontSize = 7.sp,)

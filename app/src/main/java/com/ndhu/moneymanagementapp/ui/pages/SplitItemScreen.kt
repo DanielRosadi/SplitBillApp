@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,33 @@ fun SplitItemScreen(context: Context, navController: NavController, viewModel: S
 
 @Composable
 fun ComposeSplitItem(context: Context, navController: NavController, viewModel: SharedViewModel){
+    // val listItemsAndOwners = viewModel.listItemAndUserQuantities
+    var totalAssignedQuantity by remember { mutableStateOf(0f) }
+    val totalItemQuantity by remember { mutableStateOf(viewModel.currentItem.qty.toFloat()) } // cast to Float type from a Number type
+
+    // Calculate total assigned quantity and total item quantity for each item
+    //totalItemQuantity = viewModel.currentItemAndUserQuantities.item.qty // total item quantity
+
+    // calculate/sum the item quantity assigned to each user/owner
+    totalAssignedQuantity = viewModel.currentItemAndUserQuantities.ownership.fold(0f) { sum, itemOwnership ->
+        sum + itemOwnership.itemQuantity.value  // Add each itemQuantity.value (Float)
+    }
+
+    // Determine if the quantity is fully assigned, over-assigned, or under-assigned
+    val assignedStatus = when {
+        totalAssignedQuantity == totalItemQuantity -> "0"
+        totalAssignedQuantity > totalItemQuantity -> "+${"%.2f".format(totalAssignedQuantity - totalItemQuantity)}"
+        totalAssignedQuantity < totalItemQuantity -> "-${"%.2f".format(totalItemQuantity - totalAssignedQuantity)}"
+        else -> ""
+    }
+
+    // Control save button state
+    val isSaveEnabled = totalAssignedQuantity == totalItemQuantity
+
+
+
+
+
     // TODO: try debug viewModel real time to observe the data changes
     /*
     var copyCurrentItemAndUserQuantities by remember{
@@ -97,8 +125,23 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
             Text(text = "Price will be calculated based on quantity assigned.", fontSize = 15.sp)
 
             // TODO: make it responsive (cannot add more if exceed. cannot save if is NOT fully assigned)
-            Text(text = "Total Item Quantity: " + viewModel.currentItem.qty, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text(text = "Fully Assigned Item Quantity: y", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Total Item Quantity: $totalItemQuantity", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
+
+            // Text(text = "Fully Assigned Item Quantity: $totalAssignedQuantity", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
+            // Display assigned status (fully assigned, excess, lack)
+            Text(
+                text = "Fully Assigned: $assignedStatus",
+                color = when {
+                    totalAssignedQuantity == totalItemQuantity -> Color.Green
+                    totalAssignedQuantity > totalItemQuantity -> Color.Red
+                    totalAssignedQuantity < totalItemQuantity -> Color.Red
+                    else -> Color.Gray
+                },
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
 
             // Body
             LazyColumn (
@@ -131,7 +174,8 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
                     // if save, then on;y we save the changes from copied copyCurrentItemAndUserQuantities
 
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = isSaveEnabled
             ) {
                 Text(text = "Save")
             }
