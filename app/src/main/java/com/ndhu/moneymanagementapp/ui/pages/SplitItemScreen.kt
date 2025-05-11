@@ -65,29 +65,29 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
     }
 
     // Determine if the quantity is fully assigned, over-assigned, or under-assigned
-    // uses annotated string to allow different part of the text to be modified invidiually
+    // uses annotated string to allow different part of the text to be modified individually
     val assignedStatus = when {
         totalAssignedQuantity.compareTo(totalItemQuantity) == 0 ->
             buildAnnotatedString {
-                append("Fully Assigned: ")
+                append("Item Quantity Assigned: ")
                 withStyle(style = SpanStyle(color = Color(0xFF008000))) { // using "correct" green color code
-                    append("0")
+                    append("FULLY assigned")
                 }
             }
 
         totalAssignedQuantity.compareTo(totalItemQuantity) > 0 ->
             buildAnnotatedString {
-                append("Fully Assigned: ")
-                withStyle(style = SpanStyle(color = Color.Red)) {
-                    append("+${(totalAssignedQuantity - totalItemQuantity)}")
+                append("Item Quantity Assigned: ")
+                withStyle(style = SpanStyle(color = Color(0xFFFF2C2C))) { // using "error" red color code
+                    append("excess by ${(totalAssignedQuantity - totalItemQuantity)} (+)")
                 }
             }
 
         totalAssignedQuantity.compareTo(totalItemQuantity) < 0 ->
             buildAnnotatedString {
-                append("Fully Assigned: ")
-                withStyle(style = SpanStyle(color = Color.Red)) {
-                    append("-${(totalItemQuantity - totalAssignedQuantity)}")
+                append("Item Quantity Assigned: ")
+                withStyle(style = SpanStyle(color = Color(0xFFFF2C2C))) { // using "error" red color code
+                    append("short by ${(totalItemQuantity - totalAssignedQuantity)} (-)")
                 }
             }
 
