@@ -33,8 +33,11 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -62,11 +65,33 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
     }
 
     // Determine if the quantity is fully assigned, over-assigned, or under-assigned
+    // uses annotated string to allow different part of the text to be modified invidiually
     val assignedStatus = when {
-        totalAssignedQuantity == totalItemQuantity -> "0"
-        totalAssignedQuantity > totalItemQuantity -> "+${"%.2f".format(totalAssignedQuantity - totalItemQuantity)}"
-        totalAssignedQuantity < totalItemQuantity -> "-${"%.2f".format(totalItemQuantity - totalAssignedQuantity)}"
-        else -> ""
+        totalAssignedQuantity.compareTo(totalItemQuantity) == 0 ->
+            buildAnnotatedString {
+                append("Fully Assigned: ")
+                withStyle(style = SpanStyle(color = Color(0xFF008000))) { // using "correct" green color code
+                    append("0")
+                }
+            }
+
+        totalAssignedQuantity.compareTo(totalItemQuantity) > 0 ->
+            buildAnnotatedString {
+                append("Fully Assigned: ")
+                withStyle(style = SpanStyle(color = Color.Red)) {
+                    append("+${(totalAssignedQuantity - totalItemQuantity)}")
+                }
+            }
+
+        totalAssignedQuantity.compareTo(totalItemQuantity) < 0 ->
+            buildAnnotatedString {
+                append("Fully Assigned: ")
+                withStyle(style = SpanStyle(color = Color.Red)) {
+                    append("-${(totalItemQuantity - totalAssignedQuantity)}")
+                }
+            }
+
+        else -> buildAnnotatedString { append("") }
     }
 
     // Control save button state
@@ -132,13 +157,7 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
 
             // Display assigned status (fully assigned, excess, lack)
             Text(
-                text = "Fully Assigned: $assignedStatus",
-                color = when {
-                    totalAssignedQuantity == totalItemQuantity -> Color.Green
-                    totalAssignedQuantity > totalItemQuantity -> Color.Red
-                    totalAssignedQuantity < totalItemQuantity -> Color.Red
-                    else -> Color.Gray
-                },
+                text = assignedStatus,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
