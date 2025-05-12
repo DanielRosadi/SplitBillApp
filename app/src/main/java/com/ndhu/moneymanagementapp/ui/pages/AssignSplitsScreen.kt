@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,28 +22,35 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,6 +63,7 @@ import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemAndOwner
 import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -71,19 +80,54 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
     val listParticipants = viewModel.billParticipants
     val listItems = viewModel.itemDetailList
 
+    // TODO: need to re-load data after coming back from SplitItemScreen
+    /*
     var itemAndUsersList = listItems.map { item ->
-        ItemWithUsersList(item = item, owners = mutableStateListOf())
+        ItemWithUsersList(item = item, ownership = mutableStateListOf())
     }.toMutableStateList()
+
+     */
+
+    /*
+    viewModel.listItemAndUserQuantities = listItems.map { item ->
+        ItemWithUsersList(item = item, ownership = mutableStateListOf())
+    }.toMutableStateList()
+
+     */
 
     val userColors = remember { mutableStateMapOf<User?, Color>() } // <-- HOISTED
 
-    ComposeAssignSplits(context, listParticipants, itemAndUsersList, navController, splitBillController, viewModel, userColors)
+    ComposeAssignSplits(context, listParticipants, viewModel.listItemAndUserQuantities, navController, splitBillController, viewModel, userColors)
 }
 
 @Composable
 fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItemsAndOwners: MutableList<ItemWithUsersList>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel, userColors: SnapshotStateMap<User?, Color>){
     // val userColors = remember { mutableStateMapOf<User?, Color>() }
     var selectedUser by remember { mutableStateOf<User?>(null) }
+    // var selectedUser by remember { mutableStateOf<User?>("No User Selected") }
+
+    /*
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+     */
+    // for showing Toast message
+    val localContext = LocalContext.current
+
+    // save/cache the item and user quantities data initially (no need, already done in selectfriendpage)
+    // viewModel.listItemAndUserQuantities = listItemsAndOwners
+
+    var isAllItemsFullyAssigned by remember { mutableStateOf(false) }
+    //var assignedQty by remember { mutableStateOf(0f) }
+    //var isFullyAssigned by remember { mutableStateOf(false) }
+
+    /*
+    val isAllItemsFullyAssigned = listItemsAndOwners.all { itemWithUsers ->
+        val assignedQty = itemWithUsers.ownership.fold(0f) { sum, itemOwnership-> sum + itemOwnership.itemQuantity.value }
+        assignedQty == itemWithUsers.item.qty // check with total quantity
+    }
+
+     */
 
     UniformDesignScaffold(
         topAppBar = {
@@ -103,6 +147,34 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 .padding(paddingValues)
                 .padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
+
+                // calculate if all items have been assigned, otherwise disabled save button
+                isAllItemsFullyAssigned = listItemsAndOwners.all { itemWithUsers ->
+                    val assignedQty = itemWithUsers.ownership.fold(0f) { sum, itemOwnership ->
+                        sum + itemOwnership.itemQuantity.value
+                    }
+                    assignedQty == itemWithUsers.item.qty.toFloat() // Check if assigned quantity matches total quantity
+                }
+
+
+
+                /*
+                // Perform the checks and update the state
+                LaunchedEffect(listItemsAndOwners) { // Recalculate whenever the list changes
+                    val fullyAssigned = listItemsAndOwners.all { itemWithUsers ->
+                        //  val assignedQty
+                        assignedQty = itemWithUsers.ownership.fold(0f) { sum, itemOwnership ->
+                            sum + itemOwnership.itemQuantity.value
+                        }
+                        assignedQty == itemWithUsers.item.qty.toFloat() // Check if assigned quantity matches total quantity
+                    }
+
+                    // isAllItemsFullyAssigned.value = fullyAssigned // Update the state
+                    isAllItemsFullyAssigned = fullyAssigned // Update the state
+                }
+                */
+
+
                 Spacer(modifier = Modifier.height(10.dp))
 
                 SearchBox()
@@ -110,7 +182,8 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 // update current user selected text
-                Text(text = "Now Selecting: {${selectedUser?.username}}" ?: "No User Selected")
+                // Text(text = "Now Selecting: {${selectedUser?.username}}" ?: "No User Selected")
+                Text(text = selectedUser?.let { selectedUser -> "Now Selecting: ${selectedUser.username}" } ?: "No User Selected")
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -120,11 +193,13 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                     // it also automatically handles when the list is not perfectly divisible by 3
                     items(listItemsAndOwners) { itemAndUsers ->
                         ListItemSplits(
+                            listItemAndUserQuantities = listItemsAndOwners,
                             navController = navController,
                             itemWithUsers = itemAndUsers,
                             selectedUser = selectedUser,
                             userColors = userColors,
-                            onToggleUser = { user -> toggleUser(user, itemAndUsers) }
+                            onToggleUser = { user -> toggleUser(user, itemAndUsers) },
+                            viewModel = viewModel
                         )
                     }
 
@@ -147,14 +222,12 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                     // TODO: if done, create list of itemIdAndOwners
 
                     // TODO: then, submit bill data to database (with list of itemIdAndOwners)
-                    // val splitBillRequest = SplitBillRequest(billOwnerId = viewModel.getBillOwner(), itemIdAndOwners = )
-                    /*
-                    runBlocking {
-                        splitBillController.addSplitBill(context = context, request = splitBillRequest)
-                    }
-                     */
+                    // *******
 
                     // TODO: need to discuss on qty for ItemAndOwner
+                    // TODO: need to recheck if there is changes since we are implementing additional logic
+
+
                     val itemIdAndOwners = mapItemsToItemAndOwners(listItemsAndOwners)
 
 
@@ -163,14 +236,43 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                         itemIdAndOwners = itemIdAndOwners
                     )
 
+
                     runBlocking {
                         splitBillController.addSplitBill(context = context, request = splitBillRequest)
                     }
 
+                    // TODO: need to put some toast/feedback
+
+                    navController.navigate(route = AppScreens.HomeScreen.name)
+
+                    // TODO: clear all data in viewModel because its for one transaction only?
+
+
+                    // Example trigger (button click, etc.)
+                    Toast.makeText(localContext, "Bill has been successfully saved", Toast.LENGTH_LONG).show()
+
+                    /*
+                    // provide feedback when user successfully save the bill
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "Bill has been successfully saved",
+                            // actionLabel = "Dismiss",
+                            withDismissAction = true,
+                            duration = SnackbarDuration.Long, // Adjust duration here
+
+                        )
+                    }
+                    */
+
+
                 },
                     modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)) {
+                    .height(60.dp),
+                    enabled = isAllItemsFullyAssigned
+
+                )
+                {
                     Text(text = "Done")
                 }
 
@@ -185,7 +287,12 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 }
 
 @Composable
-fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit) {
+fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit, viewModel: SharedViewModel) {
+
+    var isFullyAssigned by remember {mutableStateOf(false)}
+
+    // keep track of quantities to provide feedback to user if the item quantities has not been assigned
+    isFullyAssigned = itemWithUsers.item.qty.toFloat() == itemWithUsers.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}
 
         Card(
             modifier = Modifier
@@ -196,7 +303,12 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                     selectedUser?.let { onToggleUser(it) }
                 },
             elevation = CardDefaults.cardElevation(4.dp),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+            // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(
+                containerColor = if (!isFullyAssigned) Color(0xFFFF7074) // light red
+                // Color(0xFFFFEBEE), Color(0xFFFF474D), Color(0xFFFF5B61)
+                else MaterialTheme.colorScheme.surface
+            )
         ) {
 
 
@@ -205,16 +317,17 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                     .fillMaxWidth()
                     .padding(9.dp),
                 verticalAlignment = Alignment.CenterVertically, //  center content vertically
-                horizontalArrangement = Arrangement.SpaceBetween // space between 3 main sections
+                // horizontalArrangement = Arrangement.SpaceBetween // space between 3 main sections
+                horizontalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = itemWithUsers.item.name,
-                    fontSize = 18.sp,
+                    fontSize = 15.sp, // 18.sp
                     // modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
-                        .weight(1.3f) //  allow flexible width
-                        .padding(end = 8.dp)
+                        .weight(0.5f) //  allow flexible width
+                        .padding(end = 7.dp)
                 )
 
                 // TODO: implement selected users here
@@ -230,20 +343,21 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                     // Display selected users as colored dots
                     LazyRow(
                         modifier = Modifier
-                            .weight(1.6f) // take up most space
+                            .weight(0.7f) // take up most space
                             .height(32.dp), // Adjust height for good dot fit
                         horizontalArrangement = Arrangement.spacedBy(2.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(itemWithUsers.owners) { user ->
-                            val color = userColors[user] ?: Color.Gray
-                            UserDot(user = user, color = color)
+                        items(itemWithUsers.ownership) { ownership ->
+                            // user == ownership.owner
+                            val color = userColors[ownership.owner] ?: Color.Gray
+                            UserDot(user = ownership.owner, color = color)
                         }
 
                         // If a user is selected, show a "plus" slot
-                        if (selectedUser != null && !itemWithUsers.owners.contains(selectedUser)) {
+                        if (selectedUser != null && !itemWithUsers.ownership.any{ it.owner == selectedUser }) {
                             item {
-                                val alreadySelected = itemWithUsers.owners.contains(selectedUser)
+                                val alreadySelected = itemWithUsers.ownership.any{ it.owner == selectedUser }
                                 if (!alreadySelected) {
                                     Card(
                                         modifier = Modifier
@@ -269,11 +383,13 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .weight(1.9f) // share width evenly with item name
-                        .padding(start = 4.dp),
+                        .weight(1.0f) // share width evenly with item name
+                        .padding(start = 2.dp),
                     horizontalArrangement = Arrangement.Center
+                    // horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     // TODO: rework design for custom quantity (move to rightmost, use pencil icon)
+                    /*
                     Button(
                         onClick = { navController.navigate(route = AppScreens.SplitItemScreen.name) },
                         modifier = Modifier.width(70.dp).height(70.dp),
@@ -282,13 +398,47 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
                         Text(text = "C", fontSize = 30.sp) // Custom quantity
                     }
 
-                    Text(
-                        // TODO: omit additional float 0 on price
-                        text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
-                        fontSize = 18.sp,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                     */
+
+                    Column(modifier = Modifier.fillMaxHeight()){
+
+                        // TODO: delete when not needed, temporary for debugging
+
+                        // This ensures:
+                        // You only check and access once.
+                        // You avoid inconsistencies between the two ownership[0] calls during recomposition.
+
+                        /*
+                        val firstOwnership = viewModel.currentItemAndUserQuantities.ownership.getOrNull(0)
+                        val currentItem = viewModel.currentItemAndUserQuantities
+                        if (firstOwnership != null){
+                            // Text(text = "user: ${firstOwnership.owner.username}, itemQuantity: ${firstOwnership.itemQuantity.value}",  fontSize = 7.sp,)
+                            // Text(text = "equal: " + (currentItem.item.qty == currentItem.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}).toString(),  fontSize = 7.sp,)
+                            Text(text = "total: " + currentItem.item.qty.toFloat().toString() + ", sum: " + currentItem.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}.toString(),  fontSize = 7.sp,)
+
+                        }
+                        */
+
+
+                        Text(
+                            // TODO: omit additional float 0 on price
+                            text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
+                            fontSize = 15.sp,
+                            modifier = Modifier.padding(8.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                    }
+
+
+
+                    TransparentEditButton {
+                        // save/cache the item and user quantities data
+                        viewModel.listItemAndUserQuantities = listItemAndUserQuantities
+                        viewModel.currentItemAndUserQuantities = itemWithUsers
+                        viewModel.currentItem = itemWithUsers.item // passing current item detail
+                        navController.navigate(route = AppScreens.SplitItemScreen.name)
+                    }
 
                 }
 
@@ -318,7 +468,7 @@ fun ListItemSplits(navController: NavController, itemWithUsers: ItemWithUsersLis
 }
 
 @Composable
-fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User) -> Unit, listParticipants: MutableList<User?>){
+fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User?) -> Unit, listParticipants: MutableList<User?>){
     val index = listParticipants.indexOf(participant) // get participant index in the list
     val color = userColors.getOrPut(participant) {
         generateDistinctColor(index, listParticipants.size)
@@ -332,7 +482,11 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
             .fillMaxWidth()
             .padding(5.dp)
             .clickable {
-                if (participant != null) {
+                // Toggle selection of the same user card
+                if (participant == selectedUser) {
+                    onUserSelected(null)  // Deselect if the same user is clicked again
+                }
+                else {
                     // apply selection, this function is required because we are passing state into a child function
                     // otherwise, error may occur
                     onUserSelected(participant)
@@ -359,19 +513,68 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
     }
 }
 
-fun mapItemsToItemAndOwners(items: List<ItemWithUsersList>): List<ItemAndOwner> {
+@Composable
+fun TransparentEditButton(clickEvent: () -> Unit) {
+    Button(
+        onClick = clickEvent,
+        modifier = Modifier
+            .padding(4.dp)
+            .size(40.dp), // Make it small and square-ish
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = green, // Visible color (blue)
+            contentColor = Color.White
+        ),
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Edit,
+            contentDescription = "Edit",
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+
+/*
+@Composable
+fun TransparentEditButton( clickEvent: () -> Unit ) {
+    Button(
+        onClick = clickEvent,
+        modifier = Modifier.padding(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            // containerColor = Color.Transparent,  // Make button background transparent
+            containerColor = Color.Blue,
+            contentColor = Color.Black          // Set the icon and text color
+        )
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Edit, // Pencil/Edit icon
+            contentDescription = "Edit",
+            modifier = Modifier.padding(end = 8.dp) // Space between icon and text
+        )
+        Text(text = "Edit")
+    }
+}
+*/
+
+
+// TODO: need to adapt this code with new logic
+fun mapItemsToItemAndOwners(items: MutableList<ItemWithUsersList>): List<ItemAndOwner?> {
     // flatMap transform one item into many items. in our case, one item produces multiple ItemAndOwner.
     // and then flatMap flatten all produced items into one list
     return items.flatMap { itemWithUsers ->
-        itemWithUsers.owners.map { user ->
+        itemWithUsers.ownership.map { user ->
             ItemAndOwner(
                 itemId = itemWithUsers.item.id,
-                ownerId = user.id,
-                qty = itemWithUsers.item.qty
+                ownerId = user.owner.id,
+                qty = user.itemQuantity.value
             )
         }
     }
 }
+
+
 
 
 @Composable
@@ -392,14 +595,30 @@ fun UserDot(user: User, color: Color) {
     ) {}
 }
 
-
+/*
 fun toggleUser(user: User, item: ItemWithUsersList) {
-    if (item.owners.contains(user)) {
-        item.owners.remove(user)
+    if (item.ownership.any{it.owner == user}) {
+        item.ownership.remove(user)
     } else {
-        item.owners.add(user)
+        item.ownership.add(user)
     }
 }
+
+ */
+
+fun toggleUser(user: User, item: ItemWithUsersList) {
+    val ownership = item.ownership
+    val existingOwnership = ownership.find { it.owner == user }
+
+    if (existingOwnership != null) {
+        ownership.remove(existingOwnership)  // Remove the ItemOwnership object
+    } else {
+        // TODO: update according to latest viewModel
+        // TODO: need to turn off toggle? maybe toggle on causes it to reset to 1.0f item quantity
+        ownership.add(ItemOwnership(owner = user, itemQuantity = mutableStateOf(1.0f)))  // Add with default quantity (by one)
+    }
+}
+
 
 
 
