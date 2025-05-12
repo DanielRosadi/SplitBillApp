@@ -186,6 +186,7 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
                     // viewModel.currentItemAndUserQuantities = viewModel.tempItemAndUserQuantities
                     viewModel.currentItemAndUserQuantities.ownership.clear()
                     viewModel.currentItemAndUserQuantities.ownership.addAll(viewModel.tempItemAndUserQuantities.ownership)
+                    filterZeroQuantityUser(viewModel = viewModel)
 
 
                     // viewModel.listItemAndUserQuantities.
@@ -201,6 +202,17 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
         }
 
 
+    }
+
+}
+
+// filter out user with 0 item quantity
+fun filterZeroQuantityUser(viewModel: SharedViewModel) {
+    // This mutates the list in-place → Compose will recompose correctly
+    viewModel.currentItemAndUserQuantities.ownership.apply {
+        val filtered = filter { ownership -> ownership.itemQuantity.value > 0 }
+        clear()
+        addAll(filtered)
     }
 
 }
