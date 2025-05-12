@@ -200,12 +200,14 @@ fun PendingCard(contact: Contact, context: Context, userController: UserControll
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Text(
-                    text = "Username",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF009669)
-                )
+                // Show username of pending user
+                val userId = contact.userId1 // Sender
+                val userObject = runBlocking{
+                    userController.searchUserByUserId(context, userId)
+                }
+                if (userObject != null) {
+                    Text(text = userObject.username, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
+                }
             } // Row 1
 
             // Row 2 = Accept/Reject buttons
