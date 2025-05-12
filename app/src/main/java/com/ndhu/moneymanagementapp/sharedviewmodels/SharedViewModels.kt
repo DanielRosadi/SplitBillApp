@@ -1,5 +1,6 @@
 package com.ndhu.moneymanagementapp.sharedviewmodels
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.Contact
@@ -7,6 +8,8 @@ import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
+import com.ndhu.moneymanagementapp.ui.pages.ItemOwnership
+import com.ndhu.moneymanagementapp.ui.pages.ItemWithUsersList
 
 // ignore this for
 /*
@@ -24,6 +27,8 @@ And pass respective dataId to find specific database record/row/document
  */
 
 class SharedViewModel : ViewModel() {
+
+    // --------------- class variables/fields
 
     var storeList: MutableList<Store>? = null
 
@@ -48,9 +53,26 @@ class SharedViewModel : ViewModel() {
     // to contains information of one bill (1 store, items, friends, 1 bill owner, item assigns)
     var bill: Bill? = null
 
+    // act as a data backup/"cache" between AssignSplitsScreen and SplitItemScreen
+    var listItemAndUserQuantities: MutableList<ItemWithUsersList> = mutableListOf()
 
+    // current item with users/owners list
+    var currentItemAndUserQuantities: ItemWithUsersList = ItemWithUsersList(ItemDetail(), mutableStateListOf())
+        /*
+    var currentItemAndUserQuantities: ItemWithUsersList = ItemWithUsersList(ItemDetail(), mutableStateListOf(ItemOwnership(
+        User(id = "xxxxxxxxx", username = "user_debug", "email", "lol")
+        , 1.0f)))
 
+         */
 
+    // current item highlighted for SplitItemScreen
+    var currentItem: ItemDetail = ItemDetail()
+
+    // copy of current item with users/owners list (temp)
+    // this is used to save data and only applies if the user really saves the data. otherwise, if user press cancels, we will not use this
+    var tempItemAndUserQuantities: ItemWithUsersList = ItemWithUsersList(ItemDetail(), mutableStateListOf())
+
+    // --------------- functions (getters, setters)
 
     fun getStoreById(id: String): Store? {
         return storeList?.find { it.id == id }
