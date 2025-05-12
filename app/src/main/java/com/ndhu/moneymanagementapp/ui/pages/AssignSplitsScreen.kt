@@ -36,6 +36,8 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -109,11 +111,23 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
     val scope = rememberCoroutineScope()
 
      */
-
+    // for showing Toast message
     val localContext = LocalContext.current
 
     // save/cache the item and user quantities data initially (no need, already done in selectfriendpage)
     // viewModel.listItemAndUserQuantities = listItemsAndOwners
+
+    var isAllItemsFullyAssigned by remember { mutableStateOf(false) }
+    //var assignedQty by remember { mutableStateOf(0f) }
+    //var isFullyAssigned by remember { mutableStateOf(false) }
+
+    /*
+    val isAllItemsFullyAssigned = listItemsAndOwners.all { itemWithUsers ->
+        val assignedQty = itemWithUsers.ownership.fold(0f) { sum, itemOwnership-> sum + itemOwnership.itemQuantity.value }
+        assignedQty == itemWithUsers.item.qty // check with total quantity
+    }
+
+     */
 
     UniformDesignScaffold(
         topAppBar = {
@@ -132,6 +146,34 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 .fillMaxHeight()
                 .padding(paddingValues)
                 .padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+
+                // calculate if all items have been assigned, otherwise disabled save button
+                isAllItemsFullyAssigned = listItemsAndOwners.all { itemWithUsers ->
+                    val assignedQty = itemWithUsers.ownership.fold(0f) { sum, itemOwnership ->
+                        sum + itemOwnership.itemQuantity.value
+                    }
+                    assignedQty == itemWithUsers.item.qty.toFloat() // Check if assigned quantity matches total quantity
+                }
+
+
+
+                /*
+                // Perform the checks and update the state
+                LaunchedEffect(listItemsAndOwners) { // Recalculate whenever the list changes
+                    val fullyAssigned = listItemsAndOwners.all { itemWithUsers ->
+                        //  val assignedQty
+                        assignedQty = itemWithUsers.ownership.fold(0f) { sum, itemOwnership ->
+                            sum + itemOwnership.itemQuantity.value
+                        }
+                        assignedQty == itemWithUsers.item.qty.toFloat() // Check if assigned quantity matches total quantity
+                    }
+
+                    // isAllItemsFullyAssigned.value = fullyAssigned // Update the state
+                    isAllItemsFullyAssigned = fullyAssigned // Update the state
+                }
+                */
+
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -226,7 +268,11 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 },
                     modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)) {
+                    .height(60.dp),
+                    enabled = isAllItemsFullyAssigned
+
+                )
+                {
                     Text(text = "Done")
                 }
 
@@ -243,6 +289,11 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 @Composable
 fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit, viewModel: SharedViewModel) {
 
+    var isFullyAssigned by remember {mutableStateOf(false)}
+
+    // keep track of quantities to provide feedback to user if the item quantities has not been assigned
+    isFullyAssigned = itemWithUsers.item.qty.toFloat() == itemWithUsers.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -252,7 +303,11 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
                     selectedUser?.let { onToggleUser(it) }
                 },
             elevation = CardDefaults.cardElevation(4.dp),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+            // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(
+                containerColor = if (!isFullyAssigned) Color(0xFFFFEBEE) // light red
+                else MaterialTheme.colorScheme.surface
+            )
         ) {
 
 
@@ -354,11 +409,15 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
 
                         /*
                         val firstOwnership = viewModel.currentItemAndUserQuantities.ownership.getOrNull(0)
+                        val currentItem = viewModel.currentItemAndUserQuantities
                         if (firstOwnership != null){
-                            Text(text = "user: ${firstOwnership.owner.username}, itemQuantity: ${firstOwnership.itemQuantity.value}",  fontSize = 7.sp,)
-                        }
+                            // Text(text = "user: ${firstOwnership.owner.username}, itemQuantity: ${firstOwnership.itemQuantity.value}",  fontSize = 7.sp,)
+                            // Text(text = "equal: " + (currentItem.item.qty == currentItem.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}).toString(),  fontSize = 7.sp,)
+                            Text(text = "total: " + currentItem.item.qty.toFloat().toString() + ", sum: " + currentItem.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}.toString(),  fontSize = 7.sp,)
 
-                         */
+                        }
+                        */
+
 
                         Text(
                             // TODO: omit additional float 0 on price
