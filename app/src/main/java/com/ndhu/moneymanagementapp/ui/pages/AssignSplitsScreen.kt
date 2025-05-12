@@ -31,6 +31,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +40,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.toMutableStateList
@@ -56,6 +59,7 @@ import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemAndOwner
 import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -97,6 +101,9 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
     // val userColors = remember { mutableStateMapOf<User?, Color>() }
     var selectedUser by remember { mutableStateOf<User?>(null) }
     // var selectedUser by remember { mutableStateOf<User?>("No User Selected") }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     // save/cache the item and user quantities data initially (no need, already done in selectfriendpage)
     // viewModel.listItemAndUserQuantities = listItemsAndOwners
@@ -190,6 +197,17 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                     navController.navigate(route = AppScreens.HomeScreen.name)
 
                     // TODO: clear all data in viewModel because its for one transaction only?
+
+                    // provide feedback when user successfully save the bill
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "Bill has been successfully saved",
+                            // actionLabel = "Dismiss",
+                            withDismissAction = true,
+                            duration = SnackbarDuration.Long, // Adjust duration here
+
+                        )
+                    }
 
 
                 },
