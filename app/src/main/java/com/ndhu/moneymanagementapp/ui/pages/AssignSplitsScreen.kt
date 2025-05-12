@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +48,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,8 +104,13 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
     var selectedUser by remember { mutableStateOf<User?>(null) }
     // var selectedUser by remember { mutableStateOf<User?>("No User Selected") }
 
+    /*
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+     */
+
+    val localContext = LocalContext.current
 
     // save/cache the item and user quantities data initially (no need, already done in selectfriendpage)
     // viewModel.listItemAndUserQuantities = listItemsAndOwners
@@ -198,6 +205,11 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                     // TODO: clear all data in viewModel because its for one transaction only?
 
+
+                    // Example trigger (button click, etc.)
+                    Toast.makeText(localContext, "Bill has been successfully saved", Toast.LENGTH_LONG).show()
+
+                    /*
                     // provide feedback when user successfully save the bill
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -208,6 +220,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                         )
                     }
+                    */
 
 
                 },
