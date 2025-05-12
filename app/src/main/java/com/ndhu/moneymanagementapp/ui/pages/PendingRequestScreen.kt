@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -36,10 +37,8 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.Contact
+import com.ndhu.moneymanagementapp.models.User
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-
-// Test Coroutine habis ini
 
 /*
 TODO:
@@ -117,7 +116,13 @@ private fun ComposePendingRequest(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(contacts) { contact ->
-                            PendingCard(contacts, contact, context, userController, contactController)
+                            PendingCard(
+                                contacts,
+                                contact,
+                                context,
+                                userController,
+                                contactController
+                            )
                         }
                     }
                 }
@@ -173,14 +178,23 @@ private fun ComposePendingRequest(
 
 // Card Item inside Lazy Column containing Pending Contact information
 @Composable
-fun PendingCard(contacts: SnapshotStateList<Contact>, contact: Contact, context: Context, userController: UserController, contactController: ContactController) {
+fun PendingCard(
+    contacts: SnapshotStateList<Contact>,
+    contact: Contact,
+    context: Context,
+    userController: UserController,
+    contactController: ContactController
+) {
 
     val coroutineScope = rememberCoroutineScope()
 
-    // Show username of pending user
-    val userId = contact.userId1 // Sender
-    val userObject = runBlocking {
-        userController.searchUserByUserId(context, userId)
+    // Store the state of the sender's username
+    val userObject = remember { mutableStateOf<User?>(null) }
+
+    // Fetch the sender's username
+    LaunchedEffect(contact.userId1) {
+        val sender = userController.searchUserByUserId(context, contact.userId1)
+        userObject.value = sender
     }
 
     Card(
@@ -217,14 +231,16 @@ fun PendingCard(contacts: SnapshotStateList<Contact>, contact: Contact, context:
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                if (userObject != null) {
+                // Show sender's username
+                userObject.value?.let {
                     Text(
-                        text = userObject.username,
+                        text = it.username,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF009669)
                     )
                 }
+
             } // Row 1
 
             // Row 2 = Accept/Reject buttons
@@ -240,9 +256,13 @@ fun PendingCard(contacts: SnapshotStateList<Contact>, contact: Contact, context:
                     modifier = Modifier
                         .clickable {
                             coroutineScope.launch {
-                                contactController.rejectFriend(context, contact.userId1)
-                                contacts.remove(contact)
-                                Log.d("PendingCard", "Rejected friend request: $userId!")
+                                try {
+                                    contactController.rejectFriend(context, contact.userId1)
+                                    contacts.remove(contact)
+                                    Log.d("PendingCard", "Rejected friend request: ${contact.userId1}!")
+                                } catch (e: Exception) {
+                                    Log.e("PendingCard", "Failed to reject request: ${e.message}")
+                                }
                             }
                         }
                         .fillMaxHeight()
@@ -257,15 +277,18 @@ fun PendingCard(contacts: SnapshotStateList<Contact>, contact: Contact, context:
                     )
                 }
 
-
                 // Accept
                 Box(
                     modifier = Modifier
                         .clickable {
                             coroutineScope.launch {
-                                contactController.acceptFriend(context, contact.userId1)
-                                contacts.remove(contact)
-                                Log.d("PendingCard", "Accepted friend request: $userId!")
+                                try {
+                                    contactController.acceptFriend(context, contact.userId1)
+                                    contacts.remove(contact)
+                                    Log.d("PendingCard", "Accepted friend request: ${contact.userId1}!")
+                                } catch (e: Exception) {
+                                    Log.e("PendingCard", "Failed to accept request: ${e.message}")
+                                }
                             }
                         }
                         .fillMaxHeight()
