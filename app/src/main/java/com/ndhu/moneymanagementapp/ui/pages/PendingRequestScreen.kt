@@ -42,11 +42,11 @@ import kotlinx.coroutines.launch
 
 /*
 TODO:
-    - finish design UI
-    - function button acc all and reject all
+    - Confirmation dialog yet for Accept/Reject All
+    - Empty state if the contact list is empty
     - Ganti font
     - Ganti image
-    - Search
+    - Search function
 */
 
 @Composable
@@ -73,6 +73,9 @@ private fun ComposePendingRequest(
     userController: UserController,
     contactController: ContactController
 ) {
+
+    val coroutineScope = rememberCoroutineScope()
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -86,18 +89,16 @@ private fun ComposePendingRequest(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(30.dp))
-
             TitleText()
-
             Spacer(modifier = Modifier.height(30.dp))
 
             // White Box
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(10.dp)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(Color(0xFFD9D9D9))
+                    .padding(10.dp)
             ) {
                 // Content Top Bar
                 // TODO: search func
@@ -115,13 +116,9 @@ private fun ComposePendingRequest(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(contacts) { contact ->
+                        items(contacts, key = { it.userId1 }) { contact ->
                             PendingCard(
-                                contacts,
-                                contact,
-                                context,
-                                userController,
-                                contactController
+                                contacts, contact, context, userController, contactController
                             )
                         }
                     }
@@ -138,7 +135,20 @@ private fun ComposePendingRequest(
                 ) {
                     // Reject All
                     Button(
-                        onClick = { /* TODO: Reject All Request  */ },
+                        onClick = {
+                            coroutineScope.launch {
+                                try {
+                                    // Loop through list and rejectFriend() for each Contact
+                                    contacts.toList().forEach {
+                                        contactController.rejectFriend(context, it.userId1)
+                                    }
+                                    contacts.clear() // Updates the UI
+                                    Log.d("PendingRequest", "All requests rejected.")
+                                } catch (e: Exception) {
+                                    Log.e("PendingRequest", "Failed to reject all: ${e.message}")
+                                }
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxHeight()
                             .weight(1f)
@@ -154,7 +164,20 @@ private fun ComposePendingRequest(
 
                     // Accept All
                     Button(
-                        onClick = { /* TODO: Accept All Request  */ },
+                        onClick = {
+                            coroutineScope.launch {
+                                try {
+                                    // Loop through list and acceptFriend() for each Contact
+                                    contacts.toList().forEach {
+                                        contactController.acceptFriend(context, it.userId1)
+                                    }
+                                    contacts.clear() // Updates the UI
+                                    Log.d("PendingRequest", "All requests accepted.")
+                                } catch (e: Exception) {
+                                    Log.e("PendingRequest", "Failed to accept all: ${e.message}")
+                                }
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxHeight()
                             .weight(1f)
@@ -259,7 +282,10 @@ fun PendingCard(
                                 try {
                                     contactController.rejectFriend(context, contact.userId1)
                                     contacts.remove(contact)
-                                    Log.d("PendingCard", "Rejected friend request: ${contact.userId1}!")
+                                    Log.d(
+                                        "PendingCard",
+                                        "Rejected friend request: ${contact.userId1}!"
+                                    )
                                 } catch (e: Exception) {
                                     Log.e("PendingCard", "Failed to reject request: ${e.message}")
                                 }
@@ -285,7 +311,10 @@ fun PendingCard(
                                 try {
                                     contactController.acceptFriend(context, contact.userId1)
                                     contacts.remove(contact)
-                                    Log.d("PendingCard", "Accepted friend request: ${contact.userId1}!")
+                                    Log.d(
+                                        "PendingCard",
+                                        "Accepted friend request: ${contact.userId1}!"
+                                    )
                                 } catch (e: Exception) {
                                     Log.e("PendingCard", "Failed to accept request: ${e.message}")
                                 }
