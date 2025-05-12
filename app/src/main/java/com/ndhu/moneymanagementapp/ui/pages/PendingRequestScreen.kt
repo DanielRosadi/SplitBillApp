@@ -1,7 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
-import android.graphics.drawable.Icon
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,45 +10,36 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CheckCircleOutline
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircleOutline
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
-import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.Contact
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+
+// Test Coroutine habis ini
 
 /*
 TODO:
@@ -61,8 +51,7 @@ TODO:
 */
 
 @Composable
-fun PendingRequestScreen (context: Context, navController: NavController)
-{
+fun PendingRequestScreen(context: Context, navController: NavController) {
     val contactController = ContactController()
     val userController = UserController()
     val listPending = remember { mutableStateListOf<Contact>() }
@@ -74,7 +63,7 @@ fun PendingRequestScreen (context: Context, navController: NavController)
         listPending.addAll(pendingContactsFromDb)
     }
 
-    ComposePendingRequest(listPending, context, navController, userController)
+    ComposePendingRequest(listPending, context, navController, userController, contactController)
 }
 
 @Composable
@@ -82,7 +71,8 @@ private fun ComposePendingRequest(
     contacts: SnapshotStateList<Contact>,
     context: Context,
     navController: NavController,
-    userController: UserController
+    userController: UserController,
+    contactController: ContactController
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -95,7 +85,7 @@ private fun ComposePendingRequest(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
             Spacer(modifier = Modifier.height(30.dp))
 
             TitleText()
@@ -105,7 +95,8 @@ private fun ComposePendingRequest(
             // White Box
             Column(
                 modifier = Modifier
-                    .fillMaxSize().padding(10.dp)
+                    .fillMaxSize()
+                    .padding(10.dp)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(Color(0xFFD9D9D9))
             ) {
@@ -115,7 +106,9 @@ private fun ComposePendingRequest(
 
                 // Use Card to make rounded corner for LazyColumn
                 Card(
-                    modifier = Modifier.fillMaxWidth().weight(4f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(4f),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFBDBDBD)),
                 ) {
@@ -124,7 +117,7 @@ private fun ComposePendingRequest(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(contacts) { contact ->
-                            PendingCard(contact, context, userController)
+                            PendingCard(contacts, contact, context, userController, contactController)
                         }
                     }
                 }
@@ -133,13 +126,18 @@ private fun ComposePendingRequest(
 
                 // Button Section
                 Row(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // Reject All
                     Button(
                         onClick = { /* TODO: Reject All Request  */ },
-                        modifier = Modifier.fillMaxHeight().weight(1f).padding(10.dp),
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .padding(10.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF961400), // Red
@@ -152,7 +150,10 @@ private fun ComposePendingRequest(
                     // Accept All
                     Button(
                         onClick = { /* TODO: Accept All Request  */ },
-                        modifier = Modifier.fillMaxHeight().weight(1f).padding(10.dp),
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .padding(10.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF009669), // Green
@@ -172,9 +173,20 @@ private fun ComposePendingRequest(
 
 // Card Item inside Lazy Column containing Pending Contact information
 @Composable
-fun PendingCard(contact: Contact, context: Context, userController: UserController) {
+fun PendingCard(contacts: SnapshotStateList<Contact>, contact: Contact, context: Context, userController: UserController, contactController: ContactController) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+    // Show username of pending user
+    val userId = contact.userId1 // Sender
+    val userObject = runBlocking {
+        userController.searchUserByUserId(context, userId)
+    }
+
     Card(
-        modifier = Modifier.fillMaxWidth().height(80.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(Color.White),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -187,12 +199,17 @@ fun PendingCard(contact: Contact, context: Context, userController: UserControll
         ) {
             // Row 1 = Profile Image and Name
             Row(
-                modifier = Modifier.fillMaxHeight().weight(2f).padding(20.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(2f)
+                    .padding(20.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    modifier = Modifier.size(40.dp).clip(CircleShape),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape),
                     imageVector = Icons.Filled.Person,
                     contentDescription = "Profile Picture",
                     tint = Color.Gray
@@ -200,27 +217,36 @@ fun PendingCard(contact: Contact, context: Context, userController: UserControll
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                // Show username of pending user
-                val userId = contact.userId1 // Sender
-                val userObject = runBlocking{
-                    userController.searchUserByUserId(context, userId)
-                }
                 if (userObject != null) {
-                    Text(text = userObject.username, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
+                    Text(
+                        text = userObject.username,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF009669)
+                    )
                 }
             } // Row 1
 
             // Row 2 = Accept/Reject buttons
             Row(
-                modifier = Modifier.fillMaxHeight().weight(1f),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Reject
                 Box(
                     modifier = Modifier
-                        .clickable {  }
-                        .fillMaxHeight().weight(1f)
+                        .clickable {
+                            coroutineScope.launch {
+                                contactController.rejectFriend(context, contact.userId1)
+                                contacts.remove(contact)
+                                Log.d("PendingCard", "Rejected friend request: $userId!")
+                            }
+                        }
+                        .fillMaxHeight()
+                        .weight(1f)
                         .background(Color(0xFFD84315)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -231,11 +257,19 @@ fun PendingCard(contact: Contact, context: Context, userController: UserControll
                     )
                 }
 
+
                 // Accept
                 Box(
                     modifier = Modifier
-                        .clickable {  }
-                        .fillMaxHeight().weight(1f)
+                        .clickable {
+                            coroutineScope.launch {
+                                contactController.acceptFriend(context, contact.userId1)
+                                contacts.remove(contact)
+                                Log.d("PendingCard", "Accepted friend request: $userId!")
+                            }
+                        }
+                        .fillMaxHeight()
+                        .weight(1f)
                         .background(Color(0xFF009688)),
                     contentAlignment = Alignment.Center
                 ) {
