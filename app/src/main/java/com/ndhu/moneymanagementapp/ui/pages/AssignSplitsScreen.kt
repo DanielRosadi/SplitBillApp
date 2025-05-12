@@ -305,7 +305,8 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
             elevation = CardDefaults.cardElevation(4.dp),
             // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
             colors = CardDefaults.cardColors(
-                containerColor = if (!isFullyAssigned) Color(0xFFFFEBEE) // light red
+                containerColor = if (!isFullyAssigned) Color(0xFFFF7074) // light red
+                // Color(0xFFFFEBEE), Color(0xFFFF474D), Color(0xFFFF5B61)
                 else MaterialTheme.colorScheme.surface
             )
         ) {
