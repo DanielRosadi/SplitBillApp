@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
 /*
 TODO:
     - Confirmation dialog yet for Accept/Reject All
-    - Empty state if the contact list is empty
     - Ganti font
     - Ganti image
     - Search function
@@ -112,14 +111,24 @@ private fun ComposePendingRequest(
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFBDBDBD)),
                 ) {
-                    LazyColumn(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(contacts, key = { it.userId1 }) { contact ->
-                            PendingCard(
-                                contacts, contact, context, userController, contactController
-                            )
+                    // Handle empty list
+                    if (contacts.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = "No pending friend requests", fontSize = 16.sp, color = Color.Gray)
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(contacts, key = { it.userId1 }) { contact ->
+                                PendingCard(
+                                    contacts, contact, context, userController, contactController
+                                )
+                            }
                         }
                     }
                 }
