@@ -5,5 +5,4 @@ data class Contact (
     var userId1 : String = "",
     var userId2 : String = "",
     var friendStatus : String = "",
-    var requestedBy: String = "",
 )

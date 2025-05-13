@@ -1,14 +1,11 @@
 package com.ndhu.moneymanagementapp.repositories.impl
 
-import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 import com.ndhu.moneymanagementapp.enums.Collection
 import com.ndhu.moneymanagementapp.enums.FriendStatus
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.repositories.IContactRepository
-import com.ndhu.moneymanagementapp.repositories.IRepositories
 import kotlinx.coroutines.tasks.await
 
 class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRepository{
@@ -93,6 +90,20 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
         whereEqualTo("userId1", userId1).
         whereEqualTo("friendStatus", friendStatus.name).
+        get().await()
+        if(!querySnapshot.isEmpty) {
+            for (document in querySnapshot.documents) {
+                document.toObject(Contact::class.java)?.let { contacts.add(it) }
+            }
+        }
+        return contacts
+    }
+
+    override suspend fun getRejectContacts(userId : String) : List<Contact> {
+        var contacts = mutableListOf<Contact>()
+        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
+        whereEqualTo("userId2", userId).
+        whereEqualTo("friendStatus", FriendStatus.REJECT.name).
         get().await()
         if(!querySnapshot.isEmpty) {
             for (document in querySnapshot.documents) {

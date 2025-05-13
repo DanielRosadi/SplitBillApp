@@ -1,12 +1,9 @@
 package com.ndhu.moneymanagementapp.controllers
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import com.google.firebase.firestore.local.LocalStore
 import com.ndhu.moneymanagementapp.enums.FriendStatus
 import com.ndhu.moneymanagementapp.models.Contact
-import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.repositories.IContactRepository
 import com.ndhu.moneymanagementapp.repositories.IUserRepository
 import com.ndhu.moneymanagementapp.repositories.impl.ContactRepository
@@ -49,6 +46,10 @@ class ContactController {
         return contactRepository.getPendingContact(Util.getUserId(context).toString())
     }
 
+    suspend fun getRejectContact(context: Context) : List<Contact> {
+        return contactRepository.getRejectContacts(Util.getUserId(context).toString())
+    }
+
     suspend fun acceptFriend(context : Context, userId : String)  {
         acceptFriend(Util.getUserId(context).toString(), userId)
         acceptFriend(userId, Util.getUserId(context).toString())
@@ -69,7 +70,6 @@ class ContactController {
             userId1 = user1,
             userId2 = user2,
             friendStatus = FriendStatus.PENDING.name,
-            requestedBy = requestBy
         ))
     }
 
