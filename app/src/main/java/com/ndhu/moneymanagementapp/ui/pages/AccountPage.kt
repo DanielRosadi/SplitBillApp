@@ -70,13 +70,13 @@ fun AccountPage(context: Context, navController: NavController) {
                     .padding(top = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Scaffold section (for navigation and text)
+                // Scaffold section
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp),
                 ) {
-                    // Back button aligned to the start
+                    // Back button
                     IconButton(
                         onClick = { navController.popBackStack() },
                         modifier = Modifier.align(Alignment.CenterStart)
