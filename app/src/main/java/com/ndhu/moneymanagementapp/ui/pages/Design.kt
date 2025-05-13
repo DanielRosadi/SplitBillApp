@@ -60,7 +60,8 @@ val alexandriaFont = FontFamily(
 )
 
 // Colors
-val green = Color(0xFF009669)
+val dangerRed = Color(0xFF961400)
+val primaryGreen = Color(0xFF009669) // Main brand color
 val darkGrey = Color(0xFF9D9D9D)
 
 // Background Image used in most pages

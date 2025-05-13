@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircleOutline
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,7 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,7 +46,6 @@ import kotlinx.coroutines.launch
 
 /*
 TODO:
-    - Confirmation dialog yet for Accept/Reject All
     - Ganti font
     - Ganti image
     - Search function
@@ -72,8 +75,11 @@ private fun ComposePendingRequest(
     userController: UserController,
     contactController: ContactController
 ) {
-
     val coroutineScope = rememberCoroutineScope()
+
+    // Confirmation dialog for Accept/Reject All
+    val showRejectAllDialog = remember { mutableStateOf(false) }
+    val showAcceptAllDialog = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -100,25 +106,18 @@ private fun ComposePendingRequest(
                     .padding(10.dp)
             ) {
                 // Content Top Bar
-                // TODO: search func
+                // TODO: search function
                 ContentTopBar(navController = navController, topBarText = "Pending Request")
 
                 // Use Card to make rounded corner for LazyColumn
-                Card(
+                ContactContainer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(4f),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFBDBDBD)),
+                        .weight(4f)
                 ) {
                     // Handle empty list
                     if (contacts.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "No pending friend requests", fontSize = 16.sp, color = Color.Gray)
-                        }
+                        EmptyStateMessage("No pending friend requests")
                     } else {
                         LazyColumn(
                             modifier = Modifier.padding(16.dp),
@@ -144,27 +143,14 @@ private fun ComposePendingRequest(
                 ) {
                     // Reject All
                     Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                try {
-                                    // Loop through list and rejectFriend() for each Contact
-                                    contacts.toList().forEach {
-                                        contactController.rejectFriend(context, it.userId1)
-                                    }
-                                    contacts.clear() // Updates the UI
-                                    Log.d("PendingRequest", "All requests rejected.")
-                                } catch (e: Exception) {
-                                    Log.e("PendingRequest", "Failed to reject all: ${e.message}")
-                                }
-                            }
-                        },
+                        onClick = { showRejectAllDialog.value = true },
                         modifier = Modifier
                             .fillMaxHeight()
                             .weight(1f)
                             .padding(10.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF961400), // Red
+                            containerColor = dangerRed,
                             contentColor = Color.White
                         )
                     ) {
@@ -173,27 +159,14 @@ private fun ComposePendingRequest(
 
                     // Accept All
                     Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                try {
-                                    // Loop through list and acceptFriend() for each Contact
-                                    contacts.toList().forEach {
-                                        contactController.acceptFriend(context, it.userId1)
-                                    }
-                                    contacts.clear() // Updates the UI
-                                    Log.d("PendingRequest", "All requests accepted.")
-                                } catch (e: Exception) {
-                                    Log.e("PendingRequest", "Failed to accept all: ${e.message}")
-                                }
-                            }
-                        },
+                        onClick = { showAcceptAllDialog.value = true },
                         modifier = Modifier
                             .fillMaxHeight()
                             .weight(1f)
                             .padding(10.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF009669), // Green
+                            containerColor = primaryGreen,
                             contentColor = Color.White
                         )
                     ) {
@@ -202,6 +175,58 @@ private fun ComposePendingRequest(
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // Show Reject All confirmation dialog
+                if (showRejectAllDialog.value) {
+                    ConfirmationDialog(
+                        title = "Confirm Reject All",
+                        message = "Are you sure you want to reject all friend requests?",
+                        confirmText = "Reject All",
+                        confirmColor = dangerRed,
+                        onConfirm = {
+                            coroutineScope.launch {
+                                try {
+                                    contacts.toList().forEach {
+                                        contactController.rejectFriend(context, it.userId1)
+                                    }
+                                    contacts.clear()
+                                    Log.d("PendingRequest", "All requests rejected.")
+                                } catch (e: Exception) {
+                                    Log.e("PendingRequest", "Failed to reject all: ${e.message}")
+                                } finally {
+                                    showRejectAllDialog.value = false // Manual dismissal
+                                }
+                            }
+                        },
+                        showDialog = showRejectAllDialog
+                    )
+                } // Reject All Dialog
+
+                // Show Accept All confirmation dialog
+                if (showAcceptAllDialog.value) {
+                    ConfirmationDialog(
+                        title = "Confirm Accept All",
+                        message = "Are you sure you want to accept all friend requests?",
+                        confirmText = "Accept All",
+                        confirmColor = primaryGreen,
+                        onConfirm = {
+                            coroutineScope.launch {
+                                try {
+                                    contacts.toList().forEach {
+                                        contactController.acceptFriend(context, it.userId1)
+                                    }
+                                    contacts.clear()
+                                    Log.d("PendingRequest", "All requests accepted.")
+                                } catch (e: Exception) {
+                                    Log.e("PendingRequest", "Failed to accept all: ${e.message}")
+                                } finally {
+                                    showAcceptAllDialog.value = false // Manual dismissal
+                                }
+                            }
+                        },
+                        showDialog = showAcceptAllDialog
+                    )
+                } // Accept All Dialog
 
             } // White Box
         } // Full Page
@@ -217,7 +242,6 @@ fun PendingCard(
     userController: UserController,
     contactController: ContactController
 ) {
-
     val coroutineScope = rememberCoroutineScope()
 
     // Store the state of the sender's username
@@ -284,64 +308,168 @@ fun PendingCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Reject
-                Box(
-                    modifier = Modifier
-                        .clickable {
-                            coroutineScope.launch {
-                                try {
-                                    contactController.rejectFriend(context, contact.userId1)
-                                    contacts.remove(contact)
-                                    Log.d(
-                                        "PendingCard",
-                                        "Rejected friend request: ${contact.userId1}!"
-                                    )
-                                } catch (e: Exception) {
-                                    Log.e("PendingCard", "Failed to reject request: ${e.message}")
-                                }
+                BoxIconButton(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.Cancel,
+                    backgroundColor = Color(0xFFD84315),
+                    onClick = {
+                        coroutineScope.launch {
+                            try {
+                                contactController.rejectFriend(context, contact.userId1)
+                                contacts.remove(contact)
+                                Log.d("PendingCard", "Rejected friend request: ${contact.userId1}")
+                                // Optional: Show snackbar/toast
+                            } catch (e: Exception) {
+                                Log.e("PendingCard", "Failed to reject: ${e.message}")
+                                // Optional: Show error feedback to user
                             }
                         }
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(Color(0xFFD84315)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Cancel,
-                        contentDescription = "Reject",
-                        tint = Color.White
-                    )
-                }
+                    },
+                    contentDescription = "Reject"
+                )
 
                 // Accept
-                Box(
-                    modifier = Modifier
-                        .clickable {
-                            coroutineScope.launch {
-                                try {
-                                    contactController.acceptFriend(context, contact.userId1)
-                                    contacts.remove(contact)
-                                    Log.d(
-                                        "PendingCard",
-                                        "Accepted friend request: ${contact.userId1}!"
-                                    )
-                                } catch (e: Exception) {
-                                    Log.e("PendingCard", "Failed to accept request: ${e.message}")
-                                }
+                BoxIconButton(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.CheckCircleOutline,
+                    backgroundColor = Color(0xFF009688),
+                    onClick = {
+                        coroutineScope.launch {
+                            try {
+                                contactController.acceptFriend(context, contact.userId1)
+                                contacts.remove(contact)
+                                Log.d("PendingCard", "Accepted friend request: ${contact.userId1}")
+                                // Optional: Show snackbar/toast
+                            } catch (e: Exception) {
+                                Log.e("PendingCard", "Failed to accept: ${e.message}")
+                                // Optional: Show error feedback to user
                             }
                         }
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(Color(0xFF009688)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.CheckCircleOutline,
-                        contentDescription = "Accept",
-                        tint = Color.White
-                    )
-                } // Accept
+                    },
+                    contentDescription = "Accept"
+                )
 
             } // Row 2
         } // Outer Row
     } // Card
 }
+
+// Reusable for LazyColumn Container
+@Composable
+fun ContactContainer(
+    modifier: Modifier = Modifier,
+    containerColor: Color = darkGrey,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+    ) {
+        content()
+    }
+}
+
+// Reusable for Empty State in LazyColumn
+@Composable
+fun EmptyStateMessage(message: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFBDBDBD)), // light gray
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = message,
+            color = Color(0xFF616161), // darker gray
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+// Reusable for accept/reject-type actions in any list card
+@Composable
+fun BoxIconButton(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    backgroundColor: Color,
+    onClick: () -> Unit,
+    contentDescription: String
+) {
+    Box(
+        modifier = modifier
+            .clickable { onClick() }
+            .fillMaxHeight()
+            .background(backgroundColor),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = Color.White
+        )
+    }
+}
+
+// Reusable for Confirmation Dialog (pop up)
+@Composable
+fun ConfirmationDialog(
+    title: String,
+    message: String,
+    confirmText: String,
+    cancelText: String = "Cancel",
+    confirmColor: Color,
+    onConfirm: () -> Unit,
+    showDialog: MutableState<Boolean>
+) {
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text(title) },
+            text = { Text(message) },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = { showDialog.value = false },
+                        modifier = Modifier
+                            .height(48.dp)
+                            .weight(5f),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = darkGrey,
+                            contentColor = Color.White
+                        ),
+                    ) {
+                        Text(cancelText)
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Button(
+                        onClick = {
+                            onConfirm()
+                        },
+                        modifier = Modifier
+                            .height(48.dp)
+                            .weight(5f),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = confirmColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(confirmText)
+                    }
+                }
+            },
+            containerColor = Color.White
+        )
+    }
+}
+
