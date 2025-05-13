@@ -1,13 +1,11 @@
 package com.ndhu.moneymanagementapp.repositories.impl
 
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 import com.ndhu.moneymanagementapp.enums.Collection
 import com.ndhu.moneymanagementapp.enums.FriendStatus
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.repositories.IContactRepository
-import com.ndhu.moneymanagementapp.repositories.IRepositories
 import kotlinx.coroutines.tasks.await
 
 class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRepository{
@@ -28,21 +26,39 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         return this.delete(Collection.CONTACT.collection, documentId)
     }
 
-    override suspend fun getUserContact(userId : String) : List<Contact> {
-        val contacts = mutableListOf<Contact>()
-        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).whereEqualTo("userId1", userId).whereEqualTo("friendStatus", FriendStatus.FRIEND.name).get().await()
-        if(!querySnapshot.isEmpty) {
-            for (document in querySnapshot.documents) {
-                document.toObject(Contact::class.java)?.let { contacts.add(it) }
-            }
+    override suspend fun getUserContact(userId: String): List<Contact> {
+        val contacts = mutableSetOf<Contact>()
+
+        val db = Firebase.firestore
+        val collectionRef = db.collection(Collection.CONTACT.collection)
+
+        val query1 = collectionRef
+            .whereEqualTo("userId1", userId)
+            .whereEqualTo("friendStatus", FriendStatus.FRIEND.name)
+            .get()
+            .await()
+
+        val query2 = collectionRef
+            .whereEqualTo("userId2", userId)
+            .whereEqualTo("friendStatus", FriendStatus.FRIEND.name)
+            .get()
+            .await()
+
+        query1.documents.forEach { doc ->
+            doc.toObject(Contact::class.java)?.let { contacts.add(it) }
         }
-        return contacts
+
+        query2.documents.forEach { doc ->
+            doc.toObject(Contact::class.java)?.let { contacts.add(it) }
+        }
+
+        return contacts.toList()
     }
 
     override suspend fun getPendingContact(userId : String) : List<Contact> {
         val contacts = mutableListOf<Contact>()
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-            whereEqualTo("userId2", userId).
+            whereEqualTo("userId1", userId).
             whereEqualTo("friendStatus", FriendStatus.PENDING.name).
             get().await()
         if(!querySnapshot.isEmpty) {
@@ -53,8 +69,8 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         return contacts
     }
 
-    override suspend fun getContactFromUsers(userId1 : String, userId2 : String) : Contact {
-        var contact = Contact()
+    override suspend fun getContactFromUsers(userId1 : String, userId2 : String) : Contact? {
+        var contact: Contact? = null
 
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
             whereEqualTo("userId1", userId1).
@@ -74,6 +90,20 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
         whereEqualTo("userId1", userId1).
         whereEqualTo("friendStatus", friendStatus.name).
+        get().await()
+        if(!querySnapshot.isEmpty) {
+            for (document in querySnapshot.documents) {
+                document.toObject(Contact::class.java)?.let { contacts.add(it) }
+            }
+        }
+        return contacts
+    }
+
+    override suspend fun getRejectContacts(userId : String) : List<Contact> {
+        var contacts = mutableListOf<Contact>()
+        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
+        whereEqualTo("userId2", userId).
+        whereEqualTo("friendStatus", FriendStatus.REJECT.name).
         get().await()
         if(!querySnapshot.isEmpty) {
             for (document in querySnapshot.documents) {
