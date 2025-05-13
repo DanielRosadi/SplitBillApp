@@ -27,7 +27,7 @@ class ContactController {
 
         val userExist = userRepository.getById(userId)
         if (userExist == null) {
-            Log.d("ERROR", "TAK BISA ADD DIRI SEORANG WA")
+            Log.d("ERROR", "TAK BISA ADD USER YG GAK ADA")
             return
         }
 
