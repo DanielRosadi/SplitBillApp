@@ -313,7 +313,7 @@ fun DeleteAccountDialog(
                             )
                         ) {
                             Text(
-                                "Delete Account",
+                                "Delete",
                                 fontSize = 18.sp,
                                 fontFamily = surannaFont,
                                 maxLines = 1,
