@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -36,7 +38,16 @@ import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.Contact
 import kotlinx.coroutines.runBlocking
+
 @Composable
+
+        /*
+        TODO:
+            - PendingRequest Notification
+            - Ganti font
+            - Ganti image
+            - Search function
+        */
 
 fun ContactPage(context: Context, navController: NavController) {
 
@@ -44,22 +55,21 @@ fun ContactPage(context: Context, navController: NavController) {
     val userController = UserController()
     val listFriends = remember { mutableStateListOf<Contact>() }
 
-    // Fetch user's contacts from Firebase and display them when the screen is launched
-    // Unit = "key" to make LaunchedEffect run only once
     LaunchedEffect(Unit) {
         val contactsFromDb = contactController.getCurrUserLoginContact(context)
+        Log.d("Contact Screen", "Fetched ${contactsFromDb.size} contacts")
         listFriends.clear() // Clear old data
         listFriends.addAll(contactsFromDb) // Add fresh new data
     }
 
-    ComposeContactScreen(context, navController, listFriends, contactController, userController)
+    ComposeContactScreen(listFriends, context, navController, contactController, userController)
 }
 
 @Composable
 fun ComposeContactScreen(
+    contacts: SnapshotStateList<Contact>,
     context: Context,
     navController: NavController,
-    contacts: SnapshotStateList<Contact>,
     contactController: ContactController,
     userController: UserController
 ) {
@@ -78,7 +88,7 @@ fun ComposeContactScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
             Spacer(modifier = Modifier.height(30.dp))
             TitleText()
             Spacer(modifier = Modifier.height(30.dp))
@@ -90,32 +100,40 @@ fun ComposeContactScreen(
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(Color(0xFFD9D9D9))
                     .padding(10.dp)
-            )
-            {
+            ) {
                 // Content Top Bar
                 // TODO: search func
                 ContentTopBar(navController = navController, topBarText = "Contacts")
 
                 // Use Card to make rounded corner for LazyColumn
-                Card(
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFBDBDBD)),
-                    modifier = Modifier.fillMaxWidth().weight(3f)
+                ContactContainer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(4f)
                 ) {
-                    LazyColumn(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(contacts) { contact ->
-                            ContactItem(context, contact, userController)
+                    // Handle empty list
+                    if (contacts.isEmpty()) {
+                        EmptyStateMessage("No contacts available")
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(contacts) { contact ->
+                                ContactCard(contacts, contact, context, userController)
+                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Column(modifier = Modifier.fillMaxWidth().weight(1f))
-                {
+                // Button Section
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
                     // Pending Request Button
                     Button(
                         onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
@@ -124,11 +142,21 @@ fun ComposeContactScreen(
                             .weight(1f),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF009669),
+                            containerColor = primaryGreen,
                             contentColor = Color.White
                         )
                     ) {
-                        Text(text = "Pending Request", fontSize = 16.sp)
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Pending Request",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = surannaFont
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -141,11 +169,16 @@ fun ComposeContactScreen(
                             .weight(1f),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF009669),
+                            containerColor = primaryGreen,
                             contentColor = Color.White
                         )
                     ) {
-                        Text(text = "Add New Contact", fontSize = 16.sp)
+                        Text(
+                            text = "Add New Contact",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = surannaFont,
+                        )
                     }
                 }
 
@@ -168,20 +201,39 @@ fun ComposeContactScreen(
 
 // Card Item inside Lazy Column containing Contact information
 @Composable
-fun ContactItem(context: Context, contact: Contact, userController: UserController) {
+fun ContactCard(
+    contacts: SnapshotStateList<Contact>,
+    contact: Contact,
+    context: Context,
+    userController: UserController
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    // Fetching username of contact
+    val userId = contact.userId2
+    val userObject = runBlocking {
+        userController.searchUserByUserId(context, userId)
+    }
+
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(Color.White),
         elevation = CardDefaults.cardElevation(4.dp),
-        modifier = Modifier.fillMaxWidth().height(80.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxSize().padding(20.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
         ) {
             // Box (canvas) to show profile picture
             Box(
-                modifier = Modifier.size(32.dp).clip(CircleShape)
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
             ) {
                 // TODO: Change Icon -> Image later
                 Icon(
@@ -195,12 +247,14 @@ fun ContactItem(context: Context, contact: Contact, userController: UserControll
             Spacer(modifier = Modifier.width(16.dp))
 
             // Show friend's username
-            val userId = contact.userId2
-            val userObject = runBlocking{
-                userController.searchUserByUserId(context, userId)
-            }
             if (userObject != null) {
-                Text(text = userObject.username, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF009669))
+                Text(
+                    text = userObject.username,
+                    color = primaryGreen,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = alexandriaFont
+                )
             }
         }
     } // Card
