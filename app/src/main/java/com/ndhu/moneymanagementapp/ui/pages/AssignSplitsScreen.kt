@@ -522,7 +522,7 @@ fun TransparentEditButton(clickEvent: () -> Unit) {
             .size(40.dp), // Make it small and square-ish
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = green, // Visible color (blue)
+            containerColor = primaryGreen, // Visible color (blue)
             contentColor = Color.White
         ),
         contentPadding = PaddingValues(0.dp)
