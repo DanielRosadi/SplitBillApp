@@ -72,8 +72,8 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         return contacts
     }
 
-    override suspend fun getContactFromUsers(userId1 : String, userId2 : String) : Contact {
-        var contact = Contact()
+    override suspend fun getContactFromUsers(userId1 : String, userId2 : String) : Contact? {
+        var contact: Contact? = null
 
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
             whereEqualTo("userId1", userId1).

@@ -31,9 +31,14 @@ class ContactController {
             return
         }
 
+        if (contactRepository.getContactFromUsers(Util.getUserId(context).toString(), userId) != null
+            || contactRepository.getContactFromUsers(userId, Util.getUserId(context).toString()) != null) {
+            Log.d("ERROR", "CONTACT UDAH EXISTS")
+            return
+        }
+
         var requestBy = Util.getUserId(context).toString()
         makeFriend(Util.getUserId(context).toString(), userId, requestBy)
-        makeFriend(userId, Util.getUserId(context).toString(), requestBy)
     }
 
     suspend fun getCurrUserLoginContact(context : Context) : List<Contact> {
@@ -70,7 +75,7 @@ class ContactController {
 
     private suspend fun acceptFriend(user1 : String, user2 : String) {
         var contact = contactRepository.getContactFromUsers(user1, user2)
-        if(contact.friendStatus == FriendStatus.PENDING.name) {
+        if(contact?.friendStatus == FriendStatus.PENDING.name) {
             contact.friendStatus = FriendStatus.FRIEND.name
             contactRepository.update(contact.id, contact)
             return
@@ -79,7 +84,7 @@ class ContactController {
 
     private suspend fun rejectFriend(user1 : String, user2 : String) {
         var contact = contactRepository.getContactFromUsers(user1, user2)
-        if(contact.friendStatus == FriendStatus.PENDING.name) {
+        if(contact?.friendStatus == FriendStatus.PENDING.name) {
             contact.friendStatus = FriendStatus.REJECT.name
             contactRepository.update(contact.id, contact)
             Log.w("INFO", "YAHAHAHAHHA KENA REJECT")
