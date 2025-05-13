@@ -8,15 +8,29 @@ import com.ndhu.moneymanagementapp.enums.FriendStatus
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.repositories.IContactRepository
+import com.ndhu.moneymanagementapp.repositories.IUserRepository
 import com.ndhu.moneymanagementapp.repositories.impl.ContactRepository
+import com.ndhu.moneymanagementapp.repositories.impl.UserRepository
 import com.ndhu.moneymanagementapp.utils.Util
 import java.util.UUID
 
 class ContactController {
 
     val contactRepository : IContactRepository = ContactRepository()
+    val userRepository : IUserRepository = UserRepository()
 
     suspend fun addContact(context : Context, userId : String) {
+        if(Util.getUserId(context).toString() == userId) {
+            Log.d("ERROR", "TAK BISA ADD DIRI SEORANG WA")
+            return
+        }
+
+        val userExist = userRepository.getById(userId)
+        if (userExist == null) {
+            Log.d("ERROR", "TAK BISA ADD DIRI SEORANG WA")
+            return
+        }
+
         var requestBy = Util.getUserId(context).toString()
         makeFriend(Util.getUserId(context).toString(), userId, requestBy)
         makeFriend(userId, Util.getUserId(context).toString(), requestBy)
