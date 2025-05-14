@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -37,7 +37,8 @@ import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.Contact
-import kotlinx.coroutines.runBlocking
+import com.ndhu.moneymanagementapp.models.User
+import com.ndhu.moneymanagementapp.utils.Util
 
 @Composable
 
@@ -109,7 +110,7 @@ fun ComposeContactScreen(
                 ContactContainer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(4f)
+                        .weight(3f)
                 ) {
                     // Handle empty list
                     if (contacts.isEmpty()) {
@@ -146,17 +147,13 @@ fun ComposeContactScreen(
                             contentColor = Color.White
                         )
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Pending Request",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                fontFamily = surannaFont
-                            )
-                        }
+                        Text(
+                            text = "Pending Request",
+                            //modifier = Modifier.background(Color.Blue),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = surannaFont,
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -177,7 +174,7 @@ fun ComposeContactScreen(
                             text = "Add New Contact",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.SemiBold,
-                            fontFamily = surannaFont,
+                            fontFamily = surannaFont
                         )
                     }
                 }
@@ -207,12 +204,26 @@ fun ContactCard(
     context: Context,
     userController: UserController
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    // val coroutineScope = rememberCoroutineScope()
+    var isLoading by remember { mutableStateOf(true) }
 
-    // Fetching username of contact
-    val userId = contact.userId2
-    val userObject = runBlocking {
-        userController.searchUserByUserId(context, userId)
+    // Get ID of both users
+    val currentUserId = remember { Util.getUserId(context).toString() }
+    val friendUserId = if (contact.userId1 == currentUserId) contact.userId2 else contact.userId1
+
+    // Mutable state to hold the fetched user object
+    var userObject by remember { mutableStateOf<User?>(null) }
+
+    // Fetch the user asynchronously when friendUserId changes
+    LaunchedEffect(friendUserId) {
+        isLoading = true
+        try {
+            userObject = userController.searchUserByUserId(context, friendUserId)
+        } catch (e: Exception) {
+            Log.e("ContactCard", "Failed to fetch user: ${e.message}")
+        } finally {
+            isLoading = false
+        }
     }
 
     Card(
@@ -229,13 +240,11 @@ fun ContactCard(
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
-            // Box (canvas) to show profile picture
             Box(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
             ) {
-                // TODO: Change Icon -> Image later
                 Icon(
                     Icons.Filled.Person,
                     contentDescription = "Profile Picture",
@@ -246,16 +255,42 @@ fun ContactCard(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Show friend's username
-            if (userObject != null) {
-                Text(
-                    text = userObject.username,
-                    color = primaryGreen,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = alexandriaFont
-                )
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.height(18.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = primaryGreen
+                        )
+                    }
+                }
+
+                userObject != null -> {
+                    userObject?.let { user ->
+                        Text(
+                            text = user.username,
+                            color = primaryGreen,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = alexandriaFont
+                        )
+                    }
+                }
+
+                else -> {
+                    Text(
+                        text = "Unknown User",
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
+
         }
-    } // Card
+    }
 }
