@@ -38,6 +38,8 @@ fun BillHistory(context: Context, navController: NavController) {
         History("10", "Clinic123", "2024-04-01", "User456", "Pending")
     )
 
+    // val histories = emptyList<History>()
+
     ComposeBillHistoryScreen(histories = histories, navController = navController)
 }
 
@@ -64,14 +66,18 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
             ) {
                 ContentTopBar(navController = navController, topBarText = "Bill History")
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(histories) { history ->
-                        HistoryItem(history = history, navController = navController)
+                if (histories.isEmpty()) {
+                    EmptyStateMessage("No bill history available")
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(histories) { history ->
+                            HistoryItem(history = history, navController = navController)
+                        }
                     }
                 }
 
