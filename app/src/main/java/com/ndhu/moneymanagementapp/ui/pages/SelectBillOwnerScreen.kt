@@ -199,7 +199,8 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(15.dp))
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -252,7 +253,7 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
 
 
         }
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
         }
 
@@ -273,7 +274,7 @@ fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit) {
     // val borderColor = if (isSelected) Color.Red else Color.Gray
     val borderColor = if (isSelected) correctTransparentGreen else Color.Gray
 
-
+    // TODO: omit the square shadow when user performing click on cards
     Column( //  Wrapped everything in Column to stack Card & Text
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -288,7 +289,7 @@ fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit) {
             .padding(3.dp)
             .clickable { onClick() /* changes selectedIndex to globalIndex, therefore making it currently selected user/owner because (selectedIndex == globalIndex) for isSelected condition */ },
         shape = CircleShape, // Makes it round
-        border = BorderStroke(2.dp, borderColor),
+        // border = BorderStroke(2.dp, borderColor),
         // colors = CardDefaults.cardColors(containerColor = backgroundColor),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(4.dp),
