@@ -230,7 +230,10 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                     )
                 ) {
                     // TODO: font family?
-                    Text(text = "Add Friend", fontSize = 24.sp)
+                    Text(text = "Add Friend",
+                        fontSize = 24.sp,
+                        //fontFamily = surannaFont
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -256,7 +259,10 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                     )
                 ) {
                     // TODO: font family?
-                    Text(text = "Done", fontSize = 24.sp)
+                    Text(text = "Done",
+                        fontSize = 24.sp,
+                        //fontFamily = surannaFont
+                    )
                 }
 
 
