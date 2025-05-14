@@ -1,8 +1,10 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,13 +13,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -36,6 +43,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,7 +93,8 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
     var showDialogAddFriend by remember { mutableStateOf(false) }
 
-    UniformDesignScaffold(
+    //UniformDesignScaffold(
+        /*
         topAppBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.popBackStack() }) {
@@ -94,45 +104,133 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                 Text("Select Friends", fontSize = 40.sp, fontWeight = FontWeight.Bold)
             }
         },
+        */
 
-        body = {paddingValues->
-            Column (modifier = Modifier
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+
+        // Background Image
+        BackgroundImage()
+
+
+
+        // Full page
+        Column(
+            modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(paddingValues)
-                .padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                // .fillMaxHeight()
+            // .padding(paddingValues)
+            //.padding(10.dp)
+            ,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-                Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(30.dp))
+
+            TitleText()
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+
+            // White box
+
+
+
+//body = {paddingValues->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color(0xFFD9D9D9))
+                    .padding(10.dp)
+
+
+                    // .padding(paddingValues)
+                    //.padding(10.dp),
+                //verticalArrangement = Arrangement.Center,
+               // horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                // Content Top Bar
+                // TODO: search func
+                ContentTopBar(navController = navController, topBarText = "Select Friend")
+
+
+                //Spacer(modifier = Modifier.height(10.dp))
 
                 // TODO: implement search feature
-                SearchBox()
+                //SearchBox()
 
-                Spacer(modifier = Modifier.height(10.dp))
+                // Spacer(modifier = Modifier.height(10.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(5.5f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(darkGrey)
+                ) {
 
-                LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        contentPadding = PaddingValues(5.dp)
+                    ) {
 
-                    items(listFriends) { friend ->
-                        // initially, isSelected is false for all friends (cards are unchecked)
-                        // selectedFriends list are empty
-                        val isSelected = friend in selectedFriends
+                        items(listFriends) { friend ->
+                            // initially, isSelected is false for all friends (cards are unchecked)
+                            // selectedFriends list are empty
+                            val isSelected = friend in selectedFriends
 
-                        // if user clicks the friend's card, it will be added to selectedFriends list
-                        // else, if user unclick the friend's card, it will be remove from the selectedFriends list
-                        // we only define the isSelected and onCheckedChange function as parameter here, execution happens later
-                        ListFriends(context = context, friend = friend, isSelected = isSelected, onCheckedChange = {
-                                checked ->
-                            if (checked) selectedFriends.add(friend)
-                            else selectedFriends.remove(friend)
-                        }, userController = userController)
+                            // if user clicks the friend's card, it will be added to selectedFriends list
+                            // else, if user unclick the friend's card, it will be remove from the selectedFriends list
+                            // we only define the isSelected and onCheckedChange function as parameter here, execution happens later
+                            ListFriends(
+                                context = context,
+                                friend = friend,
+                                isSelected = isSelected,
+                                onCheckedChange = { checked ->
+                                    if (checked) selectedFriends.add(friend)
+                                    else selectedFriends.remove(friend)
+                                },
+                                userController = userController
+                            )
+                        }
+
                     }
-
                 }
 
-                Spacer(modifier = Modifier.height(30.dp))
+                // Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
-                Button(onClick = { showDialogAddFriend = true },
-                    modifier = Modifier.fillMaxWidth().height(60.dp)) {
-                    Text(text = "Add Friend")
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    //.fillMaxHeight()
+                    .weight(2.5f)
+                    .padding(2.dp)
+                ,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+
+                Button(
+                    onClick = { showDialogAddFriend = true },
+                    modifier = Modifier.fillMaxWidth().height(60.dp)
+                    ,
+                    shape = RoundedCornerShape(18.dp),
+                    colors = ButtonColors(
+                        containerColor = primaryGreen,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.White
+                    )
+                ) {
+                    // TODO: font family?
+                    Text(text = "Add Friend", fontSize = 24.sp)
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -146,19 +244,40 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                         viewModel.listItemAndUserQuantities = viewModel.itemDetailList.map { item ->
                             ItemWithUsersList(item = item, ownership = mutableStateListOf())
                         }.toMutableStateList()
-                              },
-                    modifier = Modifier.fillMaxWidth().height(60.dp)) {
-                    Text(text = "Done")
+                    },
+                    modifier = Modifier.fillMaxWidth().height(60.dp)
+                    ,
+                    shape = RoundedCornerShape(18.dp),
+                    colors = ButtonColors(
+                        containerColor = primaryGreen,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.White
+                    )
+                ) {
+                    // TODO: font family?
+                    Text(text = "Done", fontSize = 24.sp)
                 }
+
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (showDialogAddFriend){
-                    PopUpAddFriend(context, contactController, userController, onDismiss = {showDialogAddFriend = false}, listFriends = listFriends )
+                if (showDialogAddFriend) {
+                    PopUpAddFriend(
+                        context,
+                        contactController,
+                        userController,
+                        onDismiss = { showDialogAddFriend = false },
+                        listFriends = listFriends
+                    )
                 }
 
             }
-        })
+
+            }
+            //})
+        }
+    }
 }
 
 @Composable
@@ -172,17 +291,38 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
             .padding(5.dp)
             .clickable{onCheckedChange(!isSelected)},
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(modifier = Modifier.
             fillMaxWidth().
-            padding(5.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            padding(15.dp),
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ){
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            // Box (canvas) to show profile picture
+            Box(
+                modifier = Modifier.size(50.dp).clip(CircleShape)
+            ) {
+                // TODO: Change Icon -> Image later
+                Icon(
+                    Icons.Filled.Person,
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier.size(70.dp),
+                    tint = Color.Gray
+                )
+            }
+
+            Spacer(modifier = Modifier.width(1.dp))
+
+
             Text(
                 text = friendName,
-                fontSize = 30.sp,
+                color = primaryGreen,
+                fontSize = 20.sp,
+                fontFamily = alexandriaFont,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge
             )
@@ -190,6 +330,12 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
             // If user clicks the Friend's card, isSelected is true. Else, if unclicks, isSelected is false
             // Using the defined onCheckedChange function, it gets evaluated in this code block
             // This is done separately in each card/friend/record
+
+
+            // TODO: no need spacer if dont use checkbox
+            Spacer(modifier = Modifier.width(120.dp))
+
+
             // TODO: should save checked friends for when user navigates back?
             Checkbox(
                 checked = isSelected,

@@ -173,7 +173,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
 
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
                 Column(
                     modifier = Modifier
@@ -205,13 +205,14 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                         ,
                         shape = RoundedCornerShape(18.dp),
                         colors = ButtonColors(
-                            containerColor = green,
+                            containerColor = primaryGreen,
                             contentColor = Color.White,
                             disabledContainerColor = Color.Gray,
                             disabledContentColor = Color.White
                         )
                     ) {
-                        Text(text = "Add Store")
+                        // TODO: font family?
+                        Text(text = "Add Store", fontSize = 24.sp)
                     }
 
                     if (showDialogAddStore) {
@@ -287,7 +288,7 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
                     },
 
                  */
-                color = green,
+                color = primaryGreen,
                 fontSize = 20.sp,
                 fontFamily = alexandriaFont,
                 //modifier = Modifier.padding(16.dp),
