@@ -2,21 +2,19 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -36,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.components.SearchBox
+import com.ndhu.moneymanagementapp.models.Store
 
 // to store repeatable/repetitive/common composables function design
 
@@ -177,6 +175,67 @@ fun ContentTopBar(navController: NavController, topBarText: String) {
         }
     }
 }
+
+
+@Composable
+fun ItemContentTopBar(navController: NavController, store: Store?) {
+    /*
+    Content Top Bar
+    */
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+            }
+
+            Spacer(modifier = Modifier.height(55.dp))
+        }
+
+        Spacer(modifier = Modifier.width(5.dp))
+
+        Column(
+            modifier = Modifier.weight(10f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card (modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFD9D9D9))
+                .clickable { /* TODO: editable? */ }) {
+                Text(
+                    text = store?.name ?: "Unknown Store",
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = store?.address ?: "Unknown Store",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold)
+            }
+
+            SearchBox()
+        }
+
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.width(40.dp))
+        }
+    }
+}
+
 
 /*
 @Composable
