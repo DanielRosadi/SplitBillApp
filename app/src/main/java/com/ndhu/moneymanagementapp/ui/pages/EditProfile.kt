@@ -54,16 +54,24 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.User
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfile(context: Context, navController: NavController) {
     val userController = UserController()
-    var user by remember { mutableStateOf<User?>(null) }
+    var user by remember { runBlocking {
+        UserController().getOnboardUser(context = context)?.username ?: "{FAIL-LOGIN}"
+    } }
 
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var bio by remember { mutableStateOf(TextFieldValue("")) }
+
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+    var newPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var confirmPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         user = userController.getOnboardUser(context)
@@ -225,6 +233,23 @@ fun EditProfile(context: Context, navController: NavController) {
                         onValueChange = { bio = it }
                     )
 
+                    Button(
+                        onClick = {
+                            // Reset states each time it's opened
+                            newPassword = TextFieldValue("")
+                            confirmPassword = TextFieldValue("")
+                            passwordError = null
+                            showChangePasswordDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                    ) {
+                        Text("Change Password", color = Color.White, fontSize = 16.sp)
+                    }
+
                     Spacer(modifier = Modifier.weight(1f))
 
                     // Buttons
@@ -265,6 +290,32 @@ fun EditProfile(context: Context, navController: NavController) {
             }
         }
     }
+    if (showChangePasswordDialog) {
+        ChangePasswordDialog(
+            onDismiss = {
+                showChangePasswordDialog = false
+                newPassword = TextFieldValue("")
+                confirmPassword = TextFieldValue("")
+                passwordError = null
+            },
+            onSave = { password ->
+                if (password.isEmpty()) {
+                    passwordError = "Passwords do not match"
+                } else {
+                    // TODO: Handle password update logic (e.g., userController.updatePassword)
+                    showChangePasswordDialog = false
+                    newPassword = TextFieldValue("")
+                    confirmPassword = TextFieldValue("")
+                    passwordError = null
+                }
+            },
+            newPassword = newPassword,
+            confirmPassword = confirmPassword,
+            onNewPasswordChange = { newPassword = it },
+            onConfirmPasswordChange = { confirmPassword = it },
+            errorMessage = passwordError
+        )
+    }
 }
 
 @Composable
@@ -302,5 +353,73 @@ fun RoundedInputField(
             focusedPlaceholderColor = Color.Gray,
             unfocusedPlaceholderColor = Color.Gray
         )
+    )
+}
+
+@Composable
+fun ChangePasswordDialog(
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit,
+    newPassword: TextFieldValue,
+    confirmPassword: TextFieldValue,
+    onNewPasswordChange: (TextFieldValue) -> Unit,
+    onConfirmPasswordChange: (TextFieldValue) -> Unit,
+    errorMessage: String?
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {},
+        dismissButton = {},
+        title = {
+            Text("Change Password", fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = newPassword,
+                    onValueChange = onNewPasswordChange,
+                    placeholder = { Text("New Password") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = onConfirmPasswordChange,
+                    placeholder = { Text("Confirm Password") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (!errorMessage.isNullOrEmpty()) {
+                    Text(text = errorMessage, color = Color.Red, fontSize = 12.sp)
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = {
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Button(
+                        onClick = {
+                            if (newPassword.text != confirmPassword.text) {
+                                onSave("") // This triggers validation error
+                            } else {
+                                onSave(newPassword.text)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
     )
 }
