@@ -273,6 +273,9 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
+
+        // Spacer(modifier = Modifier.width(10.dp))
+
         // pressable text
         Column(
             modifier = Modifier

@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -143,10 +146,10 @@ fun ContentTopBar(navController: NavController, topBarText: String) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(55.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back", modifier = Modifier.size(30.dp))
             }
         }
 
@@ -189,43 +192,80 @@ fun ItemContentTopBar(navController: NavController, store: Store?) {
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Left
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back", modifier = Modifier.size(30.dp))
             }
 
-            Spacer(modifier = Modifier.height(55.dp))
+            Spacer(modifier = Modifier.height(65.dp))
         }
 
-        Spacer(modifier = Modifier.width(5.dp))
+        Spacer(modifier = Modifier.width(15.dp))
 
+        // Middle
         Column(
             modifier = Modifier.weight(10f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Card (modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFD9D9D9))
-                .clickable { /* TODO: editable? */ }) {
-                Text(
-                    text = store?.name ?: "Unknown Store",
-                    fontSize = 25.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = store?.address ?: "Unknown Store",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold)
+
+
+            Row(
+
+            ){
+
+                Spacer(modifier = Modifier.width(20.dp))
+
+                Card (modifier = Modifier
+                    .fillMaxWidth()
+                    // .background(Color(0xFFD9D9D9))
+                    .clickable { /* TODO: editable? */ },
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFD9D9D9) // correct way to set Card background
+                    )
+
+
+                ) {
+
+                    Column(
+                        // modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                        // to make suranna font stick close to each other (normally they spaced out far)
+                        verticalArrangement = Arrangement.spacedBy((-23).dp) // try -2 to -6
+
+                    ){
+                        Text(
+                            text = store?.name ?: "Unknown Store",
+                            fontSize = 30.sp,
+                            fontFamily = surannaFont,
+                            //lineHeight = 10.sp
+                            //fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = store?.address ?: "Unknown Store",
+                            fontSize = 15.sp,
+                            fontFamily = surannaFont,
+                            //lineHeight = 10.sp
+                            //fontWeight = FontWeight.Bold
+                        )
+
+
+                    }
+
+
+                }
+
             }
+
 
             SearchBox()
         }
 
+        // Right
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center,
