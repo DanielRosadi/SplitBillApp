@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -43,7 +44,7 @@ import com.ndhu.moneymanagementapp.utils.Util
 
 /*
 TODO:
-    - PendingRequest Notification
+    - Rework UI popup
     - Ganti font
     - Ganti image
     - Search function
@@ -132,7 +133,7 @@ fun ComposeContactScreen(
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(contacts) { contact ->
+                            items(contacts, key = { it.id }) { contact ->
                                 ContactCard(currentUserId, contact, context, userController)
                             }
                         }
@@ -148,24 +149,50 @@ fun ComposeContactScreen(
                         .weight(1f)
                 ) {
                     // Pending Request Button
-                    Button(
-                        onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryGreen,
-                            contentColor = Color.White
-                        )
+                            .weight(1f)
                     ) {
-                        Text(
-                            text = "Pending Request",
-                            //modifier = Modifier.background(Color.Blue),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            fontFamily = surannaFont,
-                        )
+                        Button(
+                            onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.Center),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = primaryGreen,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                text = "Pending Request",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = surannaFont,
+                            )
+                        }
+
+                        // Shows a red notification badge
+                        if (pendingContacts.isNotEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = (-8).dp, y = 4.dp)
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.Red),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = pendingContacts.size.toString(),
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
