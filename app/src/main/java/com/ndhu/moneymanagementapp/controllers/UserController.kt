@@ -84,4 +84,40 @@ class UserController {
         Log.d("INFO", "USER NOT FOUND")
         return
     }
+
+    suspend fun updateUserData(
+        context: Context,
+        newUsername: String,
+        newEmail: String,
+        newBio: String,
+    ) {
+        val user = getOnboardUser(context)
+        if (user != null) {
+            val updatedUser = user.copy(
+                username = newUsername,
+                email = newEmail,
+                bio = newBio,
+            )
+            userRepo.update(updatedUser.id, updatedUser)
+            Log.d("INFO", "User data updated successfully")
+        } else {
+            Log.w("ERROR", "No onboard user found to update")
+        }
+    }
+
+    suspend fun updateUserPassword(
+        context: Context,
+        newPassword: String
+    ) {
+        val user = getOnboardUser(context)
+        if (user != null) {
+            val updatedUser = user.copy(
+                password = Util.passwordEncryption(newPassword)
+            )
+            userRepo.update(updatedUser.id, updatedUser)
+            Log.d("INFO", "User password updated successfully")
+        } else {
+            Log.w("ERROR", "No onboard user found to update")
+        }
+    }
 }

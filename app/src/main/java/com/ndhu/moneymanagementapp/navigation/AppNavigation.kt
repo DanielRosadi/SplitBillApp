@@ -15,7 +15,7 @@ import com.ndhu.moneymanagementapp.ui.pages.BillHistory
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
 import com.ndhu.moneymanagementapp.ui.pages.DeleteStoreScreen
 import com.ndhu.moneymanagementapp.ui.pages.EditProfile
-import com.ndhu.moneymanagementapp.ui.pages.FirstLogin
+import com.ndhu.moneymanagementapp.ui.oldpages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.Home
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
