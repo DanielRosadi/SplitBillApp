@@ -26,24 +26,28 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         return this.delete(Collection.CONTACT.collection, documentId)
     }
 
+    // Get all contacts where the user is either sender or receiver and the status is FRIEND
     override suspend fun getUserContact(userId: String): List<Contact> {
         val contacts = mutableSetOf<Contact>()
 
         val db = Firebase.firestore
         val collectionRef = db.collection(Collection.CONTACT.collection)
 
+        // Query for user as sender
         val query1 = collectionRef
-            .whereEqualTo("userId1", userId)
+            .whereEqualTo("senderId", userId)
             .whereEqualTo("friendStatus", FriendStatus.FRIEND.name)
             .get()
             .await()
 
+        // Query for user as receiver
         val query2 = collectionRef
-            .whereEqualTo("userId2", userId)
+            .whereEqualTo("receiverId", userId)
             .whereEqualTo("friendStatus", FriendStatus.FRIEND.name)
             .get()
             .await()
 
+        // Convert documents to Contact objects
         query1.documents.forEach { doc ->
             doc.toObject(Contact::class.java)?.let { contacts.add(it) }
         }
@@ -55,42 +59,54 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         return contacts.toList()
     }
 
-    override suspend fun getPendingContact(userId : String) : List<Contact> {
-        val contacts = mutableListOf<Contact>()
-        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-            whereEqualTo("userId1", userId).
-            whereEqualTo("friendStatus", FriendStatus.PENDING.name).
-            get().await()
-        if(!querySnapshot.isEmpty) {
-            for (document in querySnapshot.documents) {
-                document.toObject(Contact::class.java)?.let { contacts.add(it) }
-            }
-        }
-        return contacts
+    override suspend fun getPendingContact(userId: String): List<Contact> {
+        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection)
+            .whereEqualTo("receiverId", userId)
+            .whereEqualTo("friendStatus", FriendStatus.PENDING.name)
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .get()
+            .await()
+
+        return querySnapshot.documents.mapNotNull { it.toObject(Contact::class.java) }
     }
 
-    override suspend fun getContactFromUsers(userId1 : String, userId2 : String) : Contact? {
-        var contact: Contact? = null
+    // Get a specific contact between two users
+    override suspend fun getContactFromUsers(userId1: String, userId2: String): Contact? {
+        val collectionRef = Firebase.firestore.collection(Collection.CONTACT.collection)
 
-        val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-            whereEqualTo("userId1", userId1).
-            whereEqualTo("userId2", userId2).
-            limit(1).
-            get().await()
+        // Try direction 1 → 2
+        val query1 = collectionRef
+            .whereEqualTo("senderId", userId1)
+            .whereEqualTo("receiverId", userId2)
+            .limit(1)
+            .get()
+            .await()
 
-        if(!querySnapshot.isEmpty) {
-            contact = querySnapshot.first().toObject(Contact::class.java)
+        if (!query1.isEmpty) {
+            return query1.first().toObject(Contact::class.java)
         }
 
-        return contact
+        // Try direction 2 → 1
+        val query2 = collectionRef
+            .whereEqualTo("senderId", userId2)
+            .whereEqualTo("receiverId", userId1)
+            .limit(1)
+            .get()
+            .await()
+
+        return if (!query2.isEmpty) query2.first().toObject(Contact::class.java) else null
     }
 
-    override suspend fun getUserContactsByStatus(userId1 : String, friendStatus : FriendStatus) : List<Contact> {
+    // Get all contacts by userId with a specific friend status
+    override suspend fun getUserContactsByStatus(senderId : String, friendStatus : FriendStatus) : List<Contact> {
         var contacts = mutableListOf<Contact>()
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-        whereEqualTo("userId1", userId1).
+        whereEqualTo("senderId", senderId).
         whereEqualTo("friendStatus", friendStatus.name).
+        orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING).
         get().await()
+
+        // Convert documents to Contact objects
         if(!querySnapshot.isEmpty) {
             for (document in querySnapshot.documents) {
                 document.toObject(Contact::class.java)?.let { contacts.add(it) }
@@ -99,12 +115,16 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         return contacts
     }
 
+    // Get all rejected contact requests where the user is the receiver
     override suspend fun getRejectContacts(userId : String) : List<Contact> {
         var contacts = mutableListOf<Contact>()
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-        whereEqualTo("userId2", userId).
+        whereEqualTo("receiverId", userId).
         whereEqualTo("friendStatus", FriendStatus.REJECT.name).
+        orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING).
         get().await()
+
+        // Convert documents to Contact objects
         if(!querySnapshot.isEmpty) {
             for (document in querySnapshot.documents) {
                 document.toObject(Contact::class.java)?.let { contacts.add(it) }
