@@ -56,22 +56,31 @@ fun ContactPage(context: Context, navController: NavController) {
     val userController = UserController()
 
     val currentUserId = remember { Util.getUserId(context).toString() }
-    val listFriends = remember { mutableStateListOf<Contact>() }
+    val contactList = remember { mutableStateListOf<Contact>() }
+    val pendingList = remember { mutableStateListOf<Contact>() }
 
     LaunchedEffect(Unit) {
         val contactsFromDb = contactController.getCurrUserLoginContact(context)
+        val pendingContactsFromDb = contactController.getPendingUserListContact(context)
+
         Log.d("Contact Screen", "Fetched ${contactsFromDb.size} contacts")
-        listFriends.clear() // Clear old data
-        listFriends.addAll(contactsFromDb) // Add fresh new data
+        Log.d("Contact Screen", "Fetched ${pendingContactsFromDb.size} pending contacts")
+
+        contactList.clear()
+        contactList.addAll(contactsFromDb)
+
+        pendingList.clear()
+        pendingList.addAll(pendingContactsFromDb)
     }
 
-    ComposeContactScreen(currentUserId, listFriends, context, navController, contactController, userController)
+    ComposeContactScreen(currentUserId, contactList, pendingList, context, navController, contactController, userController)
 }
 
 @Composable
 fun ComposeContactScreen(
     currentUserId: String,
     contacts: SnapshotStateList<Contact>,
+    pendingContacts: SnapshotStateList<Contact>,
     context: Context,
     navController: NavController,
     contactController: ContactController,
@@ -124,7 +133,7 @@ fun ComposeContactScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(contacts) { contact ->
-                                ContactCard(currentUserId, contacts, contact, context, userController)
+                                ContactCard(currentUserId, contact, context, userController)
                             }
                         }
                     }
@@ -204,7 +213,6 @@ fun ComposeContactScreen(
 @Composable
 fun ContactCard(
     currentUserId: String,
-    contacts: SnapshotStateList<Contact>,
     contact: Contact,
     context: Context,
     userController: UserController
