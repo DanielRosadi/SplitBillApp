@@ -254,17 +254,28 @@ fun ContactCard(
 
             when {
                 userResult == null -> {
-                    // Show loading indicator while fetching user
+                    // null = assumes loading
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
                         strokeWidth = 2.dp,
                         color = primaryGreen
                     )
                 }
-                else -> {
-                    // Display fetched username
+
+                userResult?.username.isNullOrBlank() -> {
+                    // blank username = “Unknown User”
                     Text(
-                        text = userResult?.username ?: "Unknown User",
+                        text = "Unknown User",
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                else -> {
+                    // Show valid username
+                    Text(
+                        text = userResult!!.username,
                         color = primaryGreen,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
