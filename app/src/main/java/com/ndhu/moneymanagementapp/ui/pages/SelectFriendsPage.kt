@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -29,7 +28,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -45,18 +43,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.components.SearchBox
-import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.ContactController
-import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.Contact
-import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 
@@ -288,7 +281,7 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
 @Composable
 fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit, userController: UserController){
-    var friendName = runBlocking { userController.searchUserByUserId(context, friend.userId2)?.username
+    var friendName = runBlocking { userController.searchUserByUserId(context, friend.receiverId)?.username
         ?: "Unknown Contact" }
 
     Card (

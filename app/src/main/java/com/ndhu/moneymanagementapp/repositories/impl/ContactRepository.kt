@@ -33,13 +33,13 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         val collectionRef = db.collection(Collection.CONTACT.collection)
 
         val query1 = collectionRef
-            .whereEqualTo("userId1", userId)
+            .whereEqualTo("senderId", userId)
             .whereEqualTo("friendStatus", FriendStatus.FRIEND.name)
             .get()
             .await()
 
         val query2 = collectionRef
-            .whereEqualTo("userId2", userId)
+            .whereEqualTo("receiverId", userId)
             .whereEqualTo("friendStatus", FriendStatus.FRIEND.name)
             .get()
             .await()
@@ -58,7 +58,7 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
     override suspend fun getPendingContact(userId : String) : List<Contact> {
         val contacts = mutableListOf<Contact>()
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-            whereEqualTo("userId1", userId).
+            whereEqualTo("senderId", userId).
             whereEqualTo("friendStatus", FriendStatus.PENDING.name).
             get().await()
         if(!querySnapshot.isEmpty) {
@@ -73,8 +73,8 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
         var contact: Contact? = null
 
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-            whereEqualTo("userId1", userId1).
-            whereEqualTo("userId2", userId2).
+            whereEqualTo("senderId", userId1).
+            whereEqualTo("receiverId", userId2).
             limit(1).
             get().await()
 
@@ -88,7 +88,7 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
     override suspend fun getUserContactsByStatus(userId1 : String, friendStatus : FriendStatus) : List<Contact> {
         var contacts = mutableListOf<Contact>()
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-        whereEqualTo("userId1", userId1).
+        whereEqualTo("senderId", userId1).
         whereEqualTo("friendStatus", friendStatus.name).
         get().await()
         if(!querySnapshot.isEmpty) {
@@ -102,7 +102,7 @@ class ContactRepository : Repositories<Contact>(Contact::class.java), IContactRe
     override suspend fun getRejectContacts(userId : String) : List<Contact> {
         var contacts = mutableListOf<Contact>()
         val querySnapshot = Firebase.firestore.collection(Collection.CONTACT.collection).
-        whereEqualTo("userId2", userId).
+        whereEqualTo("receiverId", userId).
         whereEqualTo("friendStatus", FriendStatus.REJECT.name).
         get().await()
         if(!querySnapshot.isEmpty) {

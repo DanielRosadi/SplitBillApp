@@ -67,8 +67,8 @@ class ContactController {
         }
         contactRepository.add(Contact(
             id = UUID.randomUUID().toString(),
-            userId1 = user1,
-            userId2 = user2,
+            senderId = user1,
+            receiverId = user2,
             friendStatus = FriendStatus.PENDING.name,
         ))
     }

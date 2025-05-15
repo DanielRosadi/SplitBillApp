@@ -209,7 +209,7 @@ fun ContactCard(
 
     // Get ID of both users
     val currentUserId = remember { Util.getUserId(context).toString() }
-    val friendUserId = if (contact.userId1 == currentUserId) contact.userId2 else contact.userId1
+    val friendUserId = if (contact.senderId == currentUserId) contact.receiverId else contact.senderId
 
     // Mutable state to hold the fetched user object
     var userObject by remember { mutableStateOf<User?>(null) }
