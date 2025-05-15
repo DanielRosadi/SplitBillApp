@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -40,16 +41,15 @@ import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.utils.Util
 
+/*
+TODO:
+    - PendingRequest Notification
+    - Ganti font
+    - Ganti image
+    - Search function
+*/
+
 @Composable
-
-        /*
-        TODO:
-            - PendingRequest Notification
-            - Ganti font
-            - Ganti image
-            - Search function
-        */
-
 fun ContactPage(context: Context, navController: NavController) {
 
     val contactController = ContactController()
@@ -117,7 +117,7 @@ fun ComposeContactScreen(
                         EmptyStateMessage("No contacts available")
                     } else {
                         LazyColumn(
-                            modifier = Modifier.padding(16.dp),
+                            contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(contacts) { contact ->
@@ -182,6 +182,7 @@ fun ComposeContactScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 if (showDialogAddFriend) {
+                    /* TODO: rework UI popup */
                     PopUpAddFriend(
                         context = context,
                         contactController = contactController,
@@ -211,18 +212,13 @@ fun ContactCard(
     val currentUserId = remember { Util.getUserId(context).toString() }
     val friendUserId = if (contact.userId1 == currentUserId) contact.userId2 else contact.userId1
 
-    // Mutable state to hold the fetched user object
-    var userObject by remember { mutableStateOf<User?>(null) }
-
     // Fetch the user asynchronously when friendUserId changes
-    LaunchedEffect(friendUserId) {
-        isLoading = true
+    val userResult by produceState<User?>(initialValue = null, friendUserId) {
         try {
-            userObject = userController.searchUserByUserId(context, friendUserId)
+            value = userController.searchUserByUserId(context, friendUserId)
         } catch (e: Exception) {
             Log.e("ContactCard", "Failed to fetch user: ${e.message}")
-        } finally {
-            isLoading = false
+            value = null
         }
     }
 
@@ -242,7 +238,6 @@ fun ContactCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(32.dp)
                     .clip(CircleShape)
             ) {
                 Icon(
@@ -256,37 +251,22 @@ fun ContactCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier.height(18.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                            color = primaryGreen
-                        )
-                    }
+                userResult == null -> {
+                    // Show loading indicator while fetching user
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = primaryGreen
+                    )
                 }
-
-                userObject != null -> {
-                    userObject?.let { user ->
-                        Text(
-                            text = user.username,
-                            color = primaryGreen,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = alexandriaFont
-                        )
-                    }
-                }
-
                 else -> {
+                    // Display fetched username
                     Text(
-                        text = "Unknown User",
-                        color = Color.Gray,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
+                        text = userResult?.username ?: "Unknown User",
+                        color = primaryGreen,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = alexandriaFont
                     )
                 }
             }
