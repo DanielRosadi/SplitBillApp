@@ -54,6 +54,8 @@ fun ContactPage(context: Context, navController: NavController) {
 
     val contactController = ContactController()
     val userController = UserController()
+
+    val currentUserId = remember { Util.getUserId(context).toString() }
     val listFriends = remember { mutableStateListOf<Contact>() }
 
     LaunchedEffect(Unit) {
@@ -63,11 +65,12 @@ fun ContactPage(context: Context, navController: NavController) {
         listFriends.addAll(contactsFromDb) // Add fresh new data
     }
 
-    ComposeContactScreen(listFriends, context, navController, contactController, userController)
+    ComposeContactScreen(currentUserId, listFriends, context, navController, contactController, userController)
 }
 
 @Composable
 fun ComposeContactScreen(
+    currentUserId: String,
     contacts: SnapshotStateList<Contact>,
     context: Context,
     navController: NavController,
@@ -121,7 +124,7 @@ fun ComposeContactScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(contacts) { contact ->
-                                ContactCard(contacts, contact, context, userController)
+                                ContactCard(currentUserId, contacts, contact, context, userController)
                             }
                         }
                     }
@@ -200,16 +203,14 @@ fun ComposeContactScreen(
 // Card Item inside Lazy Column containing Contact information
 @Composable
 fun ContactCard(
+    currentUserId: String,
     contacts: SnapshotStateList<Contact>,
     contact: Contact,
     context: Context,
     userController: UserController
 ) {
     // val coroutineScope = rememberCoroutineScope()
-    var isLoading by remember { mutableStateOf(true) }
 
-    // Get ID of both users
-    val currentUserId = remember { Util.getUserId(context).toString() }
     val friendUserId = if (contact.userId1 == currentUserId) contact.userId2 else contact.userId1
 
     // Fetch the user asynchronously when friendUserId changes
@@ -238,6 +239,7 @@ fun ContactCard(
         ) {
             Box(
                 modifier = Modifier
+                    .size(40.dp)
                     .clip(CircleShape)
             ) {
                 Icon(
