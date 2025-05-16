@@ -65,6 +65,8 @@ val dangerRed = Color(0xFF961400)
 val primaryGreen = Color(0xFF009669) // Main brand color
 val darkGrey = Color(0xFF9D9D9D)
 
+val correctTransparentGreen = Color(0xAA4CAF50) // green transparent for selected user card
+
 // Background Image used in most pages
 @Composable
 fun BackgroundImage() {
@@ -137,7 +139,7 @@ fun ContentTopBar(navController: NavController, topBarText: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
+            .padding(5.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
