@@ -127,7 +127,7 @@ fun AccountPage(context: Context, navController: NavController) {
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = user?.username ?: "Daniel Rosadi",
+                    text = user?.username ?: "{FAIL-LOGIN}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = syncopateFont,
@@ -196,7 +196,6 @@ fun AccountPage(context: Context, navController: NavController) {
             onDismiss = { showClearUserDataDialog = false },
             onConfirm = {
                 coroutine.launch {
-                    userController.logout(context)
                     userController.deleteCurrUser(context);
                 }
                 navController.navigate(AppScreens.LogInScreen.name) {

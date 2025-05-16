@@ -44,6 +44,7 @@ fun SignUp(context : Context, navController: NavController) {
     var userAge by remember { mutableStateOf(TextFieldValue("")) }
     var userPassword by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     // UI elements/components (Composable here)
     // TODO: Need TopBar, BottomBar?  (i.e. Scaffold)
@@ -97,27 +98,58 @@ fun SignUp(context : Context, navController: NavController) {
         // Add some space
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Submit button
         Button(
             onClick = {
                 coroutine.launch {
-                    val controller : UserController = UserController()
-                    controller.registerUser(
-                        username.text.toString(),
-                        email.text.toString(),
-                        userPassword.text.toString(),
-                        ""
+                    val isValidEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(email.text).matches()
+                    val isValidUsername = username.text.matches(Regex("^[a-zA-Z0-9_.]{3,20}$"))
+                    val isValidPassword = userPassword.text.matches(
+                        Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
                     )
-                    username = TextFieldValue("")
-                    email = TextFieldValue("")
-                    userPassword = TextFieldValue("")
-                    navController.navigate(route = AppScreens.HomeScreen.name)
+
+                    if (!isValidEmail) {
+                        errorMessage = "Invalid email format."
+                    } else if (!isValidUsername) {
+                        errorMessage = "Username must be 3–20 characters and only contain letters, numbers, underscores, or periods."
+                    } else if (!isValidPassword) {
+                        errorMessage = "Password must be at least 8 characters, with uppercase, lowercase, digit, and special character."
+                    } else {
+                        val controller = UserController()
+                        val result = controller.registerUser(
+                            username.text,
+                            email.text,
+                            userPassword.text,
+                            "No bio provided"
+                        )
+                        controller.loginUser(context, username.text, userPassword.text) //Login after sign up
+                        if (result != null) {
+                            errorMessage = result
+                        } else {
+                            errorMessage = ""
+                            username = TextFieldValue("")
+                            email = TextFieldValue("")
+                            userPassword = TextFieldValue("")
+                            navController.navigate(route = AppScreens.HomeScreen.name)
+                        }
+                    }
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(60.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
             shape = RoundedCornerShape(5.dp)
         ) {
             Text(text = "Submit")
+        }
+
+        // Show error if exists
+        if (errorMessage.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = errorMessage,
+                color = Color.Red,
+                fontSize = 14.sp
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))

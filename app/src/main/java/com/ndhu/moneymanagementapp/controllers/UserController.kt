@@ -15,7 +15,16 @@ class UserController {
 
     private val userRepo : IUserRepository = UserRepository()
 
-    suspend fun registerUser(username : String, email : String, password : String, bio : String) {
+    suspend fun registerUser(username: String, email: String, password: String, bio: String): String? {
+        val existingUserByUsername = userRepo.getUserByUsername(username)
+        if (existingUserByUsername != null) {
+            return "Username is already in use."
+        }
+
+        val existingUserByEmail = userRepo.getUserByEmail(email)
+        if (existingUserByEmail != null) {
+            return "Email is already in use."
+        }
 
         userRepo.add(
             User(
@@ -27,7 +36,7 @@ class UserController {
                 bio
             )
         )
-
+        return null
     }
 
     suspend fun loginUser(context : Context, identify : String, password : String) : User? {
