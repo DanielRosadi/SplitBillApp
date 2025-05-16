@@ -51,6 +51,7 @@ import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -281,7 +282,11 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
 @Composable
 fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit, userController: UserController){
-    var friendName = runBlocking { userController.searchUserByUserId(context, friend.receiverId)?.username
+
+    val currentUserId = remember { Util.getUserId(context).toString() }
+    val friendUserId = if (friend.senderId == currentUserId) friend.receiverId else friend.senderId
+
+    var friendName = runBlocking { userController.searchUserByUserId(context, friendUserId)?.username
         ?: "Unknown Contact" }
 
     Card (
