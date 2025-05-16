@@ -325,7 +325,5 @@ fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit) {
 
     }
 
-
-
 }
 
