@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,9 +47,11 @@ import kotlinx.coroutines.launch
 
 /*
 TODO:
-    - Ganti font
-    - Ganti image
+    - Show dialog before acc/reject request
+    - Show toast feedback
     - Search function
+    - Ganti image
+    - Ganti font (optional)
 */
 
 @Composable
@@ -243,14 +246,18 @@ fun PendingCard(
     contactController: ContactController
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val showRejectDialog = remember { mutableStateOf(false) }
 
     // Store the state of the sender's username
     val userObject = remember { mutableStateOf<User?>(null) }
 
+    // Show sender's username
+    val sender = userObject.value
+
     // Fetch the sender's username
     LaunchedEffect(contact.senderId) {
-        val sender = userController.searchUserByUserId(context, contact.senderId)
-        userObject.value = sender
+        val fetchedUser = userController.searchUserByUserId(context, contact.senderId)
+        userObject.value = fetchedUser
     }
 
     Card(
@@ -287,14 +294,32 @@ fun PendingCard(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                // Show sender's username
-                userObject.value?.let {
-                    Text(
-                        text = it.username,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF009669)
-                    )
+                when {
+                    sender == null -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = primaryGreen
+                        )
+                    }
+
+                    sender.username.isBlank() -> {
+                        Text(
+                            text = "Unknown User",
+                            color = Color.Gray,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    else -> {
+                        Text(
+                            text = sender.username,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = primaryGreen
+                        )
+                    }
                 }
 
             } // Row 1
@@ -313,17 +338,7 @@ fun PendingCard(
                     icon = Icons.Outlined.Cancel,
                     backgroundColor = Color(0xFFD84315),
                     onClick = {
-                        coroutineScope.launch {
-                            try {
-                                contactController.rejectFriend(context, contact.senderId)
-                                contacts.remove(contact)
-                                Log.d("PendingCard", "Rejected friend request: ${contact.senderId}")
-                                // Optional: Show snackbar/toast
-                            } catch (e: Exception) {
-                                Log.e("PendingCard", "Failed to reject: ${e.message}")
-                                // Optional: Show error feedback to user
-                            }
-                        }
+                        showRejectDialog.value = true
                     },
                     contentDescription = "Reject"
                 )
@@ -348,8 +363,36 @@ fun PendingCard(
                     },
                     contentDescription = "Accept"
                 )
-
             } // Row 2
+
+            // Reject Confirmation Dialog
+            if (showRejectDialog.value) {
+                val senderName = userObject.value?.username ?: contact.senderId
+                ConfirmationDialog(
+                    title = "Reject $senderName?",
+                    message = "Rejecting this request prevents further requests from this user.\n" +
+                            "You can still add them as a friend later.",
+                    confirmText = "Reject",
+                    confirmColor = Color(0xFFD84315),
+                    onConfirm = {
+                        coroutineScope.launch {
+                            try {
+                                contactController.rejectFriend(context, contact.senderId)
+                                contacts.remove(contact)
+                                Log.d("PendingCard", "Rejected friend request: ${contact.senderId}")
+                                // Optional: Show snackbar/toast
+                            } catch (e: Exception) {
+                                Log.e("PendingCard", "Failed to reject: ${e.message}")
+                                // Optional: Show error feedback to user
+                            } finally {
+                                showRejectDialog.value = false
+                            }
+                        }
+                    },
+                    showDialog = showRejectDialog
+                )
+            }
+
         } // Outer Row
     } // Card
 }
