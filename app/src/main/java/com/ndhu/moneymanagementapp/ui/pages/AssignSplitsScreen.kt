@@ -422,41 +422,68 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
             elevation = CardDefaults.cardElevation(4.dp),
             // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
             colors = CardDefaults.cardColors(
-                containerColor = if (!isFullyAssigned) Color(0xFFFF7074) // light red
-                // Color(0xFFFFEBEE), Color(0xFFFF474D), Color(0xFFFF5B61)
-                else MaterialTheme.colorScheme.surface
+                containerColor = if (!isFullyAssigned) Color(0xFFFFCDD2) // light red
+                // Color(0xFFFFEBEE), Color(0xFFFF474D), Color(0xFFFF5B61), Color(0xFFFF7074)
+                // else MaterialTheme.colorScheme.surface
+                else Color.White
             )
         ) {
 
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(9.dp),
-                verticalAlignment = Alignment.CenterVertically, //  center content vertically
-                // horizontalArrangement = Arrangement.SpaceBetween // space between 3 main sections
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = itemWithUsers.item.name,
-                    fontSize = 15.sp, // 18.sp
-                    // modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .weight(0.5f) //  allow flexible width
-                        .padding(end = 7.dp)
-                )
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(10.dp)
+            ){
+                // Top
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ){
 
-                // TODO: implement selected users here
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                /*
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(), // full width container
-                    contentAlignment = Alignment.Center //  center contents
-                ) {
+                    Text(
+                        text = itemWithUsers.item.name,
+                        color = primaryGreen,
+                        fontSize = 20.sp,
+                        // fontSize = 15.sp, // 18.sp
+                        // modifier = Modifier.padding(16.dp),
+                        fontFamily = alexandriaFont,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier
+                            .weight(0.5f) //  allow flexible width
+                            .padding(end = 7.dp)
+                    )
 
-                   */
+                    Column(
+                        // modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy((-23).dp) // try -2 to -6
+                    ){
+
+                        Text(
+                            // TODO: omit additional float 0 on price
+                            text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
+                            fontSize = 15.sp,
+                            //fontFamily = surannaFont,
+                            // color = Color.hsv(43f, 1f, 1f),
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = syncopateFont,
+                            modifier = Modifier.padding(8.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+
+
+
+
+                }
+
+                // Bottom
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ){
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
                     // Display selected users as colored dots
                     LazyRow(
                         modifier = Modifier
@@ -495,58 +522,6 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
                             }
                         }
                     }
-                //}
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .weight(1.0f) // share width evenly with item name
-                        .padding(start = 2.dp),
-                    horizontalArrangement = Arrangement.Center
-                    // horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    // TODO: rework design for custom quantity (move to rightmost, use pencil icon)
-                    /*
-                    Button(
-                        onClick = { navController.navigate(route = AppScreens.SplitItemScreen.name) },
-                        modifier = Modifier.width(70.dp).height(70.dp),
-                        shape = RoundedCornerShape(50.dp)
-                    ) {
-                        Text(text = "C", fontSize = 30.sp) // Custom quantity
-                    }
-
-                     */
-
-                    Column(modifier = Modifier.fillMaxHeight()){
-
-                        // TODO: delete when not needed, temporary for debugging
-
-                        // This ensures:
-                        // You only check and access once.
-                        // You avoid inconsistencies between the two ownership[0] calls during recomposition.
-
-                        /*
-                        val firstOwnership = viewModel.currentItemAndUserQuantities.ownership.getOrNull(0)
-                        val currentItem = viewModel.currentItemAndUserQuantities
-                        if (firstOwnership != null){
-                            // Text(text = "user: ${firstOwnership.owner.username}, itemQuantity: ${firstOwnership.itemQuantity.value}",  fontSize = 7.sp,)
-                            // Text(text = "equal: " + (currentItem.item.qty == currentItem.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}).toString(),  fontSize = 7.sp,)
-                            Text(text = "total: " + currentItem.item.qty.toFloat().toString() + ", sum: " + currentItem.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}.toString(),  fontSize = 7.sp,)
-
-                        }
-                        */
-
-
-                        Text(
-                            // TODO: omit additional float 0 on price
-                            text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(8.dp),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-
-                    }
-
 
 
                     TransparentEditButton {
@@ -557,26 +532,10 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
                         navController.navigate(route = AppScreens.SplitItemScreen.name)
                     }
 
+
                 }
 
 
-
-                /*
-                Text(
-                    text = "x",
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
-                Text(
-                    text = itemWithUsers.item.price.toString(),
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
-                 */
             }
 
         }
@@ -680,11 +639,13 @@ fun TransparentEditButton(clickEvent: () -> Unit) {
         onClick = clickEvent,
         modifier = Modifier
             .padding(4.dp)
-            .size(40.dp), // Make it small and square-ish
+            .size(35.dp), // Make it small and square-ish
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = primaryGreen, // Visible color (blue)
-            contentColor = Color.White
+            // containerColor = primaryGreen, // Visible color (blue)
+            containerColor = Color.Transparent,
+            // contentColor = Color.White
+            contentColor = primaryGreen
         ),
         contentPadding = PaddingValues(0.dp)
     ) {
