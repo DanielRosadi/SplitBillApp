@@ -185,6 +185,9 @@ private fun ComposePendingRequest(
                         message = "Are you sure you want to reject all friend requests?",
                         confirmText = "Reject All",
                         confirmColor = dangerRed,
+                        icon = Icons.Outlined.Cancel,
+                        iconTint = Color.Red,
+                        showDialog = showRejectAllDialog,
                         onConfirm = {
                             coroutineScope.launch {
                                 try {
@@ -200,7 +203,6 @@ private fun ComposePendingRequest(
                                 }
                             }
                         },
-                        showDialog = showRejectAllDialog
                     )
                 } // Reject All Dialog
 
@@ -211,6 +213,9 @@ private fun ComposePendingRequest(
                         message = "Are you sure you want to accept all friend requests?",
                         confirmText = "Accept All",
                         confirmColor = primaryGreen,
+                        icon = Icons.Outlined.CheckCircleOutline,
+                        iconTint = Color.Green,
+                        showDialog = showAcceptAllDialog,
                         onConfirm = {
                             coroutineScope.launch {
                                 try {
@@ -226,7 +231,6 @@ private fun ComposePendingRequest(
                                 }
                             }
                         },
-                        showDialog = showAcceptAllDialog
                     )
                 } // Accept All Dialog
 
@@ -369,10 +373,12 @@ fun PendingCard(
                 val senderName = userObject.value?.username ?: contact.senderId
                 ConfirmationDialog(
                     title = "Reject $senderName?",
-                    message = "Rejecting this request prevents further requests from this user.\n" +
-                            "You can still add them as a friend later.",
+                    message = "Rejecting this request prevents further requests from this user. You can still add them as a friend later.",
                     confirmText = "Reject",
-                    confirmColor = Color(0xFFD84315),
+                    confirmColor = dangerRed,
+                    icon = Icons.Outlined.Cancel,
+                    iconTint = Color.Red,
+                    showDialog = showRejectDialog,
                     onConfirm = {
                         coroutineScope.launch {
                             try {
@@ -388,7 +394,6 @@ fun PendingCard(
                             }
                         }
                     },
-                    showDialog = showRejectDialog
                 )
             }
 
@@ -463,14 +468,47 @@ fun ConfirmationDialog(
     confirmText: String,
     cancelText: String = "Cancel",
     confirmColor: Color,
+    icon: ImageVector? = null, // Optional icon
+    iconTint: Color = Color.Unspecified, // Optional tint
+    showDialog: MutableState<Boolean>,
     onConfirm: () -> Unit,
-    showDialog: MutableState<Boolean>
-) {
+)
+ {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text(title) },
-            text = { Text(message) },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(20.dp),
+            title = {
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (icon != null) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (iconTint != Color.Unspecified) iconTint else Color.Unspecified,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(bottom = 4.dp)
+                        )
+                    }
+
+                    Text(
+                        text = title,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            },
+            /*text = { Text(message) },*/
+            text = {
+                Text(
+                    text = message,
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+            },
             confirmButton = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -481,8 +519,8 @@ fun ConfirmationDialog(
                         onClick = { showDialog.value = false },
                         modifier = Modifier
                             .height(48.dp)
-                            .weight(5f),
-                        shape = RoundedCornerShape(8.dp),
+                            .weight(1f),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = darkGrey,
                             contentColor = Color.White
@@ -491,7 +529,8 @@ fun ConfirmationDialog(
                         Text(cancelText)
                     }
 
-                    Spacer(modifier = Modifier.weight(1f))
+                    //Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(16.dp))
 
                     Button(
                         onClick = {
@@ -499,8 +538,8 @@ fun ConfirmationDialog(
                         },
                         modifier = Modifier
                             .height(48.dp)
-                            .weight(5f),
-                        shape = RoundedCornerShape(8.dp),
+                            .weight(1f),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = confirmColor,
                             contentColor = Color.White
@@ -510,7 +549,6 @@ fun ConfirmationDialog(
                     }
                 }
             },
-            containerColor = Color.White
         )
     }
 }
