@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -47,8 +48,6 @@ import kotlinx.coroutines.launch
 
 /*
 TODO:
-    - Show dialog before acc/reject request
-    - Show toast feedback
     - Search function
     - Ganti image
     - Ganti font (optional)
@@ -353,11 +352,11 @@ fun PendingCard(
                             try {
                                 contactController.acceptFriend(context, contact.senderId)
                                 contacts.remove(contact)
+                                Toast.makeText(context, "Friend request accepted", Toast.LENGTH_SHORT).show()
                                 Log.d("PendingCard", "Accepted friend request: ${contact.senderId}")
-                                // Optional: Show snackbar/toast
                             } catch (e: Exception) {
+                                Toast.makeText(context, "Failed to accept request. Please try again.", Toast.LENGTH_SHORT).show()
                                 Log.e("PendingCard", "Failed to accept: ${e.message}")
-                                // Optional: Show error feedback to user
                             }
                         }
                     },
@@ -379,11 +378,11 @@ fun PendingCard(
                             try {
                                 contactController.rejectFriend(context, contact.senderId)
                                 contacts.remove(contact)
+                                Toast.makeText(context, "Friend request rejected", Toast.LENGTH_SHORT).show()
                                 Log.d("PendingCard", "Rejected friend request: ${contact.senderId}")
-                                // Optional: Show snackbar/toast
                             } catch (e: Exception) {
+                                Toast.makeText(context, "Failed to reject request. Please try again.", Toast.LENGTH_SHORT).show()
                                 Log.e("PendingCard", "Failed to reject: ${e.message}")
-                                // Optional: Show error feedback to user
                             } finally {
                                 showRejectDialog.value = false
                             }
