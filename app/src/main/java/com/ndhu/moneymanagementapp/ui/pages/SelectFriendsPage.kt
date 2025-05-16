@@ -289,6 +289,11 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
     var friendName = runBlocking { userController.searchUserByUserId(context, friendUserId)?.username
         ?: "Unknown Contact" }
 
+    // val cardColor = if (isSelected) correctTransparentGreen else Color.White
+
+    val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
+
+
     Card (
         modifier = Modifier
             .fillMaxWidth()
@@ -296,13 +301,16 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
             .clickable{onCheckedChange(!isSelected)},
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
+        // colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
-        Row(modifier = Modifier.
-            fillMaxWidth().
-            padding(15.dp),
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(15.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
 
             Spacer(modifier = Modifier.width(5.dp))
 
@@ -340,12 +348,24 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
             Spacer(modifier = Modifier.width(120.dp))
 
 
+
+
             // TODO: should save checked friends for when user navigates back?
-            Checkbox(
-                checked = isSelected,
-                onCheckedChange = onCheckedChange
-            )
+//            Checkbox(
+//                checked = isSelected,
+//                onCheckedChange = onCheckedChange
+//            )
         }
+            // Overlay when selected
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(overlayColor)
+                )
+            }
+
+    }
     }
 }
 
