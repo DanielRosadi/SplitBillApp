@@ -64,6 +64,14 @@ val dangerRed = Color(0xFF961400)
 val primaryGreen = Color(0xFF009669) // Main brand color
 val darkGrey = Color(0xFF9D9D9D)
 
+val CompletedCardColor = Color(0xFFD0F2E0)  // Soft green
+val PendingCardColor = Color(0xFFFFE6B3)    // Soft orange
+val RejectedCardColor = Color(0xFFF8C7C7)   // Soft red
+
+val TextPrimary = Color(0xFF2C3E50)         // Strong dark gray
+val TextSecondary = Color(0xFF666666)       // For date/metadata
+
+
 // Background Image used in most pages
 @Composable
 fun BackgroundImage() {
