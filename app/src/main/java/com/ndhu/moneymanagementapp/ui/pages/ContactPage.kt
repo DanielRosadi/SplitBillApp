@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -40,35 +42,46 @@ import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.utils.Util
 
+/*
+TODO:
+    - Rework UI popup
+    - Ganti font
+    - Ganti image
+    - Search function
+*/
+
 @Composable
-
-        /*
-        TODO:
-            - PendingRequest Notification
-            - Ganti font
-            - Ganti image
-            - Search function
-        */
-
 fun ContactPage(context: Context, navController: NavController) {
 
     val contactController = ContactController()
     val userController = UserController()
-    val listFriends = remember { mutableStateListOf<Contact>() }
+
+    val currentUserId = remember { Util.getUserId(context).toString() }
+    val contactList = remember { mutableStateListOf<Contact>() }
+    val pendingList = remember { mutableStateListOf<Contact>() }
 
     LaunchedEffect(Unit) {
         val contactsFromDb = contactController.getCurrUserLoginContact(context)
+        val pendingContactsFromDb = contactController.getPendingUserListContact(context)
+
         Log.d("Contact Screen", "Fetched ${contactsFromDb.size} contacts")
-        listFriends.clear() // Clear old data
-        listFriends.addAll(contactsFromDb) // Add fresh new data
+        Log.d("Contact Screen", "Fetched ${pendingContactsFromDb.size} pending contacts")
+
+        contactList.clear()
+        contactList.addAll(contactsFromDb)
+
+        pendingList.clear()
+        pendingList.addAll(pendingContactsFromDb)
     }
 
-    ComposeContactScreen(listFriends, context, navController, contactController, userController)
+    ComposeContactScreen(currentUserId, contactList, pendingList, context, navController, contactController, userController)
 }
 
 @Composable
 fun ComposeContactScreen(
+    currentUserId: String,
     contacts: SnapshotStateList<Contact>,
+    pendingContacts: SnapshotStateList<Contact>,
     context: Context,
     navController: NavController,
     contactController: ContactController,
@@ -117,11 +130,11 @@ fun ComposeContactScreen(
                         EmptyStateMessage("No contacts available")
                     } else {
                         LazyColumn(
-                            modifier = Modifier.padding(16.dp),
+                            contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(contacts) { contact ->
-                                ContactCard(contacts, contact, context, userController)
+                            items(contacts, key = { it.id }) { contact ->
+                                ContactCard(currentUserId, contact, context, userController)
                             }
                         }
                     }
@@ -136,24 +149,50 @@ fun ComposeContactScreen(
                         .weight(1f)
                 ) {
                     // Pending Request Button
-                    Button(
-                        onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryGreen,
-                            contentColor = Color.White
-                        )
+                            .weight(1f)
                     ) {
-                        Text(
-                            text = "Pending Request",
-                            //modifier = Modifier.background(Color.Blue),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            fontFamily = surannaFont,
-                        )
+                        Button(
+                            onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.Center),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = primaryGreen,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                text = "Pending Request",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = surannaFont,
+                            )
+                        }
+
+                        // Shows a red notification badge
+                        if (pendingContacts.isNotEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = (-8).dp, y = 4.dp)
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.Red),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = pendingContacts.size.toString(),
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -182,6 +221,7 @@ fun ComposeContactScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 if (showDialogAddFriend) {
+                    /* TODO: rework UI popup */
                     PopUpAddFriend(
                         context = context,
                         contactController = contactController,
@@ -199,30 +239,22 @@ fun ComposeContactScreen(
 // Card Item inside Lazy Column containing Contact information
 @Composable
 fun ContactCard(
-    contacts: SnapshotStateList<Contact>,
+    currentUserId: String,
     contact: Contact,
     context: Context,
     userController: UserController
 ) {
     // val coroutineScope = rememberCoroutineScope()
-    var isLoading by remember { mutableStateOf(true) }
 
-    // Get ID of both users
-    val currentUserId = remember { Util.getUserId(context).toString() }
-    val friendUserId = if (contact.userId1 == currentUserId) contact.userId2 else contact.userId1
-
-    // Mutable state to hold the fetched user object
-    var userObject by remember { mutableStateOf<User?>(null) }
+    val friendUserId = if (contact.senderId == currentUserId) contact.receiverId else contact.senderId
 
     // Fetch the user asynchronously when friendUserId changes
-    LaunchedEffect(friendUserId) {
-        isLoading = true
+    val userResult by produceState<User?>(initialValue = null, friendUserId) {
         try {
-            userObject = userController.searchUserByUserId(context, friendUserId)
+            value = userController.searchUserByUserId(context, friendUserId)
         } catch (e: Exception) {
             Log.e("ContactCard", "Failed to fetch user: ${e.message}")
-        } finally {
-            isLoading = false
+            value = null
         }
     }
 
@@ -242,7 +274,7 @@ fun ContactCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
             ) {
                 Icon(
@@ -256,37 +288,33 @@ fun ContactCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier.height(18.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                            color = primaryGreen
-                        )
-                    }
+                userResult == null -> {
+                    // null = assumes loading
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = primaryGreen
+                    )
                 }
 
-                userObject != null -> {
-                    userObject?.let { user ->
-                        Text(
-                            text = user.username,
-                            color = primaryGreen,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = alexandriaFont
-                        )
-                    }
-                }
-
-                else -> {
+                userResult?.username.isNullOrBlank() -> {
+                    // blank username = “Unknown User”
                     Text(
                         text = "Unknown User",
                         color = Color.Gray,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
+                    )
+                }
+
+                else -> {
+                    // Show valid username
+                    Text(
+                        text = userResult!!.username,
+                        color = primaryGreen,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = alexandriaFont
                     )
                 }
             }

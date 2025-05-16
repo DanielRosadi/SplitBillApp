@@ -123,7 +123,7 @@ private fun ComposePendingRequest(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(contacts, key = { it.userId1 }) { contact ->
+                            items(contacts, key = { it.senderId }) { contact ->
                                 PendingCard(
                                     contacts, contact, context, userController, contactController
                                 )
@@ -187,7 +187,7 @@ private fun ComposePendingRequest(
                             coroutineScope.launch {
                                 try {
                                     contacts.toList().forEach {
-                                        contactController.rejectFriend(context, it.userId1)
+                                        contactController.rejectFriend(context, it.senderId)
                                     }
                                     contacts.clear()
                                     Log.d("PendingRequest", "All requests rejected.")
@@ -213,7 +213,7 @@ private fun ComposePendingRequest(
                             coroutineScope.launch {
                                 try {
                                     contacts.toList().forEach {
-                                        contactController.acceptFriend(context, it.userId1)
+                                        contactController.acceptFriend(context, it.senderId)
                                     }
                                     contacts.clear()
                                     Log.d("PendingRequest", "All requests accepted.")
@@ -248,8 +248,8 @@ fun PendingCard(
     val userObject = remember { mutableStateOf<User?>(null) }
 
     // Fetch the sender's username
-    LaunchedEffect(contact.userId1) {
-        val sender = userController.searchUserByUserId(context, contact.userId1)
+    LaunchedEffect(contact.senderId) {
+        val sender = userController.searchUserByUserId(context, contact.senderId)
         userObject.value = sender
     }
 
@@ -315,9 +315,9 @@ fun PendingCard(
                     onClick = {
                         coroutineScope.launch {
                             try {
-                                contactController.rejectFriend(context, contact.userId1)
+                                contactController.rejectFriend(context, contact.senderId)
                                 contacts.remove(contact)
-                                Log.d("PendingCard", "Rejected friend request: ${contact.userId1}")
+                                Log.d("PendingCard", "Rejected friend request: ${contact.senderId}")
                                 // Optional: Show snackbar/toast
                             } catch (e: Exception) {
                                 Log.e("PendingCard", "Failed to reject: ${e.message}")
@@ -336,9 +336,9 @@ fun PendingCard(
                     onClick = {
                         coroutineScope.launch {
                             try {
-                                contactController.acceptFriend(context, contact.userId1)
+                                contactController.acceptFriend(context, contact.senderId)
                                 contacts.remove(contact)
-                                Log.d("PendingCard", "Accepted friend request: ${contact.userId1}")
+                                Log.d("PendingCard", "Accepted friend request: ${contact.senderId}")
                                 // Optional: Show snackbar/toast
                             } catch (e: Exception) {
                                 Log.e("PendingCard", "Failed to accept: ${e.message}")
@@ -472,4 +472,3 @@ fun ConfirmationDialog(
         )
     }
 }
-
