@@ -15,7 +15,16 @@ class UserController {
 
     private val userRepo : IUserRepository = UserRepository()
 
-    suspend fun registerUser(username : String, email : String, password : String, bio : String) {
+    suspend fun registerUser(username: String, email: String, password: String, bio: String): String? {
+        val existingUserByUsername = userRepo.getUserByUsername(username)
+        if (existingUserByUsername != null) {
+            return "Username is already in use."
+        }
+
+        val existingUserByEmail = userRepo.getUserByEmail(email)
+        if (existingUserByEmail != null) {
+            return "Email is already in use."
+        }
 
         userRepo.add(
             User(
@@ -27,7 +36,7 @@ class UserController {
                 bio
             )
         )
-
+        return null
     }
 
     suspend fun loginUser(context : Context, identify : String, password : String) : User? {
@@ -83,5 +92,41 @@ class UserController {
         }
         Log.d("INFO", "USER NOT FOUND")
         return
+    }
+
+    suspend fun updateUserData(
+        context: Context,
+        newUsername: String,
+        newEmail: String,
+        newBio: String,
+    ) {
+        val user = getOnboardUser(context)
+        if (user != null) {
+            val updatedUser = user.copy(
+                username = newUsername,
+                email = newEmail,
+                bio = newBio,
+            )
+            userRepo.update(updatedUser.id, updatedUser)
+            Log.d("INFO", "User data updated successfully")
+        } else {
+            Log.w("ERROR", "No onboard user found to update")
+        }
+    }
+
+    suspend fun updateUserPassword(
+        context: Context,
+        newPassword: String
+    ) {
+        val user = getOnboardUser(context)
+        if (user != null) {
+            val updatedUser = user.copy(
+                password = Util.passwordEncryption(newPassword)
+            )
+            userRepo.update(updatedUser.id, updatedUser)
+            Log.d("INFO", "User password updated successfully")
+        } else {
+            Log.w("ERROR", "No onboard user found to update")
+        }
     }
 }

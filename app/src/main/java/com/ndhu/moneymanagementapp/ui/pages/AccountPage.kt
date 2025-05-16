@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ fun AccountPage(context: Context, navController: NavController) {
     var user by remember { mutableStateOf<User?>(null) }
     var showClearUserDataDialog by remember { mutableStateOf(false) }
     var showLogOutDialog by remember { mutableStateOf(false) }
+    var bio by remember { mutableStateOf(TextFieldValue("")) }
 
     LaunchedEffect(Unit) {
         user = userController.getOnboardUser(context)
@@ -125,7 +127,7 @@ fun AccountPage(context: Context, navController: NavController) {
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = user?.username ?: "Daniel Rosadi",
+                    text = user?.username ?: "{FAIL-LOGIN}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = syncopateFont,
@@ -133,7 +135,7 @@ fun AccountPage(context: Context, navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Be Believer",
+                    text = user?.bio?:"No bio set up",
                     fontSize = 14.sp,
                     color = Color.LightGray
                 )
@@ -193,7 +195,9 @@ fun AccountPage(context: Context, navController: NavController) {
         DeleteAccountDialog(
             onDismiss = { showClearUserDataDialog = false },
             onConfirm = {
-                coroutine.launch { userController.logout(context) }
+                coroutine.launch {
+                    userController.deleteCurrUser(context);
+                }
                 navController.navigate(AppScreens.LogInScreen.name) {
                     popUpTo(0) { inclusive = true }
                 }

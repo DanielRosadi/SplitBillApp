@@ -36,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,20 +54,31 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.controllers.UserController
-import com.ndhu.moneymanagementapp.models.User
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfile(context: Context, navController: NavController) {
     val userController = UserController()
-    var user by remember { mutableStateOf<User?>(null) }
 
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var bio by remember { mutableStateOf(TextFieldValue("")) }
 
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+    var newPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var confirmPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
-        user = userController.getOnboardUser(context)
+        val user = userController.getOnboardUser(context)
+        if (user != null) {
+            username = TextFieldValue(user.username)
+            email = TextFieldValue(user.email)
+            bio = TextFieldValue(user.bio)
+        }
     }
 
     Column(
@@ -225,6 +237,23 @@ fun EditProfile(context: Context, navController: NavController) {
                         onValueChange = { bio = it }
                     )
 
+                    Button(
+                        onClick = {
+                            // Reset states each time it's opened
+                            newPassword = TextFieldValue("")
+                            confirmPassword = TextFieldValue("")
+                            passwordError = null
+                            showChangePasswordDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                    ) {
+                        Text("Change Password", color = Color.White, fontSize = 16.sp)
+                    }
+
                     Spacer(modifier = Modifier.weight(1f))
 
                     // Buttons
@@ -248,8 +277,15 @@ fun EditProfile(context: Context, navController: NavController) {
 
                         Button(
                             onClick = {
-                                // TODO: Save data
-                                navController.popBackStack()
+                                coroutineScope.launch {
+                                    userController.updateUserData(
+                                        context = context,
+                                        newUsername = username.text,
+                                        newEmail = email.text,
+                                        newBio = bio.text
+                                    )
+                                    navController.popBackStack()
+                                }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)), // Green
                             shape = RoundedCornerShape(8.dp),
@@ -264,6 +300,34 @@ fun EditProfile(context: Context, navController: NavController) {
                 }
             }
         }
+    }
+    if (showChangePasswordDialog) {
+        ChangePasswordDialog(
+            onDismiss = {
+                showChangePasswordDialog = false
+                newPassword = TextFieldValue("")
+                confirmPassword = TextFieldValue("")
+                passwordError = null
+            },
+            onSave = { password ->
+                if (password.isEmpty()) {
+                    passwordError = "Passwords do not match"
+                } else {
+                    coroutineScope.launch {
+                        userController.updateUserPassword(context, newPassword.text)
+                        showChangePasswordDialog = false
+                        newPassword = TextFieldValue("")
+                        confirmPassword = TextFieldValue("")
+                        passwordError = null
+                    }
+                }
+            },
+            newPassword = newPassword,
+            confirmPassword = confirmPassword,
+            onNewPasswordChange = { newPassword = it },
+            onConfirmPasswordChange = { confirmPassword = it },
+            errorMessage = passwordError
+        )
     }
 }
 
@@ -302,5 +366,73 @@ fun RoundedInputField(
             focusedPlaceholderColor = Color.Gray,
             unfocusedPlaceholderColor = Color.Gray
         )
+    )
+}
+
+@Composable
+fun ChangePasswordDialog(
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit,
+    newPassword: TextFieldValue,
+    confirmPassword: TextFieldValue,
+    onNewPasswordChange: (TextFieldValue) -> Unit,
+    onConfirmPasswordChange: (TextFieldValue) -> Unit,
+    errorMessage: String?
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {},
+        dismissButton = {},
+        title = {
+            Text("Change Password", fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = newPassword,
+                    onValueChange = onNewPasswordChange,
+                    placeholder = { Text("New Password") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = onConfirmPasswordChange,
+                    placeholder = { Text("Confirm Password") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (!errorMessage.isNullOrEmpty()) {
+                    Text(text = errorMessage, color = Color.Red, fontSize = 12.sp)
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = {
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Button(
+                        onClick = {
+                            if (newPassword.text != confirmPassword.text) {
+                                onSave("") // This triggers validation error
+                            } else {
+                                onSave(newPassword.text)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
     )
 }
