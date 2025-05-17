@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,6 +42,7 @@ fun AccountPage(context: Context, navController: NavController) {
     var user by remember { mutableStateOf<User?>(null) }
     var showClearUserDataDialog by remember { mutableStateOf(false) }
     var showLogOutDialog by remember { mutableStateOf(false) }
+    var bio by remember { mutableStateOf(TextFieldValue("")) }
 
     LaunchedEffect(Unit) {
         user = userController.getOnboardUser(context)
@@ -70,13 +71,13 @@ fun AccountPage(context: Context, navController: NavController) {
                     .padding(top = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Scaffold section (for navigation and text)
+                // Scaffold section
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp),
                 ) {
-                    // Back button aligned to the start
+                    // Back button
                     IconButton(
                         onClick = { navController.popBackStack() },
                         modifier = Modifier.align(Alignment.CenterStart)
@@ -125,7 +126,7 @@ fun AccountPage(context: Context, navController: NavController) {
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = user?.username ?: "Daniel Rosadi",
+                    text = user?.username ?: "{FAIL-LOGIN}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = syncopateFont,
@@ -133,9 +134,11 @@ fun AccountPage(context: Context, navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Be Believer",
+                    text = user?.bio ?: "No bio set up",
                     fontSize = 14.sp,
-                    color = Color.LightGray
+                    color = Color.LightGray,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -193,7 +196,9 @@ fun AccountPage(context: Context, navController: NavController) {
         DeleteAccountDialog(
             onDismiss = { showClearUserDataDialog = false },
             onConfirm = {
-                coroutine.launch { userController.logout(context) }
+                coroutine.launch {
+                    userController.deleteCurrUser(context);
+                }
                 navController.navigate(AppScreens.LogInScreen.name) {
                     popUpTo(0) { inclusive = true }
                 }
@@ -313,7 +318,7 @@ fun DeleteAccountDialog(
                             )
                         ) {
                             Text(
-                                "Delete Account",
+                                "Delete",
                                 fontSize = 18.sp,
                                 fontFamily = surannaFont,
                                 maxLines = 1,

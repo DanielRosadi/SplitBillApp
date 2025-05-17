@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -29,7 +28,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -45,19 +43,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.components.SearchBox
-import com.ndhu.moneymanagementapp.components.UniformDesignScaffold
 import com.ndhu.moneymanagementapp.controllers.ContactController
-import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.Contact
-import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -230,7 +224,10 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                     )
                 ) {
                     // TODO: font family?
-                    Text(text = "Add Friend", fontSize = 24.sp)
+                    Text(text = "Add Friend",
+                        fontSize = 24.sp,
+                        //fontFamily = surannaFont
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -256,7 +253,10 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                     )
                 ) {
                     // TODO: font family?
-                    Text(text = "Done", fontSize = 24.sp)
+                    Text(text = "Done",
+                        fontSize = 24.sp,
+                        //fontFamily = surannaFont
+                    )
                 }
 
 
@@ -282,8 +282,17 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
 @Composable
 fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit, userController: UserController){
-    var friendName = runBlocking { userController.searchUserByUserId(context, friend.userId2)?.username
+
+    val currentUserId = remember { Util.getUserId(context).toString() }
+    val friendUserId = if (friend.senderId == currentUserId) friend.receiverId else friend.senderId
+
+    var friendName = runBlocking { userController.searchUserByUserId(context, friendUserId)?.username
         ?: "Unknown Contact" }
+
+    // val cardColor = if (isSelected) correctTransparentGreen else Color.White
+
+    val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
+
 
     Card (
         modifier = Modifier
@@ -292,13 +301,16 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
             .clickable{onCheckedChange(!isSelected)},
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
+        // colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
-        Row(modifier = Modifier.
-            fillMaxWidth().
-            padding(15.dp),
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(15.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
 
             Spacer(modifier = Modifier.width(5.dp))
 
@@ -336,12 +348,24 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
             Spacer(modifier = Modifier.width(120.dp))
 
 
+
+
             // TODO: should save checked friends for when user navigates back?
-            Checkbox(
-                checked = isSelected,
-                onCheckedChange = onCheckedChange
-            )
+//            Checkbox(
+//                checked = isSelected,
+//                onCheckedChange = onCheckedChange
+//            )
         }
+            // Overlay when selected
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(overlayColor)
+                )
+            }
+
+    }
     }
 }
 

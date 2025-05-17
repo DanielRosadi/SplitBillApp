@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,11 +21,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -41,6 +44,7 @@ fun SignUp(context : Context, navController: NavController) {
     var userAge by remember { mutableStateOf(TextFieldValue("")) }
     var userPassword by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     // UI elements/components (Composable here)
     // TODO: Need TopBar, BottomBar?  (i.e. Scaffold)
@@ -57,7 +61,6 @@ fun SignUp(context : Context, navController: NavController) {
         Spacer(modifier = Modifier.height(15.dp))
 
         // email or username text field
-        // TODO: need to make mandatory input functionality
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -74,7 +77,6 @@ fun SignUp(context : Context, navController: NavController) {
 
 
         // password text field with visibility
-        // TODO: need to make mandatory input functionality
         OutlinedTextField(
             value = userPassword,
             onValueChange = { userPassword = it },
@@ -94,27 +96,78 @@ fun SignUp(context : Context, navController: NavController) {
         // Add some space
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Submit button
         Button(
             onClick = {
                 coroutine.launch {
-                    val controller : UserController = UserController()
-                    controller.registerUser(
-                        username.text.toString(),
-                        email.text.toString(),
-                        userPassword.text.toString(),
-                        ""
+                    val isValidEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(email.text).matches()
+                    val isValidUsername = username.text.matches(Regex("^[a-zA-Z0-9_.]{3,20}$"))
+                    val isValidPassword = userPassword.text.matches(
+                        Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
                     )
-                    username = TextFieldValue("")
-                    email = TextFieldValue("")
-                    userPassword = TextFieldValue("")
-                    navController.navigate(route = AppScreens.HomeScreen.name)
+
+                    if (!isValidEmail) {
+                        errorMessage = "Invalid email format."
+                    } else if (!isValidUsername) {
+                        errorMessage = "Username must be 3–20 characters and only contain letters, numbers, underscores, or periods."
+                    } else if (!isValidPassword) {
+                        errorMessage = "Password must be at least 8 characters, with uppercase, lowercase, digit, and special character."
+                    } else {
+                        val controller = UserController()
+                        val result = controller.registerUser(
+                            username.text,
+                            email.text,
+                            userPassword.text,
+                            "No bio provided"
+                        )
+                        controller.loginUser(context, username.text, userPassword.text) //Login after sign up
+                        if (result != null) {
+                            errorMessage = result
+                        } else {
+                            errorMessage = ""
+                            username = TextFieldValue("")
+                            email = TextFieldValue("")
+                            userPassword = TextFieldValue("")
+                            navController.navigate(route = AppScreens.HomeScreen.name)
+                        }
+                    }
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(60.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
             shape = RoundedCornerShape(5.dp)
         ) {
             Text(text = "Submit")
+        }
+
+        // Show error if exists
+        if (errorMessage.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = errorMessage,
+                color = Color.Red,
+                fontSize = 14.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Already registered?")
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "Sign in",
+                color = Color.Blue,
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.clickable {
+                    navController.navigate(AppScreens.LogInScreen.name){
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

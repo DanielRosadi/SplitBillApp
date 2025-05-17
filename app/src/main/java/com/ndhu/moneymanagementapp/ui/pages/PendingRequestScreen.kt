@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,7 +19,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,9 +49,9 @@ import kotlinx.coroutines.launch
 
 /*
 TODO:
-    - Ganti font
-    - Ganti image
     - Search function
+    - Ganti image
+    - Ganti font (optional)
 */
 
 @Composable
@@ -123,7 +126,7 @@ private fun ComposePendingRequest(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(contacts, key = { it.userId1 }) { contact ->
+                            items(contacts, key = { it.senderId }) { contact ->
                                 PendingCard(
                                     contacts, contact, context, userController, contactController
                                 )
@@ -150,7 +153,7 @@ private fun ComposePendingRequest(
                             .padding(10.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = dangerRed,
+                            containerColor = Color(0xFF961400),
                             contentColor = Color.White
                         )
                     ) {
@@ -182,12 +185,15 @@ private fun ComposePendingRequest(
                         title = "Confirm Reject All",
                         message = "Are you sure you want to reject all friend requests?",
                         confirmText = "Reject All",
-                        confirmColor = dangerRed,
+                        confirmColor = Color(0xFF961400),
+                        icon = Icons.Outlined.Cancel,
+                        iconTint = Color.Red,
+                        showDialog = showRejectAllDialog,
                         onConfirm = {
                             coroutineScope.launch {
                                 try {
                                     contacts.toList().forEach {
-                                        contactController.rejectFriend(context, it.userId1)
+                                        contactController.rejectFriend(context, it.senderId)
                                     }
                                     contacts.clear()
                                     Log.d("PendingRequest", "All requests rejected.")
@@ -198,7 +204,6 @@ private fun ComposePendingRequest(
                                 }
                             }
                         },
-                        showDialog = showRejectAllDialog
                     )
                 } // Reject All Dialog
 
@@ -209,11 +214,14 @@ private fun ComposePendingRequest(
                         message = "Are you sure you want to accept all friend requests?",
                         confirmText = "Accept All",
                         confirmColor = primaryGreen,
+                        icon = Icons.Outlined.CheckCircleOutline,
+                        iconTint = Color.Green,
+                        showDialog = showAcceptAllDialog,
                         onConfirm = {
                             coroutineScope.launch {
                                 try {
                                     contacts.toList().forEach {
-                                        contactController.acceptFriend(context, it.userId1)
+                                        contactController.acceptFriend(context, it.senderId)
                                     }
                                     contacts.clear()
                                     Log.d("PendingRequest", "All requests accepted.")
@@ -224,7 +232,6 @@ private fun ComposePendingRequest(
                                 }
                             }
                         },
-                        showDialog = showAcceptAllDialog
                     )
                 } // Accept All Dialog
 
@@ -243,14 +250,18 @@ fun PendingCard(
     contactController: ContactController
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val showRejectDialog = remember { mutableStateOf(false) }
 
     // Store the state of the sender's username
     val userObject = remember { mutableStateOf<User?>(null) }
 
+    // Show sender's username
+    val sender = userObject.value
+
     // Fetch the sender's username
-    LaunchedEffect(contact.userId1) {
-        val sender = userController.searchUserByUserId(context, contact.userId1)
-        userObject.value = sender
+    LaunchedEffect(contact.senderId) {
+        val fetchedUser = userController.searchUserByUserId(context, contact.senderId)
+        userObject.value = fetchedUser
     }
 
     Card(
@@ -287,14 +298,32 @@ fun PendingCard(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                // Show sender's username
-                userObject.value?.let {
-                    Text(
-                        text = it.username,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF009669)
-                    )
+                when {
+                    sender == null -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = primaryGreen
+                        )
+                    }
+
+                    sender.username.isBlank() -> {
+                        Text(
+                            text = "Unknown User",
+                            color = Color.Gray,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    else -> {
+                        Text(
+                            text = sender.username,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = primaryGreen
+                        )
+                    }
                 }
 
             } // Row 1
@@ -313,17 +342,7 @@ fun PendingCard(
                     icon = Icons.Outlined.Cancel,
                     backgroundColor = Color(0xFFD84315),
                     onClick = {
-                        coroutineScope.launch {
-                            try {
-                                contactController.rejectFriend(context, contact.userId1)
-                                contacts.remove(contact)
-                                Log.d("PendingCard", "Rejected friend request: ${contact.userId1}")
-                                // Optional: Show snackbar/toast
-                            } catch (e: Exception) {
-                                Log.e("PendingCard", "Failed to reject: ${e.message}")
-                                // Optional: Show error feedback to user
-                            }
-                        }
+                        showRejectDialog.value = true
                     },
                     contentDescription = "Reject"
                 )
@@ -336,20 +355,65 @@ fun PendingCard(
                     onClick = {
                         coroutineScope.launch {
                             try {
-                                contactController.acceptFriend(context, contact.userId1)
+                                contactController.acceptFriend(context, contact.senderId)
                                 contacts.remove(contact)
-                                Log.d("PendingCard", "Accepted friend request: ${contact.userId1}")
-                                // Optional: Show snackbar/toast
+                                Toast.makeText(
+                                    context,
+                                    "Friend request accepted",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                Log.d("PendingCard", "Accepted friend request: ${contact.senderId}")
                             } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "Failed to accept request. Please try again.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                                 Log.e("PendingCard", "Failed to accept: ${e.message}")
-                                // Optional: Show error feedback to user
                             }
                         }
                     },
                     contentDescription = "Accept"
                 )
-
             } // Row 2
+
+            // Reject Confirmation Dialog
+            if (showRejectDialog.value) {
+                val senderName = userObject.value?.username ?: contact.senderId
+                ConfirmationDialog(
+                    title = "Reject $senderName?",
+                    message = "Rejecting this request prevents further requests from this user. You can still add them as a friend later.",
+                    confirmText = "Reject",
+                    confirmColor = Color(0xFF961400),
+                    icon = Icons.Outlined.Cancel,
+                    iconTint = Color.Red,
+                    showDialog = showRejectDialog,
+                    onConfirm = {
+                        coroutineScope.launch {
+                            try {
+                                contactController.rejectFriend(context, contact.senderId)
+                                contacts.remove(contact)
+                                Toast.makeText(
+                                    context,
+                                    "Friend request rejected",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                Log.d("PendingCard", "Rejected friend request: ${contact.senderId}")
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "Failed to reject request. Please try again.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                Log.e("PendingCard", "Failed to reject: ${e.message}")
+                            } finally {
+                                showRejectDialog.value = false
+                            }
+                        }
+                    },
+                )
+            }
+
         } // Outer Row
     } // Card
 }
@@ -358,7 +422,7 @@ fun PendingCard(
 @Composable
 fun ContactContainer(
     modifier: Modifier = Modifier,
-    containerColor: Color = darkGrey,
+    containerColor: Color = Color(0xFF9D9D9D),
     content: @Composable () -> Unit
 ) {
     Card(
@@ -421,44 +485,80 @@ fun ConfirmationDialog(
     confirmText: String,
     cancelText: String = "Cancel",
     confirmColor: Color,
+    icon: ImageVector? = null, // Optional icon
+    iconTint: Color = Color.Unspecified, // Optional tint
+    showDialog: MutableState<Boolean>,
     onConfirm: () -> Unit,
-    showDialog: MutableState<Boolean>
 ) {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text(title) },
-            text = { Text(message) },
+            containerColor = Color(0xFFF9F9F9), // Soft White
+            shape = RoundedCornerShape(20.dp),
+            title = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (icon != null) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (iconTint != Color.Unspecified) iconTint else Color.Unspecified,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(bottom = 4.dp)
+                        )
+                    }
+
+                    Text(
+                        text = title,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            },
+            text = {
+                Text(
+                    text = message,
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp,
+                    color = Color.DarkGray // Dark Gray
+                )
+            },
             confirmButton = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(
+                    // Cancel Button
+                    OutlinedButton(
                         onClick = { showDialog.value = false },
                         modifier = Modifier
                             .height(48.dp)
-                            .weight(5f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = darkGrey,
-                            contentColor = Color.White
+                            .weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color(0xFF666666), // Dark Gray
                         ),
+                        border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
                     ) {
-                        Text(cancelText)
+                        Text(cancelText, fontSize = 14.sp)
                     }
 
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(16.dp))
 
+                    // Confirm Button
                     Button(
                         onClick = {
                             onConfirm()
                         },
                         modifier = Modifier
                             .height(48.dp)
-                            .weight(5f),
-                        shape = RoundedCornerShape(8.dp),
+                            .weight(1f),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = confirmColor,
                             contentColor = Color.White
@@ -468,8 +568,6 @@ fun ConfirmationDialog(
                     }
                 }
             },
-            containerColor = Color.White
         )
     }
 }
-

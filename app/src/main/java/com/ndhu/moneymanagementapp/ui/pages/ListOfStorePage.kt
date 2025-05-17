@@ -57,6 +57,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -211,8 +212,18 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                             disabledContentColor = Color.White
                         )
                     ) {
+
                         // TODO: font family?
-                        Text(text = "Add Store", fontSize = 24.sp)
+                        Text(
+                            text = "Add Store",
+                            fontSize = 24.sp,
+                            //fontFamily = surannaFont,
+                            textAlign = TextAlign.Center,
+                            //modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+
+                        )
+
+
                     }
 
                     if (showDialogAddStore) {
@@ -262,6 +273,9 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
+
+        // Spacer(modifier = Modifier.width(10.dp))
+
         // pressable text
         Column(
             modifier = Modifier

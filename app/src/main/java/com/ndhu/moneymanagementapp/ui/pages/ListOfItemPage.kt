@@ -3,8 +3,10 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,17 +15,23 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -35,13 +43,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.ItemController
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
@@ -123,134 +132,218 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
 
     var showDialogAddItem by remember { mutableStateOf(false) }
 
-    Scaffold (
-        topBar = {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
-                }
+    //Scaffold (
+//        topBar = {
+//            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+//                IconButton(onClick = { navController.popBackStack() }) {
+//                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+//                }
+//
+//                Column() {
+//                    Card (modifier = Modifier.fillMaxWidth().clickable { }) {
+//                        Text(
+//                            text = store?.name ?: "Unknown Store",
+//                            fontSize = 25.sp,
+//                            fontWeight = FontWeight.Bold
+//                        )
+//                        Text(
+//                            text = store?.address ?: "Unknown Store",
+//                            fontSize = 15.sp,
+//                            fontWeight = FontWeight.Bold)
+//                    }
+//            }
+//            }
+//        }
+    // )
+    //{paddingValues->
 
-                Column() {
-                    Card (modifier = Modifier.fillMaxWidth().clickable { }) {
-                        Text(
-                            text = store?.name ?: "Unknown Store",
-                            fontSize = 25.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = store?.address ?: "Unknown Store",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold)
-                    }
-            }
-            }
-        }
-    )
-    {paddingValues->
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight().padding(paddingValues),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxHeight()
     ) {
 
-        SearchBox()
+        // Background Image
+        BackgroundImage()
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .weight(1f),
-            contentPadding = PaddingValues(5.dp)
-        ) {
-
-            items(uiItems) { uiItem ->
-                ListDataItem(uiItem, store, itemController, listItem, viewModel, uiItems)
-
-            }
-
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-
-        Column (modifier = Modifier.padding(20.dp)) {
-
-            Button(
-                // TODO: need to pass item list
-                onClick = {
-                    navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
-                    val result = uiItems
-                        .filter { uiItem -> uiItem.quantity > 0 } // we don't send items data that are not in the transaction
-                        .map { uiItem ->
-                            ItemDetail(
-                            id = uiItem.item.id,
-                            name = uiItem.item.name,
-                            price = uiItem.item.price,
-                            qty = uiItem.quantity
-                            )
-                    }
-
-                    // TODO: what to do with result? e.g onDoneClicked(result)
-                    // save the items for Assign_Split page
-                    viewModel.itemDetailList = result.toMutableList()
-
-                    // TODO: should notify user if there is item with 0 quantity (that is, the item is unassign)
-                          },
+            // Full Page
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                //.fillMaxHeight()
+                // .padding(paddingValues)
+                //.padding(10.dp)
+                ,
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Done")
-            }
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
-            Row {
-                // we no longer need delete item, keep it for possible future change
-                /*
-                Button(
-                    onClick = {}, modifier = Modifier
+                TitleText()
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // White Box
+                Column(
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp)
-                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                        .background(Color(0xFFD9D9D9))
+                        .padding(10.dp)
+                    //.padding(paddingValues)
+                    ,
+                    //verticalArrangement = Arrangement.Top,
+                    //horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "Delete (Temp)")
-                }
-                Spacer(modifier = Modifier.width(20.dp))
-                 */
 
-                Button(
-                    onClick = { showDialogAddItem = true}, modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .weight(1f)
-                ) {
-                    Text(text = "Add item")
+                    // Content Top Bar
+                    // TODO: search func
+                    ItemContentTopBar(navController = navController, store = store)
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(6f)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(darkGrey)
+
+                    ){
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .weight(1f),
+                            contentPadding = PaddingValues(5.dp)
+                        ) {
+
+                            items(uiItems) { uiItem ->
+                                ListDataItem(
+                                    uiItem,
+                                    store,
+                                    itemController,
+                                    listItem,
+                                    viewModel,
+                                    uiItems
+                                )
+
+                            }
+
+                        }
                 }
 
-                if (showDialogAddItem){
-                    if (store != null) {
-                        PopUpAddItem(itemController = itemController,
-                            onDismiss = {showDialogAddItem = false},
-                            storeId = store.id,
-                            itemList = listItem,
-                            viewModel = viewModel,
-                            uiItems = uiItems
-                        )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+
+                    Column(
+                        // modifier = Modifier.padding(20.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            //.fillMaxHeight()
+                            .weight(2.5f)
+                            .padding(2.dp)
+                        ,
+                        horizontalAlignment = Alignment.CenterHorizontally
+
+                    ) {
+
+                        Row {
+                            // we no longer need delete item, keep it for possible future change
+                            /*
+                                Button(
+                                    onClick = {}, modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp)
+                                        .weight(1f)
+                                ) {
+                                    Text(text = "Delete (Temp)")
+                                }
+                                Spacer(modifier = Modifier.width(20.dp))
+                                 */
+
+                            Button(
+                                onClick = { showDialogAddItem = true },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp)
+                                    .weight(1f),
+                                shape = RoundedCornerShape(18.dp),
+                                colors = ButtonColors(
+                                    containerColor = primaryGreen,
+                                    contentColor = Color.White,
+                                    disabledContainerColor = Color.Gray,
+                                    disabledContentColor = Color.White
+                                )
+                            ) {
+                                Text(text = "Add item",
+                                    fontSize = 24.sp)
+                            }
+
+                            if (showDialogAddItem) {
+                                if (store != null) {
+                                    PopUpAddItem(
+                                        itemController = itemController,
+                                        onDismiss = { showDialogAddItem = false },
+                                        storeId = store.id,
+                                        itemList = listItem,
+                                        viewModel = viewModel,
+                                        uiItems = uiItems
+                                    )
+                                }
+                            }
+
+
+                        }
+
+                        Spacer(modifier = Modifier.height(15.dp))
+
+                        Button(
+                            // TODO: need to pass item list
+                            onClick = {
+                                navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
+                                val result = uiItems
+                                    .filter { uiItem -> uiItem.quantity > 0 } // we don't send items data that are not in the transaction
+                                    .map { uiItem ->
+                                        ItemDetail(
+                                            id = uiItem.item.id,
+                                            name = uiItem.item.name,
+                                            price = uiItem.item.price,
+                                            qty = uiItem.quantity
+                                        )
+                                    }
+
+                                // TODO: what to do with result? e.g onDoneClicked(result)
+                                // save the items for Assign_Split page
+                                viewModel.itemDetailList = result.toMutableList()
+
+                                // TODO: should notify user if there is item with 0 quantity (that is, the item is unassign)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            shape = RoundedCornerShape(18.dp),
+                            colors = ButtonColors(
+                                containerColor = primaryGreen,
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.White
+                            )
+                        ) {
+                            Text(text = "Done",
+                                fontSize = 24.sp)
+                        }
+
+
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
+
                 }
-
-
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-
     }
-
 }
+
+//}
 
 }
 
@@ -277,31 +370,92 @@ private fun ListDataItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(90.dp)
             .padding(7.dp)
-            .clickable { showDialogEditItem = true }
+            .clickable { showDialogEditItem = true },
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(10.dp),
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = uiItem.item.name)
-            Spacer(modifier = Modifier.width(20.dp))
 
-            Text(text = uiItem.item.price.toString())
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column(
+                modifier = Modifier.fillMaxHeight().weight(1f)
+            ){
+                Text(text = uiItem.item.name,
+                    color = primaryGreen,
+                    fontSize = 20.sp,
+                    fontFamily = alexandriaFont,
+                    //modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                // to remove floating point if its x.0
+                val price = uiItem.item.price
+                val priceText = if (price.rem(1.0) == 0.0) {
+                    price.toInt().toString()
+                } else {
+                    price.toString()
+                }
+
+
+                Text(text = "NTD $priceText",
+                    fontSize = 17.sp,
+                    // fontWeight = FontWeight.W600,
+                    fontFamily = surannaFont,
+                    //modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                    )
+            }
+
+            // Spacer(modifier = Modifier.width(20.dp))
+
+
             Spacer(modifier = Modifier.width(25.dp))
 
-            Button(onClick = {
-                if (itemQuantity > 0) {
+            Row(
+                modifier = Modifier.fillMaxHeight().weight(1f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+
+                IconButton(onClick = { if (itemQuantity > 0) {
                     updateItemQuantity(itemQuantity - 1)
                 }
-            }) { Text(text = "-") }
-            Spacer(modifier = Modifier.width(30.dp))
+                }) {
+                    Icon(Icons.Default.Remove, contentDescription = "Remove", modifier = Modifier.size(30.dp))
+                }
 
-            Text(text = itemQuantity.toString())
-            Spacer(modifier = Modifier.width(20.dp))
+                /*
+                Button(onClick = {
+                    if (itemQuantity > 0) {
+                        updateItemQuantity(itemQuantity - 1)
+                    }
+                }) { Text(text = "-") }
+                */
+                Spacer(modifier = Modifier.width(20.dp))
 
-            Button(onClick = { updateItemQuantity(itemQuantity + 1) }) { Text(text = "+") }
+                Text(text = itemQuantity.toString(),
+                    fontSize = 22.sp,
+                    fontFamily = surannaFont,
+                    //modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                    )
+                Spacer(modifier = Modifier.width(20.dp))
+
+                // Button(onClick = { updateItemQuantity(itemQuantity + 1) }) { Text(text = "+") }
+
+                IconButton(onClick = { updateItemQuantity(itemQuantity + 1) }) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add", modifier = Modifier.size(30.dp) )
+                }
+
+            }
+
         }
 
 

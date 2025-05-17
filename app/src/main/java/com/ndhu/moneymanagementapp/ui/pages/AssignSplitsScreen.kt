@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,10 +23,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,9 +52,11 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -129,24 +134,64 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
      */
 
-    UniformDesignScaffold(
-        topAppBar = {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
-                }
-                Spacer(modifier = Modifier.width(50.dp))
-                Text("Assign Splits", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-            }
-        },
+    //UniformDesignScaffold(
+//        topAppBar = {
+//            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+//                IconButton(onClick = { navController.popBackStack() }) {
+//                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+//                }
+//                Spacer(modifier = Modifier.width(50.dp))
+//                Text("Assign Splits", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+//            }
+//        },
 
-        body = {paddingValues->
-            Column (modifier = Modifier
+        //body = {paddingValues->
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+
+        // Background Image
+        BackgroundImage()
+
+        // Full Page
+        Column(
+            modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(paddingValues)
-                .padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            //.fillMaxHeight()
+            // .padding(paddingValues)
+            //.padding(10.dp)
+            ,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
+            Spacer(modifier = Modifier.height(30.dp))
+
+            TitleText()
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // White Box
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color(0xFFD9D9D9))
+                    .padding(10.dp),
+                    // .padding(paddingValues)
+                    //.padding(10.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+
+                // Content Top Bar
+                // TODO: search func
+                ContentTopBar(navController = navController, topBarText = "Assign Splits")
 
                 // calculate if all items have been assigned, otherwise disabled save button
                 isAllItemsFullyAssigned = listItemsAndOwners.all { itemWithUsers ->
@@ -155,7 +200,6 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                     }
                     assignedQty == itemWithUsers.item.qty.toFloat() // Check if assigned quantity matches total quantity
                 }
-
 
 
                 /*
@@ -175,19 +219,43 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 */
 
 
-                Spacer(modifier = Modifier.height(10.dp))
+                //Spacer(modifier = Modifier.height(10.dp))
 
-                SearchBox()
+                //SearchBox()
 
-                Spacer(modifier = Modifier.height(10.dp))
+                //Spacer(modifier = Modifier.height(10.dp))
 
-                // update current user selected text
-                // Text(text = "Now Selecting: {${selectedUser?.username}}" ?: "No User Selected")
-                Text(text = selectedUser?.let { selectedUser -> "Now Selecting: ${selectedUser.username}" } ?: "No User Selected")
+                // Top (below TopBar)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
 
-                Spacer(modifier = Modifier.height(10.dp))
+                ) {
+                    // update current user selected text
+                    // Text(text = "Now Selecting: {${selectedUser?.username}}" ?: "No User Selected")
+                    Text(
+                        text = selectedUser?.let {
+                            selectedUser -> "Now Selecting: ${selectedUser.username}"
+                        } ?: "No User Selected",
+                        fontSize = 20.sp,
+                        fontFamily = surannaFont
+                    )
 
-                LazyColumn (modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
+                    // Spacer(modifier = Modifier.height(0.dp))
+                }
+
+
+                // Middle Top
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(6f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(darkGrey)
+
+                ){
+                LazyColumn(modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
 
                     // chunked groups items into sets of 3 for each row
                     // it also automatically handles when the list is not perfectly divisible by 3
@@ -205,85 +273,134 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                 }
 
-                Spacer(modifier = Modifier.height(30.dp))
 
-                LazyRow () {
-                    items(listParticipants) { participant ->
-
-                        ListBillParticipants(participant = participant, userColors = userColors, selectedUser = selectedUser, onUserSelected = { selectedUser = it}, listParticipants = listParticipants)
-                    }
                 }
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-
-
-                Button(onClick = {
-                    // TODO: if done, create list of itemIdAndOwners
-
-                    // TODO: then, submit bill data to database (with list of itemIdAndOwners)
-                    // *******
-
-                    // TODO: need to discuss on qty for ItemAndOwner
-                    // TODO: need to recheck if there is changes since we are implementing additional logic
-
-
-                    val itemIdAndOwners = mapItemsToItemAndOwners(listItemsAndOwners)
-
-
-                    val splitBillRequest = SplitBillRequest(
-                        billOwnerId = viewModel.getBillOwnerId(),
-                        itemIdAndOwners = itemIdAndOwners
-                    )
-
-
-                    runBlocking {
-                        splitBillController.addSplitBill(context = context, request = splitBillRequest)
-                    }
-
-                    // TODO: need to put some toast/feedback
-
-                    navController.navigate(route = AppScreens.HomeScreen.name)
-
-                    // TODO: clear all data in viewModel because its for one transaction only?
-
-
-                    // Example trigger (button click, etc.)
-                    Toast.makeText(localContext, "Bill has been successfully saved", Toast.LENGTH_LONG).show()
-
-                    /*
-                    // provide feedback when user successfully save the bill
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = "Bill has been successfully saved",
-                            // actionLabel = "Dismiss",
-                            withDismissAction = true,
-                            duration = SnackbarDuration.Long, // Adjust duration here
-
-                        )
-                    }
-                    */
-
-
-                },
+                // Middle Bottom
+                Column (
                     modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                    enabled = isAllItemsFullyAssigned
+                        .fillMaxWidth()
+                        .padding(2.dp)
+                        .weight(2.7f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(darkGrey)
+                ) {
+                    LazyRow (
+                    ) {
+                        items(listParticipants) { participant ->
 
-                )
-                {
-                    Text(text = "Done")
+                            ListBillParticipants(participant = participant, userColors = userColors, selectedUser = selectedUser, onUserSelected = { selectedUser = it}, listParticipants = listParticipants)
+                        }
+                    }
                 }
 
 
 
-                Spacer(modifier = Modifier.height(20.dp))
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+
+                // Bottom Page
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.fillMaxHeight()
+                        .weight(1.5f)
+                        .padding(2.dp)
+                    ,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Button(onClick = {
+                        // TODO: if done, create list of itemIdAndOwners
+
+                        // TODO: then, submit bill data to database (with list of itemIdAndOwners)
+                        // *******
+
+                        // TODO: need to discuss on qty for ItemAndOwner
+                        // TODO: need to recheck if there is changes since we are implementing additional logic
+
+
+                        val itemIdAndOwners = mapItemsToItemAndOwners(listItemsAndOwners)
+
+
+                        val splitBillRequest = SplitBillRequest(
+                            billOwnerId = viewModel.getBillOwnerId(),
+                            itemIdAndOwners = itemIdAndOwners
+                        )
+
+
+                        runBlocking {
+                            splitBillController.addSplitBill(context = context, request = splitBillRequest)
+                        }
+
+                        // TODO: need to put some toast/feedback
+
+                        navController.navigate(route = AppScreens.HomeScreen.name)
+
+                        // TODO: clear all data in viewModel because its for one transaction only?
+
+
+                        // Example trigger (button click, etc.)
+                        Toast.makeText(localContext, "Bill has been successfully saved", Toast.LENGTH_LONG).show()
+
+                        /*
+                        // provide feedback when user successfully save the bill
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Bill has been successfully saved",
+                                // actionLabel = "Dismiss",
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Long, // Adjust duration here
+
+                            )
+                        }
+                        */
+
+
+                    },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        enabled = isAllItemsFullyAssigned,
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonColors(
+                            containerColor = primaryGreen,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.White
+                        )
+                    )
+                    {
+                        Text(text = "Done",
+                            fontSize = 24.sp,
+                            )
+                    }
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                }
+
+
+
 
             }
+
         }
 
-    )
+
+
+
+    }
+
+
+
+
+//}
+
+    //)
 }
 
 @Composable
@@ -305,41 +422,68 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
             elevation = CardDefaults.cardElevation(4.dp),
             // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
             colors = CardDefaults.cardColors(
-                containerColor = if (!isFullyAssigned) Color(0xFFFF7074) // light red
-                // Color(0xFFFFEBEE), Color(0xFFFF474D), Color(0xFFFF5B61)
-                else MaterialTheme.colorScheme.surface
+                containerColor = if (!isFullyAssigned) Color(0xFFFFCDD2) // light red
+                // Color(0xFFFFEBEE), Color(0xFFFF474D), Color(0xFFFF5B61), Color(0xFFFF7074)
+                // else MaterialTheme.colorScheme.surface
+                else Color.White
             )
         ) {
 
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(9.dp),
-                verticalAlignment = Alignment.CenterVertically, //  center content vertically
-                // horizontalArrangement = Arrangement.SpaceBetween // space between 3 main sections
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = itemWithUsers.item.name,
-                    fontSize = 15.sp, // 18.sp
-                    // modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .weight(0.5f) //  allow flexible width
-                        .padding(end = 7.dp)
-                )
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(10.dp)
+            ){
+                // Top
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ){
 
-                // TODO: implement selected users here
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                /*
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(), // full width container
-                    contentAlignment = Alignment.Center //  center contents
-                ) {
+                    Text(
+                        text = itemWithUsers.item.name,
+                        color = primaryGreen,
+                        fontSize = 20.sp,
+                        // fontSize = 15.sp, // 18.sp
+                        // modifier = Modifier.padding(16.dp),
+                        fontFamily = alexandriaFont,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier
+                            .weight(0.5f) //  allow flexible width
+                            .padding(end = 7.dp)
+                    )
 
-                   */
+                    Column(
+                        // modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy((-23).dp) // try -2 to -6
+                    ){
+
+                        Text(
+                            // TODO: omit additional float 0 on price
+                            text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
+                            fontSize = 15.sp,
+                            //fontFamily = surannaFont,
+                            // color = Color.hsv(43f, 1f, 1f),
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = syncopateFont,
+                            modifier = Modifier.padding(8.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+
+
+
+
+                }
+
+                // Bottom
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ){
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
                     // Display selected users as colored dots
                     LazyRow(
                         modifier = Modifier
@@ -378,58 +522,6 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
                             }
                         }
                     }
-                //}
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .weight(1.0f) // share width evenly with item name
-                        .padding(start = 2.dp),
-                    horizontalArrangement = Arrangement.Center
-                    // horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    // TODO: rework design for custom quantity (move to rightmost, use pencil icon)
-                    /*
-                    Button(
-                        onClick = { navController.navigate(route = AppScreens.SplitItemScreen.name) },
-                        modifier = Modifier.width(70.dp).height(70.dp),
-                        shape = RoundedCornerShape(50.dp)
-                    ) {
-                        Text(text = "C", fontSize = 30.sp) // Custom quantity
-                    }
-
-                     */
-
-                    Column(modifier = Modifier.fillMaxHeight()){
-
-                        // TODO: delete when not needed, temporary for debugging
-
-                        // This ensures:
-                        // You only check and access once.
-                        // You avoid inconsistencies between the two ownership[0] calls during recomposition.
-
-                        /*
-                        val firstOwnership = viewModel.currentItemAndUserQuantities.ownership.getOrNull(0)
-                        val currentItem = viewModel.currentItemAndUserQuantities
-                        if (firstOwnership != null){
-                            // Text(text = "user: ${firstOwnership.owner.username}, itemQuantity: ${firstOwnership.itemQuantity.value}",  fontSize = 7.sp,)
-                            // Text(text = "equal: " + (currentItem.item.qty == currentItem.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}).toString(),  fontSize = 7.sp,)
-                            Text(text = "total: " + currentItem.item.qty.toFloat().toString() + ", sum: " + currentItem.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}.toString(),  fontSize = 7.sp,)
-
-                        }
-                        */
-
-
-                        Text(
-                            // TODO: omit additional float 0 on price
-                            text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(8.dp),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-
-                    }
-
 
 
                     TransparentEditButton {
@@ -440,26 +532,10 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
                         navController.navigate(route = AppScreens.SplitItemScreen.name)
                     }
 
+
                 }
 
 
-
-                /*
-                Text(
-                    text = "x",
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
-                Text(
-                    text = itemWithUsers.item.price.toString(),
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
-                 */
             }
 
         }
@@ -468,15 +544,26 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
 }
 
 @Composable
-fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User?) -> Unit, listParticipants: MutableList<User?>){
+fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?, Color>, selectedUser: User?, onUserSelected: (User?) -> Unit, listParticipants: MutableList<User?>) {
     val index = listParticipants.indexOf(participant) // get participant index in the list
     val color = userColors.getOrPut(participant) {
         generateDistinctColor(index, listParticipants.size)
     }
     // update border color
-    val borderColor = if (participant == selectedUser) Color.Black else Color.Transparent
+    // val borderColor = if (participant == selectedUser) Color.Black else Color.Transparent
 
-    Card (
+    val borderColor = if (participant == selectedUser) correctTransparentGreen else Color.Gray
+
+    val backgroundColor = if (participant == selectedUser) correctTransparentGreen else Color.White
+
+    Column( //  Wrapped everything in Column to stack Card & Text
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .width(110.dp) // Fixed width for consistent sizing
+            .padding(1.dp)
+    ) {
+
+    Card(
         modifier = Modifier
             .size(90.dp)
             .fillMaxWidth()
@@ -485,8 +572,7 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
                 // Toggle selection of the same user card
                 if (participant == selectedUser) {
                     onUserSelected(null)  // Deselect if the same user is clicked again
-                }
-                else {
+                } else {
                     // apply selection, this function is required because we are passing state into a child function
                     // otherwise, error may occur
                     onUserSelected(participant)
@@ -495,22 +581,56 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
 
         shape = CircleShape, // Makes it round
         elevation = CardDefaults.cardElevation(4.dp),
-        border = BorderStroke(2.dp, borderColor),
+        // border = BorderStroke(2.dp, borderColor),
         // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
         // update card color based on user (according to distinct color generator)
         colors = CardDefaults.cardColors(
-            containerColor = if (participant == selectedUser) color else Color.White
+            // containerColor = if (participant == selectedUser) color else Color.White
+            containerColor = Color.White
         )
 
 
     ) {
-        Text(
-            text = participant?.username ?: "Unknown User", // if participant is not null, execute participant.username else put "Unknown User"
-            fontSize = 18.sp,
-            modifier = Modifier.padding(16.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
+
+        // TODO: You can put an image/icon here if needed later
+
+        Box(modifier = Modifier.fillMaxSize()) { //  Added Box for layering
+
+            /*
+            // TODO: Your image here
+            Image(
+                painter = painterResource(id = R.drawable.your_image),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            */
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(backgroundColor) // Green transparent overlay (50% opacity)
+            )
+        }
+
     }
+
+    Text(
+        text = participant?.username
+            ?: "Unknown User", // if participant is not null, execute participant.username else put "Unknown User"
+        color = Color.Black,
+        fontWeight = FontWeight.Bold,
+        fontSize = 15.sp,
+        fontFamily = surannaFont,
+        modifier = Modifier.padding(1.dp),
+        style = MaterialTheme.typography.bodyLarge,
+        textAlign = TextAlign.Center // Center the text below the Card
+    )
+
+}
+
+
+
 }
 
 @Composable
@@ -519,11 +639,13 @@ fun TransparentEditButton(clickEvent: () -> Unit) {
         onClick = clickEvent,
         modifier = Modifier
             .padding(4.dp)
-            .size(40.dp), // Make it small and square-ish
+            .size(35.dp), // Make it small and square-ish
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = primaryGreen, // Visible color (blue)
-            contentColor = Color.White
+            // containerColor = primaryGreen, // Visible color (blue)
+            containerColor = Color.Transparent,
+            // contentColor = Color.White
+            contentColor = primaryGreen
         ),
         contentPadding = PaddingValues(0.dp)
     ) {
