@@ -27,7 +27,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -135,9 +134,11 @@ fun AccountPage(context: Context, navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = user?.bio?:"No bio set up",
+                    text = user?.bio ?: "No bio set up",
                     fontSize = 14.sp,
-                    color = Color.LightGray
+                    color = Color.LightGray,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                    textAlign = TextAlign.Center
                 )
             }
         }

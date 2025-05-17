@@ -61,7 +61,6 @@ fun SignUp(context : Context, navController: NavController) {
         Spacer(modifier = Modifier.height(15.dp))
 
         // email or username text field
-        // TODO: need to make mandatory input functionality
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -78,7 +77,6 @@ fun SignUp(context : Context, navController: NavController) {
 
 
         // password text field with visibility
-        // TODO: need to make mandatory input functionality
         OutlinedTextField(
             value = userPassword,
             onValueChange = { userPassword = it },

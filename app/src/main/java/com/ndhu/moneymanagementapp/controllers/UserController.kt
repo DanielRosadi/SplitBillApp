@@ -2,7 +2,6 @@ package com.ndhu.moneymanagementapp.controllers
 
 import android.content.Context
 import android.util.Log
-import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.enums.UserStatus
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.repositories.IUserRepository
@@ -99,9 +98,22 @@ class UserController {
         newUsername: String,
         newEmail: String,
         newBio: String,
-    ) {
+    ): String? {
         val user = getOnboardUser(context)
         if (user != null) {
+            // Check if new username is taken by someone else
+            val userByUsername = userRepo.getUserByUsername(newUsername)
+            if (userByUsername != null && userByUsername.id != user.id) {
+                return "Username is already in use."
+            }
+
+            // Check if new email is taken by someone else
+            val userByEmail = userRepo.getUserByEmail(newEmail)
+            if (userByEmail != null && userByEmail.id != user.id) {
+                return "Email is already in use."
+            }
+
+            // If everything valid, proceed to update
             val updatedUser = user.copy(
                 username = newUsername,
                 email = newEmail,
@@ -109,8 +121,10 @@ class UserController {
             )
             userRepo.update(updatedUser.id, updatedUser)
             Log.d("INFO", "User data updated successfully")
+            return null
         } else {
             Log.w("ERROR", "No onboard user found to update")
+            return "User not found."
         }
     }
 
