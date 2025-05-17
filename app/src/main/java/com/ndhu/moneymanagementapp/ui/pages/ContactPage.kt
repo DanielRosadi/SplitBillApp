@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -421,18 +422,22 @@ fun AddFriendDialog(
                     onClick = {
                         coroutineScope.launch {
                             try {
-                                val user = userController.searchUserByUserName(context, userName)
+                                val user = userController.searchUserByUserName(context, userName.trim())
 
                                 // If user exists, add them as a contact
-                                user?.let {
-                                    contactController.addContact(context, it.id)
+                                if (user != null) {
+                                    contactController.addContact(context, user.id)
 
                                     // Refresh the contact list after adding
                                     listFriends.clear()
                                     listFriends.addAll(contactController.getCurrUserLoginContact(context))
+                                    Toast.makeText(context, "Contact added successfully", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e: Exception) {
                                 Log.e("AddFriendDialog", "Error adding friend: ${e.message}")
+                                Toast.makeText(context, "Failed to add contact", Toast.LENGTH_SHORT).show()
                             } finally {
                                 showDialog.value = false
                             }
