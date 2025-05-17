@@ -2,21 +2,17 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,9 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -383,7 +377,7 @@ fun AddFriendDialog(
                     label = {
                         Text(
                             text = "Username",
-                            color = Color(0xFF77C5AA), // mutedGreen
+                            color = primaryGreen,
                             fontSize = 14.sp
                         )
                     },
@@ -405,23 +399,24 @@ fun AddFriendDialog(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 1. outline red text
+                // Cancel Button
                 OutlinedButton(
                     onClick = { showDialog.value = false },
                     modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
+                        .height(48.dp)
+                        .weight(1f),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = Color(0xFF666666), // Dark Gray
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
                 ) {
                     Text("Cancel", fontSize = 14.sp)
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
+                // Add Button
                 Button(
                     onClick = {
                         coroutineScope.launch {

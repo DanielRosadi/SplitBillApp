@@ -21,6 +21,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -421,7 +422,7 @@ fun PendingCard(
 @Composable
 fun ContactContainer(
     modifier: Modifier = Modifier,
-    containerColor: Color = darkGrey,
+    containerColor: Color = Color(0xFF9D9D9D),
     content: @Composable () -> Unit
 ) {
     Card(
@@ -492,7 +493,7 @@ fun ConfirmationDialog(
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            containerColor = Color.White,
+            containerColor = Color(0xFFF9F9F9), // Soft White
             shape = RoundedCornerShape(20.dp),
             title = {
                 Column(
@@ -518,13 +519,12 @@ fun ConfirmationDialog(
                     )
                 }
             },
-            /*text = { Text(message) },*/
             text = {
                 Text(
                     text = message,
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray // Dark Gray
                 )
             },
             confirmButton = {
@@ -533,23 +533,24 @@ fun ConfirmationDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(
+                    // Cancel Button
+                    OutlinedButton(
                         onClick = { showDialog.value = false },
                         modifier = Modifier
                             .height(48.dp)
                             .weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = darkGrey,
-                            contentColor = Color.White
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color(0xFF666666), // Dark Gray
                         ),
+                        border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
                     ) {
-                        Text(cancelText)
+                        Text(cancelText, fontSize = 14.sp)
                     }
 
-                    //Spacer(modifier = Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(16.dp))
 
+                    // Confirm Button
                     Button(
                         onClick = {
                             onConfirm()
