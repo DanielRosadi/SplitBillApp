@@ -152,7 +152,7 @@ private fun ComposePendingRequest(
                             .padding(10.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = dangerRed,
+                            containerColor = Color(0xFF961400),
                             contentColor = Color.White
                         )
                     ) {
@@ -184,7 +184,7 @@ private fun ComposePendingRequest(
                         title = "Confirm Reject All",
                         message = "Are you sure you want to reject all friend requests?",
                         confirmText = "Reject All",
-                        confirmColor = dangerRed,
+                        confirmColor = Color(0xFF961400),
                         icon = Icons.Outlined.Cancel,
                         iconTint = Color.Red,
                         showDialog = showRejectAllDialog,
@@ -356,10 +356,18 @@ fun PendingCard(
                             try {
                                 contactController.acceptFriend(context, contact.senderId)
                                 contacts.remove(contact)
-                                Toast.makeText(context, "Friend request accepted", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Friend request accepted",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 Log.d("PendingCard", "Accepted friend request: ${contact.senderId}")
                             } catch (e: Exception) {
-                                Toast.makeText(context, "Failed to accept request. Please try again.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Failed to accept request. Please try again.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                                 Log.e("PendingCard", "Failed to accept: ${e.message}")
                             }
                         }
@@ -375,7 +383,7 @@ fun PendingCard(
                     title = "Reject $senderName?",
                     message = "Rejecting this request prevents further requests from this user. You can still add them as a friend later.",
                     confirmText = "Reject",
-                    confirmColor = dangerRed,
+                    confirmColor = Color(0xFF961400),
                     icon = Icons.Outlined.Cancel,
                     iconTint = Color.Red,
                     showDialog = showRejectDialog,
@@ -384,10 +392,18 @@ fun PendingCard(
                             try {
                                 contactController.rejectFriend(context, contact.senderId)
                                 contacts.remove(contact)
-                                Toast.makeText(context, "Friend request rejected", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Friend request rejected",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 Log.d("PendingCard", "Rejected friend request: ${contact.senderId}")
                             } catch (e: Exception) {
-                                Toast.makeText(context, "Failed to reject request. Please try again.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Failed to reject request. Please try again.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                                 Log.e("PendingCard", "Failed to reject: ${e.message}")
                             } finally {
                                 showRejectDialog.value = false
@@ -472,15 +488,17 @@ fun ConfirmationDialog(
     iconTint: Color = Color.Unspecified, // Optional tint
     showDialog: MutableState<Boolean>,
     onConfirm: () -> Unit,
-)
- {
+) {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
             containerColor = Color.White,
             shape = RoundedCornerShape(20.dp),
             title = {
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     if (icon != null) {
                         Icon(
                             imageVector = icon,

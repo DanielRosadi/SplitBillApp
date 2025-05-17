@@ -2,28 +2,42 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -41,10 +55,10 @@ import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.utils.Util
+import kotlinx.coroutines.launch
 
 /*
 TODO:
-    - Rework UI popup
     - Ganti font
     - Ganti image
     - Search function
@@ -87,7 +101,7 @@ fun ComposeContactScreen(
     contactController: ContactController,
     userController: UserController
 ) {
-    var showDialogAddFriend by remember { mutableStateOf(false) }
+    val showAddFriendDialog = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -199,7 +213,7 @@ fun ComposeContactScreen(
 
                     // Add Friend Button
                     Button(
-                        onClick = { showDialogAddFriend = true },
+                        onClick = { showAddFriendDialog.value = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
@@ -220,14 +234,13 @@ fun ComposeContactScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (showDialogAddFriend) {
-                    /* TODO: rework UI popup */
-                    PopUpAddFriend(
+                if (showAddFriendDialog.value) { // Observe the boolean value
+                    AddFriendDialog(
+                        listFriends = contacts,
+                        showDialog = showAddFriendDialog, // Pass the same state down
                         context = context,
                         contactController = contactController,
                         userController = userController,
-                        onDismiss = { showDialogAddFriend = false },
-                        listFriends = contacts
                     )
                 }
 
@@ -244,8 +257,6 @@ fun ContactCard(
     context: Context,
     userController: UserController
 ) {
-    // val coroutineScope = rememberCoroutineScope()
-
     val friendUserId = if (contact.senderId == currentUserId) contact.receiverId else contact.senderId
 
     // Fetch the user asynchronously when friendUserId changes
@@ -277,6 +288,7 @@ fun ContactCard(
                     .size(40.dp)
                     .clip(CircleShape)
             ) {
+                /*TODO: change to image*/
                 Icon(
                     Icons.Filled.Person,
                     contentDescription = "Profile Picture",
@@ -288,8 +300,8 @@ fun ContactCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             when {
+                // case 1: null = assumes loading
                 userResult == null -> {
-                    // null = assumes loading
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
                         strokeWidth = 2.dp,
@@ -297,8 +309,8 @@ fun ContactCard(
                     )
                 }
 
+                // case 2: blank username = “Unknown User”
                 userResult?.username.isNullOrBlank() -> {
-                    // blank username = “Unknown User”
                     Text(
                         text = "Unknown User",
                         color = Color.Gray,
@@ -307,10 +319,10 @@ fun ContactCard(
                     )
                 }
 
+                // case 3: have valid username
                 else -> {
-                    // Show valid username
                     Text(
-                        text = userResult!!.username,
+                        text = userResult?.username ?: "Unknown",
                         color = primaryGreen,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -321,4 +333,128 @@ fun ContactCard(
 
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddFriendDialog(
+    showDialog: MutableState<Boolean>,
+    listFriends: SnapshotStateList<Contact>,
+    context: Context,
+    contactController: ContactController,
+    userController: UserController,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var userName by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        containerColor = Color(0xFFF9F9F9), // Soft White
+        shape = RoundedCornerShape(20.dp),
+        title = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Person,
+                    contentDescription = null,
+                    tint = primaryGreen,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(bottom = 4.dp)
+                )
+
+                Text(
+                    text = "Add New Contact",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+        },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                TextField(
+                    value = userName,
+                    onValueChange = { userName = it },
+                    singleLine = true,
+                    shape = RoundedCornerShape(20.dp),
+                    label = {
+                        Text(
+                            text = "Username",
+                            color = Color(0xFF77C5AA), // mutedGreen
+                            fontSize = 14.sp
+                        )
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.White,
+                        focusedIndicatorColor = primaryGreen,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = primaryGreen
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                )
+            }
+        },
+        confirmButton = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 1. outline red text
+                OutlinedButton(
+                    onClick = { showDialog.value = false },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFF666666), // Dark Gray
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Cancel", fontSize = 14.sp)
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            try {
+                                val user = userController.searchUserByUserName(context, userName)
+
+                                // If user exists, add them as a contact
+                                user?.let {
+                                    contactController.addContact(context, it.id)
+
+                                    // Refresh the contact list after adding
+                                    listFriends.clear()
+                                    listFriends.addAll(contactController.getCurrUserLoginContact(context))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("AddFriendDialog", "Error adding friend: ${e.message}")
+                            } finally {
+                                showDialog.value = false
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .height(48.dp)
+                        .weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = primaryGreen,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Add")
+                }
+            }
+        }
+    )
 }
