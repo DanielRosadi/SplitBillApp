@@ -421,11 +421,42 @@ fun AddFriendDialog(
                 Button(
                     onClick = {
                         coroutineScope.launch {
+                            val trimmedUsername = userName.trim()
+
+                            // Validation: Empty username
+                            if (trimmedUsername.isEmpty()) {
+                                Toast.makeText(context, "Username cannot be empty", Toast.LENGTH_SHORT).show()
+                                return@launch
+                            }
+
+                            // Validation: Prevent adding self
+                            val currentUserId = Util.getUserId(context).toString()
+                            val currentUser = userController.searchUserByUserId(context, currentUserId)
+                            if (currentUser?.username == trimmedUsername) {
+                                Toast.makeText(context, "You cannot add yourself", Toast.LENGTH_SHORT).show()
+                                return@launch
+                            }
+
                             try {
-                                val user = userController.searchUserByUserName(context, userName.trim())
+                                val user = userController.searchUserByUserName(context, trimmedUsername)
+
+                                // Validation: User not found
+                                if (user == null) {
+                                    Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show()
+                                    return@launch
+                                }
+
+                                // Validation: Duplicate contact
+                                val isAlreadyFriend = listFriends.any {
+                                    it.senderId == user.id || it.receiverId == user.id
+                                }
+                                if (isAlreadyFriend) {
+                                    Toast.makeText(context, "Contact already exists", Toast.LENGTH_SHORT).show()
+                                    return@launch
+                                }
 
                                 // If user exists, add them as a contact
-                                if (user != null) {
+                                /*if (user != null) {
                                     contactController.addContact(context, user.id)
 
                                     // Refresh the contact list after adding
@@ -434,7 +465,13 @@ fun AddFriendDialog(
                                     Toast.makeText(context, "Contact added successfully", Toast.LENGTH_SHORT).show()
                                 } else {
                                     Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show()
-                                }
+                                }*/
+
+                                // Add contact
+                                contactController.addContact(context, user.id)
+                                listFriends.clear()
+                                listFriends.addAll(contactController.getCurrUserLoginContact(context))
+                                Toast.makeText(context, "Contact added successfully", Toast.LENGTH_SHORT).show()
                             } catch (e: Exception) {
                                 Log.e("AddFriendDialog", "Error adding friend: ${e.message}")
                                 Toast.makeText(context, "Failed to add contact", Toast.LENGTH_SHORT).show()
