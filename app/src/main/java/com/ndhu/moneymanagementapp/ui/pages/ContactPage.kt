@@ -47,6 +47,7 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.enums.ContactAddResult
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.utils.Util
@@ -338,6 +339,7 @@ fun AddFriendDialog(
     context: Context,
     contactController: ContactController,
     userController: UserController,
+    onSuccess: (() -> Unit)? = null
 ) {
     val coroutineScope = rememberCoroutineScope()
     var userName by remember { mutableStateOf("") }
@@ -423,59 +425,46 @@ fun AddFriendDialog(
                         coroutineScope.launch {
                             val trimmedUsername = userName.trim()
 
-                            // Validation: Empty username
+                            // Case 1: Empty username
                             if (trimmedUsername.isEmpty()) {
                                 Toast.makeText(context, "Username cannot be empty", Toast.LENGTH_SHORT).show()
-                                return@launch
-                            }
-
-                            // Validation: Prevent adding self
-                            val currentUserId = Util.getUserId(context).toString()
-                            val currentUser = userController.searchUserByUserId(context, currentUserId)
-                            if (currentUser?.username == trimmedUsername) {
-                                Toast.makeText(context, "You cannot add yourself", Toast.LENGTH_SHORT).show()
                                 return@launch
                             }
 
                             try {
                                 val user = userController.searchUserByUserName(context, trimmedUsername)
 
-                                // Validation: User not found
+                                // Case 2: User not found
                                 if (user == null) {
                                     Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show()
                                     return@launch
                                 }
 
-                                // Validation: Duplicate contact
-                                val isAlreadyFriend = listFriends.any {
-                                    it.senderId == user.id || it.receiverId == user.id
+                                // Try to add contact using the controller
+                                val result = contactController.addContact(context, user.id)
+
+                                when (result) {
+                                    ContactAddResult.SUCCESS -> {
+                                        // Refresh contact list and show success message
+                                        listFriends.clear()
+                                        listFriends.addAll(contactController.getCurrUserLoginContact(context))
+                                        Toast.makeText(context, "Contact added successfully", Toast.LENGTH_SHORT).show()
+                                    }
+                                    // Other Fail Cases
+                                    ContactAddResult.SELF_ADD -> Toast.makeText(context, "You cannot add yourself", Toast.LENGTH_SHORT).show()
+                                    ContactAddResult.USER_NOT_FOUND -> Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show()
+                                    ContactAddResult.ALREADY_FRIENDS -> Toast.makeText(context, "You are already friends", Toast.LENGTH_SHORT).show()
+                                    ContactAddResult.REQUEST_ALREADY_PENDING -> Toast.makeText(context, "Friend request is already pending", Toast.LENGTH_SHORT).show()
+                                    ContactAddResult.REQUEST_REJECTED_BLOCKED -> Toast.makeText(context, "You cannot resend a rejected request", Toast.LENGTH_SHORT).show()
+                                    ContactAddResult.ERROR -> Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                                 }
-                                if (isAlreadyFriend) {
-                                    Toast.makeText(context, "Contact already exists", Toast.LENGTH_SHORT).show()
-                                    return@launch
-                                }
-
-                                // If user exists, add them as a contact
-                                /*if (user != null) {
-                                    contactController.addContact(context, user.id)
-
-                                    // Refresh the contact list after adding
-                                    listFriends.clear()
-                                    listFriends.addAll(contactController.getCurrUserLoginContact(context))
-                                    Toast.makeText(context, "Contact added successfully", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show()
-                                }*/
-
-                                // Add contact
-                                contactController.addContact(context, user.id)
-                                listFriends.clear()
-                                listFriends.addAll(contactController.getCurrUserLoginContact(context))
-                                Toast.makeText(context, "Contact added successfully", Toast.LENGTH_SHORT).show()
                             } catch (e: Exception) {
+                                // Catch and log unexpected errors
                                 Log.e("AddFriendDialog", "Error adding friend: ${e.message}")
                                 Toast.makeText(context, "Failed to add contact", Toast.LENGTH_SHORT).show()
                             } finally {
+                                // Reset input and close dialog
+                                userName = ""
                                 showDialog.value = false
                             }
                         }
