@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -274,6 +275,62 @@ fun ItemContentTopBar(navController: NavController, store: Store?) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.width(40.dp))
+        }
+    }
+}
+
+
+
+@Composable
+fun SplitItemContentTopBar(navController: NavController, topBarText: String) {
+    /*
+    Content Top Bar
+    */
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(50.dp))
+
+//            IconButton(onClick = { navController.popBackStack() }) {
+//                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back", modifier = Modifier.size(30.dp))
+//            }
+        }
+
+        Spacer(modifier = Modifier.width(5.dp))
+
+        Column(
+            modifier = Modifier.weight(10f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = topBarText,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = surannaFont
+            )
+            // SearchBox()
+        }
+
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.width(40.dp))
+
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.Default.Close, contentDescription = "Cancel", modifier = Modifier.size(30.dp))
+            }
         }
     }
 }

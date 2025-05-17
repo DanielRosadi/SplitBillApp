@@ -1,7 +1,9 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,21 +11,29 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -128,79 +139,185 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
      */
 
 
-    Column (
-        modifier = Modifier.fillMaxWidth().fillMaxHeight()
-    ){
-        // Top Bar
-        Column (
-            modifier = Modifier.fillMaxWidth().weight(1f)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+
+        // Background Image
+        BackgroundImage()
+
+        // Full Page
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+            //.fillMaxHeight()
+            // .padding(paddingValues)
+            //.padding(10.dp)
+            ,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            SplitItemTopBar(navController = navController, viewModel = viewModel)
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            TitleText()
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // White Box
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color(0xFFD9D9D9))
+                    .padding(10.dp)
+                //.padding(paddingValues)
+                ,
+                //verticalArrangement = Arrangement.Top,
+                //horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                SplitItemContentTopBar(navController = navController, topBarText = "Split Item")
+
+//                Column(
+//                    modifier = Modifier.fillMaxWidth().fillMaxHeight()
+//                ) {
+//                    // Top Bar
+//                    Column(
+//                        modifier = Modifier.fillMaxWidth().weight(1f)
+//                    ) {
+//                        SplitItemTopBar(navController = navController, viewModel = viewModel)
+//                    }
+
+                    // Note
+                    Column(
+                        modifier = Modifier.fillMaxWidth().weight(4.5f)
+                    ) {
+                        // Header Text
+                        // TODO: Replace with real data
+                        Text(text = viewModel.currentItem.name,
+                            color = primaryGreen,
+                            fontSize = 25.sp,
+                            fontFamily = alexandriaFont,
+                            //modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                        Text(
+                            text = "You can adjust quantity of assigned items to friends.",
+                            fontSize = 15.sp,
+                            fontFamily = sensationLightFont,
+                            //modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = "Decimal number is allowed. For example: 0.5 defines half portion, or other decimal number based on agreement.",
+                            fontSize = 15.sp,
+                            fontFamily = sensationLightFont,
+                            //modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = "Price will be calculated based on quantity assigned.",
+                            fontSize = 15.sp,
+                            fontFamily = sensationLightFont,
+                            //modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                        // TODO: make it responsive (cannot add more if exceed. cannot save if is NOT fully assigned)
+                        Text(
+                            text = "Total Item Quantity: $totalItemQuantity",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = alexandriaFont,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+
+                        // Text(text = "Fully Assigned Item Quantity: $totalAssignedQuantity", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
+                        // Display assigned status (fully assigned, excess, lack)
+                        Text(
+                            text = assignedStatus,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = alexandriaFont,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                    }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                    // Content / Body
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(6.5f)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(darkGrey)
+                    ) {
+
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(viewModel.currentItemAndUserQuantities.ownership) { ownership ->
+
+                                ListSplitItemNonEqual(user = ownership.owner, viewModel = viewModel)
+
+                            }
+                        }
+
+
+                    }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                    // Bottom
+                    Column(
+                        modifier = Modifier.fillMaxWidth().weight(1f)
+                    ) {
+                        // TODO: Save data, need to save quantities
+                        Button(
+                            onClick = {
+                                // viewModel.currentItemAndUserQuantities = viewModel.tempItemAndUserQuantities
+                                viewModel.currentItemAndUserQuantities.ownership.clear()
+                                viewModel.currentItemAndUserQuantities.ownership.addAll(viewModel.tempItemAndUserQuantities.ownership)
+                                filterZeroQuantityUser(viewModel = viewModel)
+
+
+                                // viewModel.listItemAndUserQuantities.
+                                navController.navigate(route = AppScreens.AssignSplitsScreen.name)
+                                // if save, then on;y we save the changes from copied copyCurrentItemAndUserQuantities
+
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp)
+                                .weight(1f),
+                            enabled = isSaveEnabled,
+                            shape = RoundedCornerShape(18.dp),
+                            colors = ButtonColors(
+                                containerColor = primaryGreen,
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.White
+                            )
+                        ) {
+                            Text(text = "Save", fontSize = 24.sp)
+                        }
+                    }
+
+
+                // }
         }
 
-        // Content
-        Column (
-            modifier = Modifier.fillMaxWidth().weight(7f)
-        ) {
-            // Header Text
-            // TODO: Replace with real data
-            Text(text = viewModel.currentItem.name, fontSize = 30.sp)
-            Text(text = "You can adjust quantity of assigned items to friends.", fontSize = 15.sp)
-            Text(text = "Decimal number is allowed. For example: 0.5 defines half portion, or other decimal number based on agreement.", fontSize = 15.sp)
-            Text(text = "Price will be calculated based on quantity assigned.", fontSize = 15.sp)
-
-            // TODO: make it responsive (cannot add more if exceed. cannot save if is NOT fully assigned)
-            Text(text = "Total Item Quantity: $totalItemQuantity", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-
-
-            // Text(text = "Fully Assigned Item Quantity: $totalAssignedQuantity", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-
-            // Display assigned status (fully assigned, excess, lack)
-            Text(
-                text = assignedStatus,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            // Body
-            LazyColumn (
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items( viewModel.currentItemAndUserQuantities.ownership ){ ownership ->
-
-                    ListSplitItemNonEqual(user = ownership.owner, viewModel = viewModel)
-
-                }
-            }
-
-
-        }
-
-        // Bottom
-        Column (
-            modifier = Modifier.fillMaxWidth().weight(1f)
-        ) {
-            // TODO: Save data, need to save quantities
-            Button(
-                onClick = {
-                    // viewModel.currentItemAndUserQuantities = viewModel.tempItemAndUserQuantities
-                    viewModel.currentItemAndUserQuantities.ownership.clear()
-                    viewModel.currentItemAndUserQuantities.ownership.addAll(viewModel.tempItemAndUserQuantities.ownership)
-                    filterZeroQuantityUser(viewModel = viewModel)
-
-
-                    // viewModel.listItemAndUserQuantities.
-                    navController.navigate(route = AppScreens.AssignSplitsScreen.name)
-                    // if save, then on;y we save the changes from copied copyCurrentItemAndUserQuantities
-
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = isSaveEnabled
-            ) {
-                Text(text = "Save")
-            }
-        }
-
+    }
 
     }
 
@@ -291,6 +408,7 @@ fun SplitItemTopBar(navController: NavController, viewModel: SharedViewModel){
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
     // TODO: need to pass the real itemWithUsers, and update the quantities on the data variable so we can save it
@@ -317,80 +435,151 @@ fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
-            .padding(5.dp),
+            .padding(7.dp),
+        shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Text(text = user.username, modifier = Modifier.weight(2f))
+            Spacer(modifier = Modifier.width(10.dp))
 
-
-            Button(onClick = {
-                val qty = initialQuantity.toFloatOrNull() ?: 0f
-                // val qty = initialQuantity
-                val newQty = (qty - 1f ).coerceAtLeast(0f) // Prevent going below 0
-                initialQuantity = "%.2f".format(newQty)
-                // TODO: decrement quantity from itemWithUsers
-                if (index != -1) {
-                    val currentOwnership = tempItemAndUserQuantities.ownership[index]
-                    // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
-                    tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
-                    // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
-                }
-            },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = "-")
-            }
-
-            TextField(
-
-                value = initialQuantity,
-                onValueChange = {input: String ->
-                    // Allow only digits and at most one dot
-                    if (input.isEmpty() || input.matches(Regex("""\d*\.?\d*"""))) {
-                        initialQuantity = input
-
-                        //val updatedList = tempItemAndUserQuantities.ownership.toMutableStateList() // deep copy
-                        //val idx = updatedList.indexOfFirst { it.owner == user }
-                        if (index != -1) {
-                            //updatedList[idx] = updatedList[idx].copy(itemQuantity = input.toFloatOrNull() ?: 0f) // deep copy
-                            //tempItemAndUserQuantities = tempItemAndUserQuantities.copy(ownership = updatedList) // deep copy
-
-                            val currentOwnership = tempItemAndUserQuantities.ownership[index]
-                            // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
-                            tempItemAndUserQuantities.ownership[index].itemQuantity.value = input.toFloatOrNull() ?: 0f // provides a fallback value (0.0f).
-                            // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(input.toFloatOrNull() ?: 0f)) // provides a fallback value (0.0f).
-                        }
-
-                    }
-                },
-                label = { Text("Qty") },
-                modifier = Modifier.weight(1f) /*.width(100.dp)*/,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            Text(
+                text = user.username,
+                modifier = Modifier.weight(1f),
+                color = primaryGreen,
+                fontSize = 20.sp,
+                fontFamily = alexandriaFont,
+                style = MaterialTheme.typography.bodyLarge
             )
 
-            Button(onClick = {
-                val qty = initialQuantity.toFloatOrNull() ?: 0f
-                val newQty = (qty + 1f)
-                initialQuantity = "%.2f".format(newQty)
-                // TODO: increment quantity from itemWithUsers
-                if (index != -1) {
-                    val currentOwnership = tempItemAndUserQuantities.ownership[index]
-                    // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
-                    tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
-                    //  tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
-                    // tempItemAndUserQuantities.ownership[index] = ItemOwnership(user, newQty) // tried new object
+            Spacer(modifier = Modifier.width(25.dp))
+
+            Row(
+                modifier = Modifier.fillMaxHeight().weight(1f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+
+//                Button(
+//                    onClick = {
+//                        val qty = initialQuantity.toFloatOrNull() ?: 0f
+//                        // val qty = initialQuantity
+//                        val newQty = (qty - 1f).coerceAtLeast(0f) // Prevent going below 0
+//                        initialQuantity = "%.2f".format(newQty)
+//                        // TODO: decrement quantity from itemWithUsers
+//                        if (index != -1) {
+//                            val currentOwnership = tempItemAndUserQuantities.ownership[index]
+//                            // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
+//                            tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
+//                            // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
+//                        }
+//                    },
+//                    modifier = Modifier.weight(1f)
+//                ) {
+//                    Text(text = "-")
+//                }
+
+
+                IconButton(onClick = {
+                    val qty = initialQuantity.toFloatOrNull() ?: 0f
+                    // val qty = initialQuantity
+                    val newQty = (qty - 1f).coerceAtLeast(0f) // Prevent going below 0
+                    initialQuantity = "%.2f".format(newQty)
+                    // TODO: decrement quantity from itemWithUsers
+                    if (index != -1) {
+                        val currentOwnership = tempItemAndUserQuantities.ownership[index]
+                        // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
+                        tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
+                        // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
+                    }
+                },
+                    modifier = Modifier.weight(1f)
+
+                    ) {
+                    Icon(Icons.Default.Remove, contentDescription = "Remove", modifier = Modifier.size(30.dp))
                 }
-            },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = "+")
-            }
+
+                TextField(
+
+                    value = initialQuantity,
+                    onValueChange = { input: String ->
+                        // Allow only digits and at most one dot
+                        if (input.isEmpty() || input.matches(Regex("""\d*\.?\d*"""))) {
+                            initialQuantity = input
+
+                            //val updatedList = tempItemAndUserQuantities.ownership.toMutableStateList() // deep copy
+                            //val idx = updatedList.indexOfFirst { it.owner == user }
+                            if (index != -1) {
+                                //updatedList[idx] = updatedList[idx].copy(itemQuantity = input.toFloatOrNull() ?: 0f) // deep copy
+                                //tempItemAndUserQuantities = tempItemAndUserQuantities.copy(ownership = updatedList) // deep copy
+
+                                val currentOwnership = tempItemAndUserQuantities.ownership[index]
+                                // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
+                                tempItemAndUserQuantities.ownership[index].itemQuantity.value =
+                                    input.toFloatOrNull() ?: 0f // provides a fallback value (0.0f).
+                                // tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(input.toFloatOrNull() ?: 0f)) // provides a fallback value (0.0f).
+                            }
+
+                        }
+                    },
+                    label = { Text(text = "Qty") },
+                    modifier = Modifier.weight(2f) /*.width(100.dp)*/,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.White,
+                        // focusedIndicatorColor = Color.Transparent,   // removes line
+                        // unfocusedIndicatorColor = Color.Transparent, // removes line
+                        // disabledIndicatorColor = Color.Transparent
+                    )
+                )
+
+//                Button(
+//                    onClick = {
+//                        val qty = initialQuantity.toFloatOrNull() ?: 0f
+//                        val newQty = (qty + 1f)
+//                        initialQuantity = "%.2f".format(newQty)
+//                        // TODO: increment quantity from itemWithUsers
+//                        if (index != -1) {
+//                            val currentOwnership = tempItemAndUserQuantities.ownership[index]
+//                            // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
+//                            tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
+//                            //  tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
+//                            // tempItemAndUserQuantities.ownership[index] = ItemOwnership(user, newQty) // tried new object
+//                        }
+//                    },
+//                    modifier = Modifier.weight(1f)
+//                ) {
+//                    Text(text = "+")
+//                }
+
+                IconButton(onClick = {
+                    val qty = initialQuantity.toFloatOrNull() ?: 0f
+                    val newQty = (qty + 1f)
+                    initialQuantity = "%.2f".format(newQty)
+                    // TODO: increment quantity from itemWithUsers
+                    if (index != -1) {
+                        val currentOwnership = tempItemAndUserQuantities.ownership[index]
+                        // change itemQuantity of User from ownership list through state (.value) to allow correct data observation
+                        tempItemAndUserQuantities.ownership[index].itemQuantity.value = newQty
+                        //  tempItemAndUserQuantities.ownership[index] = currentOwnership.copy(itemQuantity = mutableStateOf(newQty))
+                        // tempItemAndUserQuantities.ownership[index] = ItemOwnership(user, newQty) // tried new object
+                    }
+
+                },
+                    modifier = Modifier.weight(1f)
+
+                    ) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add", modifier = Modifier.size(30.dp) )
+                }
+
+        }
+
+
         }
     }
 }
