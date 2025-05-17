@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,20 +57,34 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.controllers.UserController
-import com.ndhu.moneymanagementapp.models.User
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfile(context: Context, navController: NavController) {
     val userController = UserController()
-    var user by remember { mutableStateOf<User?>(null) }
 
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var bio by remember { mutableStateOf(TextFieldValue("")) }
 
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+    var newPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var confirmPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    val coroutineScope = rememberCoroutineScope()
+    var usernameError by remember { mutableStateOf<String?>(null) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var bioError by remember { mutableStateOf<String?>(null) }
+
     LaunchedEffect(Unit) {
-        user = userController.getOnboardUser(context)
+        val user = userController.getOnboardUser(context)
+        if (user != null) {
+            username = TextFieldValue(user.username)
+            email = TextFieldValue(user.email)
+            bio = TextFieldValue(user.bio)
+        }
     }
 
     Column(
@@ -146,7 +164,7 @@ fun EditProfile(context: Context, navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp, vertical = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(30.dp)           ) {
+                verticalArrangement = Arrangement.spacedBy(30.dp)) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -175,7 +193,7 @@ fun EditProfile(context: Context, navController: NavController) {
                             contentDescription = "Profile Picture",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                                 .clip(CircleShape)
                                 .border(2.dp, Color.Gray, CircleShape)
                         )
@@ -202,8 +220,15 @@ fun EditProfile(context: Context, navController: NavController) {
                     RoundedInputField(
                         label = "username",
                         value = username,
-                        onValueChange = { username = it },
-                        centerPlaceholder = true
+                        onValueChange = {
+                            if (it.text.length <= 20) {
+                                username = it
+                            }
+                        },
+                        centerPlaceholder = true,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        error = usernameError
                     )
 
                     RoundedInputField(
@@ -211,19 +236,42 @@ fun EditProfile(context: Context, navController: NavController) {
                         value = email,
                         keyboardType = KeyboardType.Email,
                         onValueChange = { email = it },
-                        centerPlaceholder = true
+                        centerPlaceholder = true,
+                        error = emailError
                     )
 
                     RoundedInputField(
                         label = "bio",
                         value = bio,
-                        maxLines = Int.MAX_VALUE,
+                        maxLines = 2,
                         centerPlaceholder = true,
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        onValueChange = { bio = it }
+                            .fillMaxWidth()
+                            .heightIn(min = 60.dp),
+                        onValueChange = {
+                            if (it.text.length <= 50) {
+                                bio = it
+                            }
+                        },
+                        error = bioError
                     )
+
+                    Button(
+                        onClick = {
+                            // Reset states each time it's opened
+                            newPassword = TextFieldValue("")
+                            confirmPassword = TextFieldValue("")
+                            passwordError = null
+                            showChangePasswordDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                    ) {
+                        Text("Change Password", color = Color.White, fontSize = 16.sp)
+                    }
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -248,8 +296,45 @@ fun EditProfile(context: Context, navController: NavController) {
 
                         Button(
                             onClick = {
-                                // TODO: Save data
-                                navController.popBackStack()
+                                usernameError = null
+                                emailError = null
+
+                                val trimmedUsername = username.text.trim()
+                                val trimmedEmail = email.text.trim()
+
+                                var isValid = true
+
+                                if (trimmedUsername.length < 3) {
+                                    usernameError = "Username must be at least 3 characters"
+                                    isValid = false
+                                }
+
+                                if (!isValidEmail(trimmedEmail)) {
+                                    emailError = "Invalid email format"
+                                    isValid = false
+                                }
+
+                                if (bio.text.length > 50) {
+                                    bioError = "Bio: max 50 characters"
+                                    isValid = false
+                                }
+
+                                if (isValid) {
+                                    coroutineScope.launch {
+                                        val result = userController.updateUserData(
+                                            context = context,
+                                            newUsername = trimmedUsername,
+                                            newEmail = trimmedEmail,
+                                            newBio = bio.text
+                                        )
+                                        if(result != null){
+                                            Toast.makeText(context, result, Toast.LENGTH_SHORT).show()
+                                        }
+                                        else{
+                                            navController.popBackStack()
+                                        }
+                                    }
+                                }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)), // Green
                             shape = RoundedCornerShape(8.dp),
@@ -265,6 +350,40 @@ fun EditProfile(context: Context, navController: NavController) {
             }
         }
     }
+    if (showChangePasswordDialog) {
+        ChangePasswordDialog(
+            onDismiss = {
+                showChangePasswordDialog = false
+                newPassword = TextFieldValue("")
+                confirmPassword = TextFieldValue("")
+                passwordError = null
+            },
+            onSave = { password ->
+                when {
+                    password.isEmpty() -> {
+                        passwordError = "Passwords do not match"
+                    }
+                    password == "INVALID" -> {
+                        passwordError = "Password must be at least 8 characters, with uppercase, lowercase, digit, and special character"
+                    }
+                    else -> {
+                        coroutineScope.launch {
+                            userController.updateUserPassword(context, password)
+                            showChangePasswordDialog = false
+                            newPassword = TextFieldValue("")
+                            confirmPassword = TextFieldValue("")
+                            passwordError = null
+                        }
+                    }
+                }
+            },
+            newPassword = newPassword,
+            confirmPassword = confirmPassword,
+            onNewPasswordChange = { newPassword = it },
+            onConfirmPasswordChange = { confirmPassword = it },
+            errorMessage = passwordError
+        )
+    }
 }
 
 @Composable
@@ -275,32 +394,131 @@ fun RoundedInputField(
     maxLines: Int = 1,
     centerPlaceholder: Boolean = false,
     modifier: Modifier = Modifier,
+    error: String? = null, // ✅ New parameter
     onValueChange: (TextFieldValue) -> Unit
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = label,
-                textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start,
-                modifier = Modifier.fillMaxWidth()
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            isError = error != null,
+            placeholder = {
+                Text(
+                    text = label,
+                    textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            maxLines = maxLines,
+            singleLine = true,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 6.dp),
+            textStyle = TextStyle(textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Gray,
+                unfocusedBorderColor = Color.Transparent,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedPlaceholderColor = Color.Gray,
+                unfocusedPlaceholderColor = Color.Gray
             )
-        },
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        maxLines = maxLines,
-        shape = RoundedCornerShape(16.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        textStyle = TextStyle(textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Gray,
-            unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            focusedPlaceholderColor = Color.Gray,
-            unfocusedPlaceholderColor = Color.Gray
         )
+        if (error != null) {
+            Text(
+                text = error,
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ChangePasswordDialog(
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit,
+    newPassword: TextFieldValue,
+    confirmPassword: TextFieldValue,
+    onNewPasswordChange: (TextFieldValue) -> Unit,
+    onConfirmPasswordChange: (TextFieldValue) -> Unit,
+    errorMessage: String?
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {},
+        dismissButton = {},
+        title = {
+            Text("Change Password", fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = newPassword,
+                    onValueChange = onNewPasswordChange,
+                    label = { Text("New Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = onConfirmPasswordChange,
+                    label = { Text("Confirm Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (!errorMessage.isNullOrEmpty()) {
+                    Text(text = errorMessage, color = Color.Red, fontSize = 12.sp)
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = {
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Button(
+                        onClick = {
+                            when {
+                                newPassword.text != confirmPassword.text -> {
+                                    onSave("") // Trigger error: passwords do not match
+                                }
+                                !isValidPassword(newPassword.text) -> {
+                                    onSave("INVALID") // Trigger error: invalid format
+                                }
+                                else -> {
+                                    onSave(newPassword.text)
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
     )
+}
+
+fun isValidEmail(email: String): Boolean {
+    val regex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    return regex.matches(email)
+}
+
+fun isValidPassword(password: String): Boolean {
+    val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
+    return regex.matches(password)
 }
