@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -71,6 +74,9 @@ fun EditProfile(context: Context, navController: NavController) {
     var passwordError by remember { mutableStateOf<String?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
+    var usernameError by remember { mutableStateOf<String?>(null) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var bioError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         val user = userController.getOnboardUser(context)
@@ -158,7 +164,7 @@ fun EditProfile(context: Context, navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp, vertical = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(30.dp)           ) {
+                verticalArrangement = Arrangement.spacedBy(30.dp)) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -187,7 +193,7 @@ fun EditProfile(context: Context, navController: NavController) {
                             contentDescription = "Profile Picture",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                                 .clip(CircleShape)
                                 .border(2.dp, Color.Gray, CircleShape)
                         )
@@ -214,8 +220,15 @@ fun EditProfile(context: Context, navController: NavController) {
                     RoundedInputField(
                         label = "username",
                         value = username,
-                        onValueChange = { username = it },
-                        centerPlaceholder = true
+                        onValueChange = {
+                            if (it.text.length <= 20) {
+                                username = it
+                            }
+                        },
+                        centerPlaceholder = true,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        error = usernameError
                     )
 
                     RoundedInputField(
@@ -223,18 +236,24 @@ fun EditProfile(context: Context, navController: NavController) {
                         value = email,
                         keyboardType = KeyboardType.Email,
                         onValueChange = { email = it },
-                        centerPlaceholder = true
+                        centerPlaceholder = true,
+                        error = emailError
                     )
 
                     RoundedInputField(
                         label = "bio",
                         value = bio,
-                        maxLines = Int.MAX_VALUE,
+                        maxLines = 2,
                         centerPlaceholder = true,
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        onValueChange = { bio = it }
+                            .fillMaxWidth()
+                            .heightIn(min = 60.dp),
+                        onValueChange = {
+                            if (it.text.length <= 50) {
+                                bio = it
+                            }
+                        },
+                        error = bioError
                     )
 
                     Button(
@@ -277,14 +296,44 @@ fun EditProfile(context: Context, navController: NavController) {
 
                         Button(
                             onClick = {
-                                coroutineScope.launch {
-                                    userController.updateUserData(
-                                        context = context,
-                                        newUsername = username.text,
-                                        newEmail = email.text,
-                                        newBio = bio.text
-                                    )
-                                    navController.popBackStack()
+                                usernameError = null
+                                emailError = null
+
+                                val trimmedUsername = username.text.trim()
+                                val trimmedEmail = email.text.trim()
+
+                                var isValid = true
+
+                                if (trimmedUsername.length < 3) {
+                                    usernameError = "Username must be at least 3 characters"
+                                    isValid = false
+                                }
+
+                                if (!isValidEmail(trimmedEmail)) {
+                                    emailError = "Invalid email format"
+                                    isValid = false
+                                }
+
+                                if (bio.text.length > 50) {
+                                    bioError = "Bio: max 50 characters"
+                                    isValid = false
+                                }
+
+                                if (isValid) {
+                                    coroutineScope.launch {
+                                        val result = userController.updateUserData(
+                                            context = context,
+                                            newUsername = trimmedUsername,
+                                            newEmail = trimmedEmail,
+                                            newBio = bio.text
+                                        )
+                                        if(result != null){
+                                            Toast.makeText(context, result, Toast.LENGTH_SHORT).show()
+                                        }
+                                        else{
+                                            navController.popBackStack()
+                                        }
+                                    }
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)), // Green
@@ -310,15 +359,21 @@ fun EditProfile(context: Context, navController: NavController) {
                 passwordError = null
             },
             onSave = { password ->
-                if (password.isEmpty()) {
-                    passwordError = "Passwords do not match"
-                } else {
-                    coroutineScope.launch {
-                        userController.updateUserPassword(context, newPassword.text)
-                        showChangePasswordDialog = false
-                        newPassword = TextFieldValue("")
-                        confirmPassword = TextFieldValue("")
-                        passwordError = null
+                when {
+                    password.isEmpty() -> {
+                        passwordError = "Passwords do not match"
+                    }
+                    password == "INVALID" -> {
+                        passwordError = "Password must be at least 8 characters, with uppercase, lowercase, digit, and special character"
+                    }
+                    else -> {
+                        coroutineScope.launch {
+                            userController.updateUserPassword(context, password)
+                            showChangePasswordDialog = false
+                            newPassword = TextFieldValue("")
+                            confirmPassword = TextFieldValue("")
+                            passwordError = null
+                        }
                     }
                 }
             },
@@ -339,34 +394,47 @@ fun RoundedInputField(
     maxLines: Int = 1,
     centerPlaceholder: Boolean = false,
     modifier: Modifier = Modifier,
+    error: String? = null, // ✅ New parameter
     onValueChange: (TextFieldValue) -> Unit
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = label,
-                textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start,
-                modifier = Modifier.fillMaxWidth()
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            isError = error != null,
+            placeholder = {
+                Text(
+                    text = label,
+                    textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            maxLines = maxLines,
+            singleLine = true,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 6.dp),
+            textStyle = TextStyle(textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Gray,
+                unfocusedBorderColor = Color.Transparent,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedPlaceholderColor = Color.Gray,
+                unfocusedPlaceholderColor = Color.Gray
             )
-        },
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        maxLines = maxLines,
-        shape = RoundedCornerShape(16.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        textStyle = TextStyle(textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Gray,
-            unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            focusedPlaceholderColor = Color.Gray,
-            unfocusedPlaceholderColor = Color.Gray
         )
-    )
+        if (error != null) {
+            Text(
+                text = error,
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
 }
 
 @Composable
@@ -391,14 +459,16 @@ fun ChangePasswordDialog(
                 OutlinedTextField(
                     value = newPassword,
                     onValueChange = onNewPasswordChange,
-                    placeholder = { Text("New Password") },
+                    label = { Text("New Password") },
+                    visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = onConfirmPasswordChange,
-                    placeholder = { Text("Confirm Password") },
+                    label = { Text("Confirm Password") },
+                    visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -421,10 +491,16 @@ fun ChangePasswordDialog(
 
                     Button(
                         onClick = {
-                            if (newPassword.text != confirmPassword.text) {
-                                onSave("") // This triggers validation error
-                            } else {
-                                onSave(newPassword.text)
+                            when {
+                                newPassword.text != confirmPassword.text -> {
+                                    onSave("") // Trigger error: passwords do not match
+                                }
+                                !isValidPassword(newPassword.text) -> {
+                                    onSave("INVALID") // Trigger error: invalid format
+                                }
+                                else -> {
+                                    onSave(newPassword.text)
+                                }
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
@@ -435,4 +511,14 @@ fun ChangePasswordDialog(
             }
         }
     )
+}
+
+fun isValidEmail(email: String): Boolean {
+    val regex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    return regex.matches(email)
+}
+
+fun isValidPassword(password: String): Boolean {
+    val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
+    return regex.matches(password)
 }
