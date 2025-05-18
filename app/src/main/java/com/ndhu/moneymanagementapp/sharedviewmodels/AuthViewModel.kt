@@ -61,17 +61,91 @@ class AuthViewModel : ViewModel() {
         return isValid
     }
 
-    // Clear the form after successful login
+    fun validateSignUp(): Boolean {
+        var isValid = true
+
+        val trimmedEmail = email.trim()
+        val trimmedPassword = password.trim()
+        val trimmedUsername = username.trim()
+        val trimmedConfirm = confirmPassword.trim()
+
+        // Username: required
+        usernameError = if (trimmedUsername.isEmpty()) {
+            isValid = false
+            "Username cannot be empty"
+        } else null
+
+        // Email validation
+        emailError = when {
+            trimmedEmail.isEmpty() -> {
+                isValid = false
+                "Email cannot be empty"
+            }
+            !Patterns.EMAIL_ADDRESS.matcher(trimmedEmail).matches() -> {
+                isValid = false
+                "Invalid email format"
+            }
+            else -> null
+        }
+
+        // Password: required + length
+        passwordError = when {
+            trimmedPassword.isEmpty() -> {
+                isValid = false
+                "Password cannot be empty"
+            }
+            trimmedPassword.length < 6 -> {
+                isValid = false
+                "Password must be at least 6 characters"
+            }
+            else -> null
+        }
+
+        // Confirm Password: match check
+        confirmPasswordError = when {
+            trimmedConfirm.isEmpty() -> {
+                isValid = false
+                "Please confirm your password"
+            }
+            trimmedPassword != trimmedConfirm -> {
+                isValid = false
+                "Passwords do not match"
+            }
+            else -> null
+        }
+
+        // Normalize input
+        email = trimmedEmail
+        password = trimmedPassword
+        username = trimmedUsername
+        confirmPassword = trimmedConfirm
+
+        return isValid
+    }
+
+    // Reset all, work for Both Screens
     fun reset() {
         email = ""
         password = ""
+        confirmPassword = ""
+        username = ""
+
         emailError = null
         passwordError = null
+        confirmPasswordError = null
+        usernameError = null
+
+        loginError = null
+        signupError = null
     }
 
-    // Clear previous error messages when the user starts typing again
+    // Reset when user types or switches forms
     fun resetErrors() {
         emailError = null
         passwordError = null
+        confirmPasswordError = null
+        usernameError = null
+        loginError = null
+        signupError = null
     }
 }
