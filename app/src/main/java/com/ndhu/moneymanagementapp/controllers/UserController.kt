@@ -70,6 +70,20 @@ class UserController {
         Util.clearUserId(context)
     }
 
+    suspend fun checkUsernameOrEmailTaken(username: String, email: String): String? {
+        val existingUserByUsername = userRepo.getUserByUsername(username)
+        if (existingUserByUsername != null) {
+            return "Username is already in use."
+        }
+
+        val existingUserByEmail = userRepo.getUserByEmail(email)
+        if (existingUserByEmail != null) {
+            return "Email is already in use."
+        }
+
+        return null // Both are available
+    }
+
     suspend fun searchUserByUserName(context : Context, userName : String) : User? {
         return userRepo.getUserByUsername(userName)
     }

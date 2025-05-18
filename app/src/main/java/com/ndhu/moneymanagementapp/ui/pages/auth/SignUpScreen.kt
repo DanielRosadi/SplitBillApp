@@ -91,6 +91,25 @@ fun SignUp(context: Context, navController: NavController) {
                 onClick = {
                     coroutineScope.launch {
                         if (viewModel.validateSignUp()) {
+                            // Backend check for duplicates
+                            val takenResult = userController.checkUsernameOrEmailTaken(
+                                viewModel.username,
+                                viewModel.email
+                            )
+
+                            // Handle if either field is already taken
+                            when (takenResult) {
+                                "Username is already in use." -> {
+                                    viewModel.usernameError = takenResult
+                                    return@launch
+                                }
+                                "Email is already in use." -> {
+                                    viewModel.emailError = takenResult
+                                    return@launch
+                                }
+                            }
+
+                            // If not taken, attempt registration
                             val result = userController.registerUser(
                                 viewModel.username,
                                 viewModel.email,
@@ -98,6 +117,7 @@ fun SignUp(context: Context, navController: NavController) {
                                 "No bio provided"
                             )
 
+                            // Handle registration errors or login
                             if (result != null) {
                                 viewModel.signupError = result
                             } else {

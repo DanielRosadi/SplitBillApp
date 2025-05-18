@@ -64,18 +64,30 @@ class AuthViewModel : ViewModel() {
     fun validateSignUp(): Boolean {
         var isValid = true
 
+        // Trim all input to avoid issues with accidental spaces
         val trimmedEmail = email.trim()
         val trimmedPassword = password.trim()
         val trimmedUsername = username.trim()
         val trimmedConfirm = confirmPassword.trim()
 
-        // Username: required
-        usernameError = if (trimmedUsername.isEmpty()) {
-            isValid = false
-            "Username cannot be empty"
-        } else null
+        // --- Username Validation ---
+        usernameError = when {
+            trimmedUsername.isEmpty() -> {
+                isValid = false
+                "Username cannot be empty"
+            }
+            trimmedUsername.contains(" ") -> {
+                isValid = false
+                "Username cannot contain spaces"
+            }
+            trimmedUsername.length < 3 -> {
+                isValid = false
+                "Username must be at least 3 characters"
+            }
+            else -> null
+        }
 
-        // Email validation
+        // --- Email Validation ---
         emailError = when {
             trimmedEmail.isEmpty() -> {
                 isValid = false
@@ -88,7 +100,7 @@ class AuthViewModel : ViewModel() {
             else -> null
         }
 
-        // Password: required + length
+        // --- Password Validation ---
         passwordError = when {
             trimmedPassword.isEmpty() -> {
                 isValid = false
@@ -101,20 +113,20 @@ class AuthViewModel : ViewModel() {
             else -> null
         }
 
-        // Confirm Password: match check
+        // --- Confirm Password Validation ---
         confirmPasswordError = when {
             trimmedConfirm.isEmpty() -> {
                 isValid = false
                 "Please confirm your password"
             }
-            trimmedPassword != trimmedConfirm -> {
+            trimmedConfirm != trimmedPassword -> {
                 isValid = false
                 "Passwords do not match"
             }
             else -> null
         }
 
-        // Normalize input
+        // --- Apply trimmed values to state ---
         email = trimmedEmail
         password = trimmedPassword
         username = trimmedUsername
