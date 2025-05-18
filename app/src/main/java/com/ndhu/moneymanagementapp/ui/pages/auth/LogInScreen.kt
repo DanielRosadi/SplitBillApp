@@ -1,7 +1,6 @@
-package com.ndhu.moneymanagementapp.ui.pages
+package com.ndhu.moneymanagementapp.ui.pages.auth
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.ui.pages.BackgroundImage
+import com.ndhu.moneymanagementapp.ui.pages.primaryGreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

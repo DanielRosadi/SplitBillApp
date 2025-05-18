@@ -19,11 +19,11 @@ import com.ndhu.moneymanagementapp.ui.oldpages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.Home
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
-import com.ndhu.moneymanagementapp.ui.pages.LogIn
+import com.ndhu.moneymanagementapp.ui.pages.auth.LogIn
 import com.ndhu.moneymanagementapp.ui.pages.PendingRequestScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectBillOwnerScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
-import com.ndhu.moneymanagementapp.ui.pages.SignUp
+import com.ndhu.moneymanagementapp.ui.pages.auth.SignUp
 import com.ndhu.moneymanagementapp.ui.pages.SplitItemScreen
 import com.ndhu.moneymanagementapp.ui.pages.TestingScreen
 

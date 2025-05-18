@@ -1,4 +1,4 @@
-package com.ndhu.moneymanagementapp.ui.pages
+package com.ndhu.moneymanagementapp.ui.pages.auth
 
 import android.content.Context
 import androidx.compose.foundation.clickable
