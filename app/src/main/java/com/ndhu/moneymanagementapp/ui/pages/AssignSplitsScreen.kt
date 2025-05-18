@@ -39,7 +39,9 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.User
@@ -112,6 +115,11 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
     var isAllItemsFullyAssigned by remember { mutableStateOf(false) }
     //var assignedQty by remember { mutableStateOf(0f) }
     //var isFullyAssigned by remember { mutableStateOf(false) }
+
+    var searchQuery = remember { mutableStateOf("") }
+
+    val filteredItemsAndOwners = filterItemsAndOwners(listItemsAndOwners, searchQuery.value) //  no remember
+
 
     /*
     val isAllItemsFullyAssigned = listItemsAndOwners.all { itemWithUsers ->
@@ -178,7 +186,10 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                 // Content Top Bar
                 // TODO: search func
-                ContentTopBar(navController = navController, topBarText = "Assign Splits",)
+                ContentTopBar(navController = navController,
+                    topBarText = "Assign Splits",
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
+                    )
 
                 // calculate if all items have been assigned, otherwise disabled save button
                 isAllItemsFullyAssigned = listItemsAndOwners.all { itemWithUsers ->
@@ -246,7 +257,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                     // chunked groups items into sets of 3 for each row
                     // it also automatically handles when the list is not perfectly divisible by 3
-                    items(listItemsAndOwners) { itemAndUsers ->
+                    items(filteredItemsAndOwners) { itemAndUsers ->
                         ListItemSplits(
                             listItemAndUserQuantities = listItemsAndOwners,
                             navController = navController,
@@ -382,13 +393,38 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
     }
 
-
-
-
 //}
 
     //)
 }
+
+
+
+
+// filter function for search box
+fun filterItemsAndOwners(listItemsAndOwners:MutableList<ItemWithUsersList>, query: String): MutableList<ItemWithUsersList> {
+    val result = if (query.isBlank()) {
+        listItemsAndOwners
+    } else {
+        listItemsAndOwners.filter {
+            it.item.name.contains(query, ignoreCase = true) ||
+                    it.item.price.toString().contains(query, ignoreCase = true) ||
+                    it.item.qty.toString().contains(query, ignoreCase = true) ||
+                    it.ownership.any { ownership ->
+                        ownership.owner.username.contains(query, ignoreCase = true)
+                    }
+        }.toMutableList()
+    }
+
+    // println("Filtered ${result.size} items for query: '$query'") // <-- DEBUG
+    return result
+}
+
+
+
+
+
+
 
 @Composable
 fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit, viewModel: SharedViewModel) {
