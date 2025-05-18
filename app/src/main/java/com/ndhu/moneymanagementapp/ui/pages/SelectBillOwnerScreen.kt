@@ -288,9 +288,9 @@ fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit) {
 
     // val correctTransparentGreen = Color(0xAA4CAF50)
     // val backgroundColor = if (isSelected) Color.Red else Color.White
-    val backgroundColor = if (isSelected) correctTransparentGreen else Color.White
+    val backgroundColor = if (isSelected) overlayColor else Color.White
     // val borderColor = if (isSelected) Color.Red else Color.Gray
-    val borderColor = if (isSelected) correctTransparentGreen else Color.Gray
+    // val borderColor = if (isSelected) correctTransparentGreen else Color.Gray
 
     // TODO: omit the square shadow when user performing click on cards
     Column( //  Wrapped everything in Column to stack Card & Text

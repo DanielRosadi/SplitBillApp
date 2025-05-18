@@ -320,7 +320,7 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
 
     // val cardColor = if (isSelected) correctTransparentGreen else Color.White
 
-    val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
+    // val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
 
 
     Card (

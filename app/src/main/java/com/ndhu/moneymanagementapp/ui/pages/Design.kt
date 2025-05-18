@@ -65,6 +65,7 @@ val primaryGreen = Color(0xFF009669) // Main brand color
 val darkGrey = Color(0xFF9D9D9D)
 
 val correctTransparentGreen = Color(0xAA4CAF50) // green transparent for selected user card
+val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
 
 // Background Image used in most pages
 @Composable
