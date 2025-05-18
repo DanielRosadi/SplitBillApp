@@ -4,170 +4,155 @@ import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.sharedviewmodels.AuthViewModel
+import com.ndhu.moneymanagementapp.ui.pages.primaryGreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignUp(context : Context, navController: NavController) {
-    val coroutine = rememberCoroutineScope()
-    // States variable
-    var email by remember { mutableStateOf(TextFieldValue("")) }
-    var username by remember { mutableStateOf(TextFieldValue("")) }
-    var userAge by remember { mutableStateOf(TextFieldValue("")) }
-    var userPassword by remember { mutableStateOf(TextFieldValue("")) }
+fun SignUp(context: Context, navController: NavController) {
+    val viewModel: AuthViewModel = viewModel()
+    val coroutineScope = rememberCoroutineScope()
+    val userController = UserController()
     var passwordVisible by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    // UI elements/components (Composable here)
-    // TODO: Need TopBar, BottomBar?  (i.e. Scaffold)
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        // Sign Up Text
-        Text(text = "Sign Up", fontSize = 40.sp, fontWeight = FontWeight.Bold)
+    AuthScreen(
+        screenTitle = "Sign Up",
+        formContent = {
+            // Username
+            AuthInputWrapper(error = viewModel.usernameError) {
+                UsernameField(
+                    value = viewModel.username,
+                    onValueChange = {
+                        viewModel.username = it
+                        viewModel.resetErrors()
+                        viewModel.signupError = null
+                    },
+                    error = null // Suppress internal error handling
+                )
+            }
 
-        // Add some space
-        Spacer(modifier = Modifier.height(15.dp))
+            // Email
+            AuthInputWrapper(error = viewModel.emailError) {
+                EmailField(
+                    value = viewModel.email,
+                    onValueChange = {
+                        viewModel.email = it
+                        viewModel.resetErrors()
+                        viewModel.signupError = null
+                    },
+                    error = null
+                )
+            }
 
-        // email or username text field
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth())
+            // Password
+            AuthInputWrapper(error = viewModel.passwordError) {
+                PasswordField(
+                    value = viewModel.password,
+                    onValueChange = {
+                        viewModel.password = it
+                        viewModel.resetErrors()
+                        viewModel.signupError = null
+                    },
+                    error = null,
+                    passwordVisible = passwordVisible,
+                    onToggleVisibility = { passwordVisible = !passwordVisible }
+                )
+            }
 
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth())
+            // Confirm Password
+            AuthInputWrapper(error = viewModel.confirmPasswordError) {
+                ConfirmPasswordField(
+                    value = viewModel.confirmPassword,
+                    onValueChange = {
+                        viewModel.confirmPassword = it
+                        viewModel.resetErrors()
+                        viewModel.signupError = null
+                    },
+                    error = null,
+                    passwordVisible = confirmPasswordVisible,
+                    onToggleVisibility = { confirmPasswordVisible = !confirmPasswordVisible }
+                )
+            }
 
+            // Submit Button
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        if (viewModel.validateSignUp()) {
+                            val result = userController.registerUser(
+                                viewModel.username,
+                                viewModel.email,
+                                viewModel.password,
+                                "No bio provided"
+                            )
 
-        // password text field with visibility
-        OutlinedTextField(
-            value = userPassword,
-            onValueChange = { userPassword = it },
-            label = { Text("Password") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = "Toggle Password Visibility")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Add some space
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Button(
-            onClick = {
-                coroutine.launch {
-                    val isValidEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(email.text).matches()
-                    val isValidUsername = username.text.matches(Regex("^[a-zA-Z0-9_.]{3,20}$"))
-                    val isValidPassword = userPassword.text.matches(
-                        Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
-                    )
-
-                    if (!isValidEmail) {
-                        errorMessage = "Invalid email format."
-                    } else if (!isValidUsername) {
-                        errorMessage = "Username must be 3–20 characters and only contain letters, numbers, underscores, or periods."
-                    } else if (!isValidPassword) {
-                        errorMessage = "Password must be at least 8 characters, with uppercase, lowercase, digit, and special character."
-                    } else {
-                        val controller = UserController()
-                        val result = controller.registerUser(
-                            username.text,
-                            email.text,
-                            userPassword.text,
-                            "No bio provided"
-                        )
-                        controller.loginUser(context, username.text, userPassword.text) //Login after sign up
-                        if (result != null) {
-                            errorMessage = result
-                        } else {
-                            errorMessage = ""
-                            username = TextFieldValue("")
-                            email = TextFieldValue("")
-                            userPassword = TextFieldValue("")
-                            navController.navigate(route = AppScreens.HomeScreen.name)
+                            if (result != null) {
+                                viewModel.signupError = result
+                            } else {
+                                userController.loginUser(
+                                    context,
+                                    viewModel.username,
+                                    viewModel.password
+                                )
+                                viewModel.reset()
+                                navController.navigate(AppScreens.HomeScreen.name) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
                         }
                     }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-            shape = RoundedCornerShape(5.dp)
-        ) {
-            Text(text = "Submit")
-        }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = primaryGreen)
+            ) {
+                Text("Submit", color = Color.White)
+            }
 
-        // Show error if exists
-        if (errorMessage.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = errorMessage,
-                color = Color.Red,
-                fontSize = 14.sp
-            )
-        }
+            // Signup-level error
+            if (viewModel.signupError != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = viewModel.signupError ?: "",
+                    color = Color.Red,
+                    fontSize = 14.sp
+                )
+            }
+        },
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Already registered?")
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "Sign in",
-                color = Color.Blue,
-                textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable {
-                    navController.navigate(AppScreens.LogInScreen.name){
-                        popUpTo(0) { inclusive = true }
+        footerContent = {
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = "Already registered?", color = Color.White)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Sign in",
+                    color = primaryGreen,
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable {
+                        navController.navigate(AppScreens.LogInScreen.name) {
+                            popUpTo(0) { inclusive = true }
+                        }
                     }
-                }
-            )
+                )
+            }
         }
-    }
+    )
 }

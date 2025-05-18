@@ -90,37 +90,39 @@ fun LoginForm(
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Email Input Field
-    EmailField(
-        value = viewModel.email,
-        onValueChange = {
-            viewModel.email = it
-            viewModel.resetErrors()
-            viewModel.loginError = null
-        },
-        error = viewModel.emailError
-    )
+    // Email Field with Error Wrapper
+    AuthInputWrapper(error = viewModel.emailError) {
+        EmailField(
+            value = viewModel.email,
+            onValueChange = {
+                viewModel.email = it
+                viewModel.resetErrors()
+                viewModel.loginError = null
+            },
+            error = null // Suppress internal error rendering
+        )
+    }
 
-    Spacer(modifier = Modifier.height(16.dp))
-
-    // Password Input Field
-    PasswordField(
-        value = viewModel.password,
-        onValueChange = {
-            viewModel.password = it
-            viewModel.resetErrors()
-            viewModel.loginError = null
-        },
-        error = viewModel.passwordError,
-        passwordVisible = passwordVisible,
-        onToggleVisibility = { passwordVisible = !passwordVisible }
-    )
-
-    Spacer(modifier = Modifier.height(16.dp))
+    // Password Field with Error Wrapper
+    AuthInputWrapper(error = viewModel.passwordError) {
+        PasswordField(
+            value = viewModel.password,
+            onValueChange = {
+                viewModel.password = it
+                viewModel.resetErrors()
+                viewModel.loginError = null
+            },
+            error = null,
+            passwordVisible = passwordVisible,
+            onToggleVisibility = { passwordVisible = !passwordVisible }
+        )
+    }
 
     // Forgot Password Text
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
         horizontalArrangement = Arrangement.End
     ) {
         Text(
@@ -128,18 +130,15 @@ fun LoginForm(
             fontSize = 12.sp,
             color = Color.Gray,
             modifier = Modifier.clickable {
-                // TODO: Navigate to Forgot Password Screen
+                // TODO: Implement forgot password navigation
             }
         )
     }
-
-    Spacer(modifier = Modifier.height(24.dp))
 
     // Log In Button
     Button(
         onClick = {
             coroutineScope.launch {
-                // Only proceed to backend login if form validation passes
                 if (viewModel.validateLogin()) {
                     val user = userController.loginUser(
                         context,
@@ -150,7 +149,6 @@ fun LoginForm(
                         viewModel.reset()
                         onLoginSuccess()
                     } else {
-                        // Clear password on backend login failure
                         viewModel.password = ""
                         viewModel.loginError = "Invalid email or password"
                     }
@@ -166,7 +164,7 @@ fun LoginForm(
         Text("Log In", color = Color.White)
     }
 
-    // Login Failure Error Message
+    // Login Failure (e.g., from backend)
     if (viewModel.loginError != null) {
         Spacer(modifier = Modifier.height(12.dp))
         Row(
@@ -174,7 +172,7 @@ fun LoginForm(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = viewModel.loginError!!,
+                text = viewModel.loginError ?: "",
                 color = Color.Red,
                 fontSize = 14.sp
             )

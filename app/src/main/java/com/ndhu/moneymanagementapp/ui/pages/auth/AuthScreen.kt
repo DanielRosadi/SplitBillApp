@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -113,6 +114,42 @@ fun AppBrandHeader() {
     }
 }
 
+// Reusable Username Fields
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UsernameField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    error: String?
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text("Username", color = primaryGreen) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Username Icon",
+                tint = primaryGreen
+            )
+        },
+        singleLine = true,
+        isError = error != null,
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color.White,
+            focusedIndicatorColor = primaryGreen,
+            unfocusedIndicatorColor = Color.Transparent,
+            cursorColor = primaryGreen
+        )
+    )
+    if (error != null) {
+        Text(text = error, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+    }
+}
+
+
 // Reusable Email Fields
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -154,7 +191,7 @@ fun EmailField(
     }
 }
 
-// Reusable Password Fields
+// Reusable Confirm Password Fields
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordField(
@@ -190,5 +227,70 @@ fun PasswordField(
     )
     if (error != null) {
         Text(text = error, color = Color.Red, fontSize = 12.sp)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ConfirmPasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    error: String?,
+    passwordVisible: Boolean,
+    onToggleVisibility: () -> Unit
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text("Confirm Password", color = primaryGreen) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = "Confirm Password Icon",
+                tint = primaryGreen
+            )
+        },
+        trailingIcon = {
+            val icon = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+            IconButton(onClick = onToggleVisibility) {
+                Icon(icon, contentDescription = "Toggle confirm password visibility", tint = primaryGreen)
+            }
+        },
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        singleLine = true,
+        isError = error != null,
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color.White,
+            focusedIndicatorColor = primaryGreen,
+            unfocusedIndicatorColor = Color.Transparent,
+            cursorColor = primaryGreen
+        )
+    )
+    if (error != null) {
+        Text(text = error, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+    }
+}
+
+@Composable
+fun AuthInputWrapper(
+    error: String?,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        content()
+
+        if (error != null) {
+            Text(
+                text = error,
+                color = Color.Red,
+                fontSize = 12.sp
+            )
+        } else {
+            Spacer(modifier = Modifier.height(16.dp)) // normal spacing
+        }
     }
 }
