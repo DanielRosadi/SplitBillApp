@@ -1,7 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,12 +30,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
-import com.ndhu.moneymanagementapp.components.SearchBox
+import com.ndhu.moneymanagementapp.components.SearchBoxDefault
 import com.ndhu.moneymanagementapp.models.Store
 
 // to store repeatable/repetitive/common composables function design
@@ -67,6 +65,7 @@ val primaryGreen = Color(0xFF009669) // Main brand color
 val darkGrey = Color(0xFF9D9D9D)
 
 val correctTransparentGreen = Color(0xAA4CAF50) // green transparent for selected user card
+val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
 
 // Background Image used in most pages
 @Composable
@@ -133,7 +132,7 @@ fun ContentTopBar(navController: NavController, topBarText: String){
 
 
 @Composable
-fun ContentTopBar(navController: NavController, topBarText: String) {
+fun ContentTopBar(navController: NavController, topBarText: String, searchBox: @Composable () -> Unit = { SearchBoxDefault() }) {
     /*
     Content Top Bar
     */
@@ -169,7 +168,7 @@ fun ContentTopBar(navController: NavController, topBarText: String) {
                 fontWeight = FontWeight.Bold,
                 fontFamily = surannaFont
             )
-            SearchBox()
+            searchBox()
         }
 
         Column(
@@ -184,7 +183,7 @@ fun ContentTopBar(navController: NavController, topBarText: String) {
 
 
 @Composable
-fun ItemContentTopBar(navController: NavController, store: Store?) {
+fun ItemContentTopBar(navController: NavController, store: Store?, searchBox: @Composable () -> Unit = { SearchBoxDefault() }) {
     /*
     Content Top Bar
     */
@@ -265,7 +264,7 @@ fun ItemContentTopBar(navController: NavController, store: Store?) {
             }
 
 
-            SearchBox()
+            searchBox()
         }
 
         // Right

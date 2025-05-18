@@ -41,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.components.SearchBox
+import com.ndhu.moneymanagementapp.components.SearchBoxDefault
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
@@ -106,7 +106,7 @@ fun ComposeListStoreForDelete(storeController: StoreController, data: SnapshotSt
             Spacer(modifier = Modifier.height(10.dp))
 
             // TODO: implement search feature
-            SearchBox()
+            SearchBoxDefault()
 
             Spacer(modifier = Modifier.height(10.dp))
 

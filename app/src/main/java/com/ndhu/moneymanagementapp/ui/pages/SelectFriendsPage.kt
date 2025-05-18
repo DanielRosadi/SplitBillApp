@@ -26,7 +26,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,10 +45,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.Contact
+import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.runBlocking
@@ -87,6 +88,8 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
     var showDialogAddFriend by remember { mutableStateOf(false) }
 
+    var searchQuery = remember { mutableStateOf("") }
+
     //UniformDesignScaffold(
         /*
         topAppBar = {
@@ -99,6 +102,8 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
             }
         },
         */
+
+    val filteredFriends = filterFriends(context, listFriends, searchQuery.value, userController) //  no remember
 
 
     Box(
@@ -153,7 +158,10 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
                 // Content Top Bar
                 // TODO: search func
-                ContentTopBar(navController = navController, topBarText = "Select Friend")
+                ContentTopBar(navController = navController,
+                    topBarText = "Select Friend",
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
+                    )
 
 
                 //Spacer(modifier = Modifier.height(10.dp))
@@ -175,7 +183,7 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                         contentPadding = PaddingValues(5.dp)
                     ) {
 
-                        items(listFriends) { friend ->
+                        items(filteredFriends) { friend ->
                             // initially, isSelected is false for all friends (cards are unchecked)
                             // selectedFriends list are empty
                             val isSelected = friend in selectedFriends
@@ -280,6 +288,27 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
     }
 }
 
+// filter function for search box
+@Composable
+fun filterFriends(context: Context, friendList: SnapshotStateList<Contact>, query: String, userController: UserController): SnapshotStateList<Contact> {
+    val result = if (query.isBlank()) {
+        friendList
+    } else {
+        friendList.filter {
+            val currentUserId = remember { Util.getUserId(context).toString() }
+            val friendUserId = if (it.senderId == currentUserId) it.receiverId else it.senderId
+
+            var friendName = runBlocking { userController.searchUserByUserId(context, friendUserId)?.username
+                ?: "Unknown Contact" }
+
+            friendName.contains(query, ignoreCase = true)
+        }.toMutableStateList() // Convert result to SnapshotStateList
+    }
+
+    // println("Filtered ${result.size} items for query: '$query'") // <-- DEBUG
+    return result
+}
+
 @Composable
 fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit, userController: UserController){
 
@@ -291,7 +320,7 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
 
     // val cardColor = if (isSelected) correctTransparentGreen else Color.White
 
-    val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
+    // val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
 
 
     Card (

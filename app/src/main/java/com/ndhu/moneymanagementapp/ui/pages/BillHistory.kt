@@ -7,17 +7,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.History
@@ -64,7 +60,7 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
                     .background(Color(0xFFD9D9D9))
                     .padding(10.dp)
             ) {
-                ContentTopBar(navController = navController, topBarText = "Bill History")
+                ContentTopBar(navController = navController, topBarText = "Bill History",)
 
                 ContactContainer(
                     modifier = Modifier.fillMaxSize()

@@ -32,6 +32,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,10 +43,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -60,9 +65,12 @@ fun SelectBillOwnerScreen(context: Context, navController: NavController, viewMo
     // populate listBillOwners with user's contacts
     if (listContacts != null) {
         for (contact in listContacts){
+            val currentUserId = remember { Util.getUserId(context).toString() }
+            val friendUserId = if (contact.senderId == currentUserId) contact.receiverId else contact.senderId
+
             runBlocking {
                 listPossibleOwners.add(
-                    userController.searchUserByUserId(context, contact.receiverId)
+                    userController.searchUserByUserId(context, friendUserId)
                 )
             }
         }
@@ -77,9 +85,14 @@ fun SelectBillOwnerScreen(context: Context, navController: NavController, viewMo
 fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<User?>, navController: NavController, viewModel: SharedViewModel) {
     var selectedIndex by remember { mutableStateOf(-1) }
 
+    var searchQuery = remember { mutableStateOf("") }
+
+    val filteredBillOwner = filterBillOwners(listPossibleOwners, searchQuery.value) //  no remember
+
     // chunked groups items into sets of 3 for each row
     // it also automatically handles when the list is not perfectly divisible by 3
-    val rows = listPossibleOwners.chunked(3)
+    // val rows = listPossibleOwners.chunked(3)
+    val rows = filteredBillOwner.chunked(3)
 
     //UniformDesignScaffold(
 //        topAppBar = {
@@ -137,7 +150,10 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
 
             // Content Top Bar
             // TODO: search func
-            ContentTopBar(navController = navController, topBarText = "Select Bill Owner")
+            ContentTopBar(navController = navController,
+                topBarText = "Select Bill Owner",
+                searchBox = { SearchBox(searchQuery = searchQuery) }
+                )
 
 
             // Spacer(modifier = Modifier.height(10.dp))
@@ -255,14 +271,30 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
     //)
 }
 
+
+
+// filter function for search box
+fun filterBillOwners(billOwnerList: MutableList<User?>, query: String): MutableList<User?> {
+    val result = if (query.isBlank()) {
+        billOwnerList
+    } else {
+        billOwnerList.filter {
+            it?.username?.contains(query, ignoreCase = true) ?: false
+        }.toMutableList() // Convert result to SnapshotStateList
+    }
+
+    // println("Filtered ${result.size} items for query: '$query'") // <-- DEBUG
+    return result
+}
+
 @Composable
 fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit) {
 
     // val correctTransparentGreen = Color(0xAA4CAF50)
     // val backgroundColor = if (isSelected) Color.Red else Color.White
-    val backgroundColor = if (isSelected) correctTransparentGreen else Color.White
+    val backgroundColor = if (isSelected) overlayColor else Color.White
     // val borderColor = if (isSelected) Color.Red else Color.Gray
-    val borderColor = if (isSelected) correctTransparentGreen else Color.Gray
+    // val borderColor = if (isSelected) correctTransparentGreen else Color.Gray
 
     // TODO: omit the square shadow when user performing click on cards
     Column( //  Wrapped everything in Column to stack Card & Text
