@@ -608,8 +608,8 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
         // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
         // update card color based on user (according to distinct color generator)
         colors = CardDefaults.cardColors(
-            // containerColor = if (participant == selectedUser) color else Color.White
-            containerColor = Color.White
+            containerColor = if (participant == selectedUser) color else Color.White
+            // containerColor = Color.White
         )
 
 
@@ -632,7 +632,8 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(backgroundColor) // Green transparent overlay (50% opacity)
+                    // .background(backgroundColor) // Green transparent overlay (50% opacity)
+                    .background(Color.Transparent)
             )
         }
 
