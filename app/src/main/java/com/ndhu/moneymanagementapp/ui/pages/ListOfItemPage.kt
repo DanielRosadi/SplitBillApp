@@ -41,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.controllers.ItemController
@@ -157,6 +159,11 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
     // )
     //{paddingValues->
 
+    var searchQuery = remember { mutableStateOf("") }
+
+    val filteredItems = filterItems(uiItems, searchQuery.value) //  no remember
+
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -200,7 +207,10 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
 
                     // Content Top Bar
                     // TODO: search func
-                    ItemContentTopBar(navController = navController, store = store)
+                    ItemContentTopBar(navController = navController,
+                        store = store,
+                        searchBox = { SearchBox(searchQuery = searchQuery) }
+                        )
 
                     Column(
                         modifier = Modifier
@@ -219,7 +229,7 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                             contentPadding = PaddingValues(5.dp)
                         ) {
 
-                            items(uiItems) { uiItem ->
+                            items(filteredItems) { uiItem ->
                                 ListDataItem(
                                     uiItem,
                                     store,
@@ -346,6 +356,22 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
 //}
 
 }
+
+// filter function for search box
+fun filterItems(itemList: SnapshotStateList<UIItem>, query: String): SnapshotStateList<UIItem> {
+    val result = if (query.isBlank()) {
+        itemList
+    } else {
+        itemList.filter {
+            it.item.name.contains(query, ignoreCase = true) ||
+                    it.item.price.toString().contains(query, ignoreCase = true)
+        }.toMutableStateList() // Convert result to SnapshotStateList
+    }
+
+    // println("Filtered ${result.size} items for query: '$query'") // <-- DEBUG
+    return result
+}
+
 
 @Composable
 private fun ListDataItem(

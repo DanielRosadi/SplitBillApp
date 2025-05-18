@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
@@ -156,7 +157,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                 // TODO: search func
                 ContentTopBar(navController = navController,
                     topBarText = "List of Store",
-                    searchBox = { SearchBoxStore(searchQuery = searchQuery) }
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
                 )
 
                 Column(
@@ -270,52 +271,6 @@ fun filterStores(storeList: SnapshotStateList<Store>, query: String): SnapshotSt
 }
 
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchBoxStore(searchQuery: MutableState<String>) {
-    // TODO: implement search feature
-    // var query by remember { mutableStateOf("") }
-
-    Box(
-        modifier = Modifier
-            .width(300.dp)
-            .padding(8.dp)
-    ){
-        TextField(
-            value = searchQuery.value,
-            onValueChange = { searchQuery.value = it },
-            modifier = Modifier
-                .fillMaxWidth() // width(300.dp)
-                .height(56.dp)
-                .clip(RoundedCornerShape(50.dp))
-                .background(Color.White)
-            ,
-            placeholder = { Text("search") },
-            leadingIcon = {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
-            },
-            trailingIcon = {
-                if (searchQuery.value.isNotEmpty()) {
-                    IconButton(onClick = { searchQuery.value = "" }) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "Clear Search")
-                    }
-                }
-            },
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White, // <-- keeps background clean
-                unfocusedIndicatorColor = Color.Transparent, // <-- removes line
-                focusedIndicatorColor = Color.Transparent,   // <-- removes line
-                disabledIndicatorColor = Color.Transparent   // <-- removes line
-            ),
-            shape = RoundedCornerShape(50.dp) // <-- Best to pass shape here
-        )
-
-
-    }
-
-}
 
 @Composable
 fun LazyColumnTest(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel){

@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
-import com.ndhu.moneymanagementapp.components.SearchBox
+import com.ndhu.moneymanagementapp.components.SearchBoxDefault
 import com.ndhu.moneymanagementapp.models.Store
 
 // to store repeatable/repetitive/common composables function design
@@ -131,7 +131,7 @@ fun ContentTopBar(navController: NavController, topBarText: String){
 
 
 @Composable
-fun ContentTopBar(navController: NavController, topBarText: String, searchBox: @Composable () -> Unit = { SearchBox() }) {
+fun ContentTopBar(navController: NavController, topBarText: String, searchBox: @Composable () -> Unit = { SearchBoxDefault() }) {
     /*
     Content Top Bar
     */
@@ -182,7 +182,7 @@ fun ContentTopBar(navController: NavController, topBarText: String, searchBox: @
 
 
 @Composable
-fun ItemContentTopBar(navController: NavController, store: Store?) {
+fun ItemContentTopBar(navController: NavController, store: Store?, searchBox: @Composable () -> Unit = { SearchBoxDefault() }) {
     /*
     Content Top Bar
     */
@@ -263,7 +263,7 @@ fun ItemContentTopBar(navController: NavController, store: Store?) {
             }
 
 
-            SearchBox()
+            searchBox()
         }
 
         // Right
