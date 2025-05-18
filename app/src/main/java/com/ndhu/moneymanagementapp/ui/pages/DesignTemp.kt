@@ -11,26 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.controllers.StoreController
-import com.ndhu.moneymanagementapp.models.Store
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 
 // still in experiment
 
@@ -77,7 +65,7 @@ fun LazyColumnDesignTemplate(/* storeController: StoreController, data: Snapshot
 
                 // Content Top Bar
                 // TODO: search func
-                ContentTopBar(navController = navController, topBarText = "List of Store")
+                ContentTopBar(navController = navController, topBarText = "List of Store",)
 
                 Column(
                     modifier = Modifier

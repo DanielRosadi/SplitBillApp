@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,9 +27,56 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBox() {
+fun SearchBox(searchQuery: MutableState<String>) {
+    // TODO: implement search feature
+    // var query by remember { mutableStateOf("") }
+
+    Box(
+        modifier = Modifier
+            .width(300.dp)
+            .padding(8.dp)
+    ){
+        TextField(
+            value = searchQuery.value,
+            onValueChange = { searchQuery.value = it },
+            modifier = Modifier
+                .fillMaxWidth() // width(300.dp)
+                .height(56.dp)
+                .clip(RoundedCornerShape(50.dp))
+                .background(Color.White)
+            ,
+            placeholder = { Text("search") },
+            leadingIcon = {
+                Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
+            },
+            trailingIcon = {
+                if (searchQuery.value.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery.value = "" }) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "Clear Search")
+                    }
+                }
+            },
+            singleLine = true,
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.White, // <-- keeps background clean
+                unfocusedIndicatorColor = Color.Transparent, // <-- removes line
+                focusedIndicatorColor = Color.Transparent,   // <-- removes line
+                disabledIndicatorColor = Color.Transparent   // <-- removes line
+            ),
+            shape = RoundedCornerShape(50.dp) // <-- Best to pass shape here
+        )
+
+
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBoxDefault() {
     // TODO: implement search feature
     var query by remember { mutableStateOf("") }
 
@@ -44,9 +92,10 @@ fun SearchBox() {
                 .fillMaxWidth() // width(300.dp)
                 .height(56.dp)
                 .clip(RoundedCornerShape(50.dp))
-                .background(Color.White)
+//                .background(Color.White)
+                .background(Color.Red) // to indicate this is default dummy search box
             ,
-            placeholder = { Text("search") },
+            placeholder = { Text("DEFAULT NO FUNC YET!") },
             leadingIcon = {
                 Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
             },
@@ -59,7 +108,8 @@ fun SearchBox() {
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White, // <-- keeps background clean
+                // containerColor = Color.White, // <-- keeps background clean
+                containerColor = Color.Red, // to indicate this is default dummy search box
                 unfocusedIndicatorColor = Color.Transparent, // <-- removes line
                 focusedIndicatorColor = Color.Transparent,   // <-- removes line
                 disabledIndicatorColor = Color.Transparent   // <-- removes line

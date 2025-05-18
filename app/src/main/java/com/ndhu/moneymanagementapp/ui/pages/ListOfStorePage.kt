@@ -2,18 +2,14 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,50 +19,43 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.R
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.*
 
@@ -112,6 +101,22 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
 fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel) {
     var showDialogAddStore by remember { mutableStateOf(false) }
 
+    var searchQuery = remember { mutableStateOf("") }
+
+    // Use extracted filter function
+//    val filteredStores = remember(searchQuery, data) {
+//        filterStores(data, searchQuery.value)
+//    }
+
+//    val filteredStores by remember {
+//        derivedStateOf {
+//            filterStores(data, searchQuery.value) //  Reactive search
+//        }
+//    }
+
+    val filteredStores = filterStores(data, searchQuery.value) //  no remember
+
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -150,7 +155,10 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
 
                 // Content Top Bar
                 // TODO: search func
-                ContentTopBar(navController = navController, topBarText = "List of Store")
+                ContentTopBar(navController = navController,
+                    topBarText = "List of Store",
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
+                )
 
                 Column(
                     modifier = Modifier
@@ -160,13 +168,19 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                         .background(darkGrey)
 
                 ){
+
+//                    LaunchedEffect(searchQuery.value) {
+//                        println("Search query updated to: ${searchQuery.value}")
+//                    }
+
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().weight(1f),
                         contentPadding = PaddingValues(5.dp)
                     ) {
 
                         // items(data) { item ->
-                        items(data) { item ->
+                        ///items(data) { item ->
+                        items(filteredStores) { item ->
                             ListDataStore(storeController, item, navController, data, viewModel)
                         }
 
@@ -240,6 +254,22 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
     }
 }
 }
+
+// filter function for search box
+fun filterStores(storeList: SnapshotStateList<Store>, query: String): SnapshotStateList<Store> {
+    val result = if (query.isBlank()) {
+        storeList
+    } else {
+        storeList.filter {
+            it.name.contains(query, ignoreCase = true) ||
+                    it.address.contains(query, ignoreCase = true)
+        }.toMutableStateList() // Convert result to SnapshotStateList
+    }
+
+    // println("Filtered ${result.size} items for query: '$query'") // <-- DEBUG
+    return result
+}
+
 
 
 @Composable
@@ -478,6 +508,9 @@ fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismi
     )
 
 }
+
+
+
 
 
 fun testPrintStoreAttributes(obj: Store){

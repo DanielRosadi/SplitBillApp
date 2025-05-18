@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.Contact
@@ -84,6 +85,9 @@ private fun ComposePendingRequest(
     val showRejectAllDialog = remember { mutableStateOf(false) }
     val showAcceptAllDialog = remember { mutableStateOf(false) }
 
+    var searchQuery = remember { mutableStateOf("") }
+    val filteredFriends = filterFriends(context, contacts, searchQuery.value, userController) //  no remember
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -110,7 +114,10 @@ private fun ComposePendingRequest(
             ) {
                 // Content Top Bar
                 // TODO: search function
-                ContentTopBar(navController = navController, topBarText = "Pending Request")
+                ContentTopBar(navController = navController,
+                    topBarText = "Pending Request",
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
+                )
 
                 // Use Card to make rounded corner for LazyColumn
                 ContactContainer(
@@ -126,7 +133,7 @@ private fun ComposePendingRequest(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(contacts, key = { it.senderId }) { contact ->
+                            items(filteredFriends, key = { it.senderId }) { contact ->
                                 PendingCard(
                                     contacts, contact, context, userController, contactController
                                 )

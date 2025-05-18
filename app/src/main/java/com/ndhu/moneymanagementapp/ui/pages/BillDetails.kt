@@ -1,23 +1,11 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,8 +14,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.models.Bill
-import com.ndhu.moneymanagementapp.models.BillItemDetail
 
 @Composable
 fun BillDetails(context: Context, navController: NavController) {
@@ -54,7 +40,7 @@ fun ComposeBillDetailsScreen(navController: NavController) {
                     .background(Color(0xFFD9D9D9))
                     .padding(10.dp)
             ) {
-                ContentTopBar(navController = navController, topBarText = "Bill Details")
+                ContentTopBar(navController = navController, topBarText = "Bill Details",)
 
                 Spacer(modifier = Modifier.height(32.dp))
 
