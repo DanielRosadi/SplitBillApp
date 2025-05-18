@@ -110,7 +110,7 @@ private fun ComposePendingRequest(
             ) {
                 // Content Top Bar
                 // TODO: search function
-                ContentTopBar(navController = navController, topBarText = "Pending Request")
+                ContentTopBar(navController = navController, topBarText = "Pending Request",)
 
                 // Use Card to make rounded corner for LazyColumn
                 ContactContainer(

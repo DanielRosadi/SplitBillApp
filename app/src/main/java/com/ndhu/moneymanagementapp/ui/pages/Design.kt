@@ -1,7 +1,6 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -133,7 +131,7 @@ fun ContentTopBar(navController: NavController, topBarText: String){
 
 
 @Composable
-fun ContentTopBar(navController: NavController, topBarText: String) {
+fun ContentTopBar(navController: NavController, topBarText: String, searchBox: @Composable () -> Unit = { SearchBox() }) {
     /*
     Content Top Bar
     */
@@ -169,7 +167,7 @@ fun ContentTopBar(navController: NavController, topBarText: String) {
                 fontWeight = FontWeight.Bold,
                 fontFamily = surannaFont
             )
-            SearchBox()
+            searchBox()
         }
 
         Column(

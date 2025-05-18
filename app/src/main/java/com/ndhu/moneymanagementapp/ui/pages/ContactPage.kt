@@ -127,7 +127,7 @@ fun ComposeContactScreen(
             ) {
                 // Content Top Bar
                 // TODO: search func
-                ContentTopBar(navController = navController, topBarText = "Contacts")
+                ContentTopBar(navController = navController, topBarText = "Contacts",)
 
                 // Use Card to make rounded corner for LazyColumn
                 ContactContainer(

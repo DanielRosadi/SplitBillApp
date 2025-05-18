@@ -44,9 +44,10 @@ fun SearchBox() {
                 .fillMaxWidth() // width(300.dp)
                 .height(56.dp)
                 .clip(RoundedCornerShape(50.dp))
-                .background(Color.White)
+//                .background(Color.White)
+                .background(Color.Red) // to indicate this is default dummy search box
             ,
-            placeholder = { Text("search") },
+            placeholder = { Text("DEFAULT NO FUNC YET!") },
             leadingIcon = {
                 Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
             },
@@ -59,7 +60,8 @@ fun SearchBox() {
             },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White, // <-- keeps background clean
+                // containerColor = Color.White, // <-- keeps background clean
+                containerColor = Color.Red, // to indicate this is default dummy search box
                 unfocusedIndicatorColor = Color.Transparent, // <-- removes line
                 focusedIndicatorColor = Color.Transparent,   // <-- removes line
                 disabledIndicatorColor = Color.Transparent   // <-- removes line

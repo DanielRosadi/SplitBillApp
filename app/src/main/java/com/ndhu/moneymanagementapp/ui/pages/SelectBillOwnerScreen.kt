@@ -137,7 +137,7 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
 
             // Content Top Bar
             // TODO: search func
-            ContentTopBar(navController = navController, topBarText = "Select Bill Owner")
+            ContentTopBar(navController = navController, topBarText = "Select Bill Owner",)
 
 
             // Spacer(modifier = Modifier.height(10.dp))

@@ -26,7 +26,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -153,7 +152,7 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
                 // Content Top Bar
                 // TODO: search func
-                ContentTopBar(navController = navController, topBarText = "Select Friend")
+                ContentTopBar(navController = navController, topBarText = "Select Friend",)
 
 
                 //Spacer(modifier = Modifier.height(10.dp))
