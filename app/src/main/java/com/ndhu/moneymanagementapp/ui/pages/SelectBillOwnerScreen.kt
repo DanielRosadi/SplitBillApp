@@ -49,6 +49,7 @@ import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -64,9 +65,12 @@ fun SelectBillOwnerScreen(context: Context, navController: NavController, viewMo
     // populate listBillOwners with user's contacts
     if (listContacts != null) {
         for (contact in listContacts){
+            val currentUserId = remember { Util.getUserId(context).toString() }
+            val friendUserId = if (contact.senderId == currentUserId) contact.receiverId else contact.senderId
+
             runBlocking {
                 listPossibleOwners.add(
-                    userController.searchUserByUserId(context, contact.receiverId)
+                    userController.searchUserByUserId(context, friendUserId)
                 )
             }
         }
