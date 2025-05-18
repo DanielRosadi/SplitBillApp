@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
@@ -99,6 +100,9 @@ fun ComposeContactScreen(
 ) {
     val showAddFriendDialog = remember { mutableStateOf(false) }
 
+    var searchQuery = remember { mutableStateOf("") }
+    val filteredFriends = filterFriends(context, contacts, searchQuery.value, userController) //  no remember
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,7 +131,10 @@ fun ComposeContactScreen(
             ) {
                 // Content Top Bar
                 // TODO: search func
-                ContentTopBar(navController = navController, topBarText = "Contacts",)
+                ContentTopBar(navController = navController,
+                    topBarText = "Contacts",
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
+                    )
 
                 // Use Card to make rounded corner for LazyColumn
                 ContactContainer(
@@ -143,7 +150,7 @@ fun ComposeContactScreen(
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(contacts, key = { it.id }) { contact ->
+                            items(filteredFriends, key = { it.id }) { contact ->
                                 ContactCard(currentUserId, contact, context, userController)
                             }
                         }
@@ -244,6 +251,8 @@ fun ComposeContactScreen(
         } // Full Page
     } // Outer Box
 }
+
+
 
 // Card Item inside Lazy Column containing Contact information
 @Composable
