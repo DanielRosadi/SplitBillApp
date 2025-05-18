@@ -20,7 +20,8 @@ import com.ndhu.moneymanagementapp.ui.pages.primaryGreen
 fun UsernameField(
     value: String,
     onValueChange: (String) -> Unit,
-    error: String?
+    error: String?,
+    modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
         value = value,
@@ -39,7 +40,9 @@ fun UsernameField(
         singleLine = true,
         isError = error != null,
         shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.fillMaxWidth(),
+
+        modifier = modifier.fillMaxWidth(),
+
         colors = TextFieldDefaults.textFieldColors(
             containerColor = Color.White,
             focusedIndicatorColor = primaryGreen,
@@ -49,12 +52,14 @@ fun UsernameField(
     )
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailField(
     value: String,
     onValueChange: (String) -> Unit,
-    error: String?
+    error: String?,
+    modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
         value = value,
@@ -73,7 +78,9 @@ fun EmailField(
         singleLine = true,
         isError = error != null,
         shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.fillMaxWidth(),
+
+        modifier = modifier.fillMaxWidth(),
+
         colors = TextFieldDefaults.textFieldColors(
             containerColor = Color.White,
             focusedIndicatorColor = primaryGreen,
@@ -82,6 +89,7 @@ fun EmailField(
         )
     )
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

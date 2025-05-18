@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -22,24 +23,47 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignUp(context: Context, navController: NavController) {
     val viewModel: AuthViewModel = viewModel()
-    val coroutineScope = rememberCoroutineScope()
-    val userController = UserController()
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
     AuthScreen(
         screenTitle = "Sign Up",
         formContent = {
+
+            val coroutineScope = rememberCoroutineScope()
+            val userController = remember { UserController() }
+
+            val usernameFocused = remember { mutableStateOf(false) }
+            val emailFocused = remember { mutableStateOf(false) }
+
             // Username
             AuthInputWrapper(error = viewModel.usernameError) {
                 UsernameField(
                     value = viewModel.username,
                     onValueChange = {
+                        // Update state and clear any existing errors as the user types
                         viewModel.username = it
                         viewModel.resetErrors()
                         viewModel.signupError = null
                     },
-                    error = null // Suppress internal error handling
+                    error = null, // Let AuthInputWrapper handle error display
+                    modifier = Modifier.onFocusChanged { focusState ->
+                        // Check if the username field was focused and now lost focus
+                        if (usernameFocused.value && !focusState.isFocused) {
+                            if (viewModel.username.isNotBlank()) {
+                                coroutineScope.launch {
+                                    val result = userController.checkUsernameOrEmailTaken(
+                                        username = viewModel.username,
+                                        email = null
+                                    )
+                                    viewModel.usernameError =
+                                        if (result == "Username is already in use.") result else null
+                                }
+                            }
+                        }
+                        // Track focus state for future transitions
+                        usernameFocused.value = focusState.isFocused
+                    }
                 )
             }
 
@@ -48,11 +72,29 @@ fun SignUp(context: Context, navController: NavController) {
                 EmailField(
                     value = viewModel.email,
                     onValueChange = {
+                        // Update state and clear any existing errors as the user types
                         viewModel.email = it
                         viewModel.resetErrors()
                         viewModel.signupError = null
                     },
-                    error = null
+                    error = null, // Let AuthInputWrapper handle error display
+                    modifier = Modifier.onFocusChanged { focusState ->
+                        // When the user leaves the field (lost focus after being focused)
+                        if (emailFocused.value && !focusState.isFocused) {
+                            coroutineScope.launch {
+                                // Check if email is already registered
+                                val result = userController.checkUsernameOrEmailTaken(
+                                    username = null,
+                                    email = viewModel.email
+                                )
+                                if (result == "Email is already in use.") {
+                                    viewModel.emailError = result
+                                }
+                            }
+                        }
+                        // Update focus tracker
+                        emailFocused.value = focusState.isFocused
+                    }
                 )
             }
 
