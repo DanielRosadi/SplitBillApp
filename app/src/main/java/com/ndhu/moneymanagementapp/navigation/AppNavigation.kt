@@ -22,7 +22,7 @@ import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
 import com.ndhu.moneymanagementapp.ui.pages.PendingRequestScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectBillOwnerScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
-import com.ndhu.moneymanagementapp.ui.pages.auth.SignUp
+import com.ndhu.moneymanagementapp.ui.pages.auth.SignUpScreen
 import com.ndhu.moneymanagementapp.ui.pages.SplitItemScreen
 import com.ndhu.moneymanagementapp.ui.pages.TestingScreen
 import com.ndhu.moneymanagementapp.ui.pages.auth.LogInScreen
@@ -124,7 +124,7 @@ fun AppNavigation(context : Context){
 
         // SignUp screen
         composable(AppScreens.SignUpScreen.name){
-            SignUp(context, navController = navController)
+            SignUpScreen(context, navController = navController)
         }
 
         // Testing Screen

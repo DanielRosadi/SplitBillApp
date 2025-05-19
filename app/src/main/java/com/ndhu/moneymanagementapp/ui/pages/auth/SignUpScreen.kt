@@ -21,7 +21,7 @@ import com.ndhu.moneymanagementapp.ui.pages.primaryGreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignUp(context: Context, navController: NavController) {
+fun SignUpScreen(context: Context, navController: NavController) {
     val viewModel: AuthViewModel = viewModel()
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
