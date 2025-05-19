@@ -1,6 +1,6 @@
 package com.ndhu.moneymanagementapp.payloads
 
-import com.ndhu.moneymanagementapp.enums.BillStatus
+import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 
 data class ItemDetail(
     var id : String = "",
@@ -11,6 +11,6 @@ data class ItemDetail(
 
 data class ListUserSplitBillResponse (
     var billId : String = "",
-    var status : BillStatus = BillStatus.UNPAID,
+    var status : UserPaymentStatus = UserPaymentStatus.UNPAID,
     var itemList : MutableList<ItemDetail> = mutableListOf()
 )

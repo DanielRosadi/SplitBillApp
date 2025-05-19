@@ -2,7 +2,7 @@ package com.ndhu.moneymanagementapp.controllers
 
 import android.content.Context
 import com.google.firebase.Timestamp
-import com.ndhu.moneymanagementapp.enums.BillStatus
+import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.BillItemDetail
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
@@ -42,7 +42,7 @@ class SplitBillController {
                     itemId = it1.itemId,
                     userId = it1.ownerId,
                     qty = it1.qty,
-                    status = BillStatus.UNPAID,
+                    status = UserPaymentStatus.UNPAID,
                     createdAt = Timestamp.now(),
                     updatedAt = Timestamp.now()
                 )

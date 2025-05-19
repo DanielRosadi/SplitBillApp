@@ -1,7 +1,7 @@
 package com.ndhu.moneymanagementapp.models
 
 import com.google.firebase.Timestamp
-import com.ndhu.moneymanagementapp.enums.BillStatus
+import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 
 data class BillItemDetail (
     val id : String = "",
@@ -9,7 +9,7 @@ data class BillItemDetail (
     var itemId : String = "",
     var qty : Number = 0,
     var userId: String = "",
-    var status: BillStatus = BillStatus.UNPAID,
+    var status: UserPaymentStatus = UserPaymentStatus.UNPAID,
     var createdAt : Timestamp = Timestamp.now(),
     var updatedAt : Timestamp = Timestamp.now()
 )
