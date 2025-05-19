@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,8 +22,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -163,34 +164,37 @@ fun ComposeContactScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    // Pending Request Button
+                    // Pending Request Button WITH badge
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
+                            .height(60.dp)
                     ) {
+                        // Pending Request Button
                         Button(
                             onClick = { navController.navigate(route = AppScreens.PendingRequestScreen.name) },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.Center),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(
+                                .fillMaxSize(), // ensures full Box size
+                            shape = RoundedCornerShape(18.dp),
+                            colors = ButtonColors(
                                 containerColor = primaryGreen,
-                                contentColor = Color.White
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.White
                             )
                         ) {
                             Text(
                                 text = "Pending Request",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                fontFamily = surannaFont,
+                                //fontFamily = surannaFont,
                             )
                         }
 
-                        // Shows a red notification badge
+                        // Notification Badge
                         if (pendingContacts.isNotEmpty()) {
                             Box(
                                 modifier = Modifier
@@ -212,26 +216,32 @@ fun ComposeContactScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Add Friend Button
-                    Button(
-                        onClick = { showAddFriendDialog.value = true },
+                    // Add Friend Button in a Box too (even if no badge)
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryGreen,
-                            contentColor = Color.White
-                        )
+                            .height(60.dp)
                     ) {
-                        Text(
-                            text = "Add New Contact",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            fontFamily = surannaFont
-                        )
+                        // Add Friend Button
+                        Button(
+                            onClick = { showAddFriendDialog.value = true },
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            shape = RoundedCornerShape(18.dp),
+                            colors = ButtonColors(
+                                containerColor = primaryGreen,
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                text = "Add New Contact",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                //fontFamily = surannaFont
+                            )
+                        }
                     }
                 }
 
@@ -355,7 +365,7 @@ fun AddFriendDialog(
 
     AlertDialog(
         onDismissRequest = { showDialog.value = false },
-        containerColor = Color(0xFFF9F9F9), // Soft White
+        containerColor = Color(0xFFF5F5F5), // White Smoke
         shape = RoundedCornerShape(20.dp),
         title = {
             Column(
@@ -381,7 +391,7 @@ fun AddFriendDialog(
         },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                TextField(
+                OutlinedTextField(
                     value = userName,
                     onValueChange = { userName = it },
                     singleLine = true,
