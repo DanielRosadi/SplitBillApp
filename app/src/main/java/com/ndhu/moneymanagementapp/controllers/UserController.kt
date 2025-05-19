@@ -32,7 +32,8 @@ class UserController {
                 email,
                 UserStatus.ACTIVE,
                 Util.passwordEncryption(password),
-                bio
+                bio,
+                (2..7).random()
             )
         )
         return null
@@ -142,5 +143,12 @@ class UserController {
         } else {
             Log.w("ERROR", "No onboard user found to update")
         }
+    }
+
+    suspend fun updateUserProfile(
+        context: Context,
+        newProfilePictureId: Int
+    ){
+
     }
 }

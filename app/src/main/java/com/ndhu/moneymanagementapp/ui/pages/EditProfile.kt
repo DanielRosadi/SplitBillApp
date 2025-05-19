@@ -101,6 +101,8 @@ fun EditProfile(context: Context, navController: NavController) {
         ProfilePicture(7, R.drawable.download_3),
     )
 
+    // var profilePicIdRandomizer = (2..7).random()
+
     LaunchedEffect(Unit) {
         val user = userController.getOnboardUser(context)
         if (user != null) {

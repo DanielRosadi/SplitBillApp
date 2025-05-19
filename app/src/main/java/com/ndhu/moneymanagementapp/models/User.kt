@@ -9,7 +9,8 @@ data class User(
     var email : String = "",
     var status : UserStatus = UserStatus.ACTIVE,
     var password : String = "",
-    var bio: String
+    var bio: String,
+    var profilePictureId: Int
 ) {
-    constructor() : this("", "", "", UserStatus.ACTIVE, "", "")
+    constructor() : this("", "", "", UserStatus.ACTIVE, "", "", (2..7).random())
 }
