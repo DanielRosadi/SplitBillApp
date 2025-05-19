@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.Item
+import com.ndhu.moneymanagementapp.models.ProfilePicture
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
@@ -71,6 +72,9 @@ class SharedViewModel : ViewModel() {
     // copy of current item with users/owners list (temp)
     // this is used to save data and only applies if the user really saves the data. otherwise, if user press cancels, we will not use this
     var tempItemAndUserQuantities: ItemWithUsersList = ItemWithUsersList(ItemDetail(), mutableStateListOf())
+
+    // to save user profile pic in case its need to be fetch again (save time)
+    // var currentUserProfilePic: ProfilePicture? = null
 
     // --------------- functions (getters, setters)
 

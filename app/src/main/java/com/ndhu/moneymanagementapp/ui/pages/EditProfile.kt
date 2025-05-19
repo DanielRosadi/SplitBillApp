@@ -312,13 +312,15 @@ fun EditProfile(context: Context, navController: NavController) {
                     }
 
                     // temporary
+                    /*
                     Button(onClick = {
                         coroutineScope.launch {
                             userController.migrateUserModelForm(context)
                         }
                     }){
-                        Text(text = "MIGRATE")
+                        Text(text = "MIGRATE (TEMP)")
                     }
+                    */
 
                     Spacer(modifier = Modifier.weight(1f))
 

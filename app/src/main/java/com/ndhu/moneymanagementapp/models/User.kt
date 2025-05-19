@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.models
 
 import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.enums.UserStatus
+import com.ndhu.moneymanagementapp.ui.pages.profilePictureRandomizer
 
 data class User(
     var id : String = "",
@@ -10,8 +11,8 @@ data class User(
     var status : UserStatus = UserStatus.ACTIVE,
     var password : String = "",
     var bio: String,
-    var profilePictureId: Int? = (2..7).random()
+    var profilePictureId: Int? = profilePictureRandomizer
 ) {
-    constructor() : this("", "", "", UserStatus.ACTIVE, "", "", (2..7).random())
+    constructor() : this("", "", "", UserStatus.ACTIVE, "", "", profilePictureRandomizer)
     // (2..7).random()
 }

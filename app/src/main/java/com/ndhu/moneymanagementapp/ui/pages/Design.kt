@@ -79,6 +79,10 @@ val profilePictures = listOf(
     ProfilePicture(7, R.drawable.download_3),
 )
 
+var minPictureRand = 2
+var maxPictureRand = 7
+var profilePictureRandomizer = (minPictureRand..maxPictureRand).random()
+
 // Background Image used in most pages
 @Composable
 fun BackgroundImage() {

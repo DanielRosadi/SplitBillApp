@@ -192,6 +192,7 @@ class UserController {
 
     }
 
+    // transform old User data model to new User data model (add new profilePictureId variable)
     suspend fun migrateUserModelForm(context: Context):String? {
         val user = getOnboardUser(context)
         if (user != null) {
