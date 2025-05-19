@@ -3,6 +3,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -303,13 +306,24 @@ fun ContactCard(
                     .size(40.dp)
                     .clip(CircleShape)
             ) {
+
+                var profilePic = profilePictures.firstOrNull(){ it.id == (userResult?.profilePictureId ?: 1) }
+
                 /*TODO: change to image*/
-                Icon(
-                    Icons.Filled.Person,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier.size(40.dp),
-                    tint = Color.Gray
-                )
+//                Icon(
+//                    Icons.Filled.Person,
+//                    contentDescription = "Profile Picture",
+//                    modifier = Modifier.size(40.dp),
+//                    tint = Color.Gray
+//                )
+                if (profilePic != null) {
+                    Image(
+                        painter = painterResource(id = profilePic.imageRes),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))
