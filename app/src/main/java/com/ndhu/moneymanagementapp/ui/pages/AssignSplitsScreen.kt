@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -46,12 +47,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.enums.AppScreens
@@ -216,13 +220,6 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 }
                 */
 
-
-                //Spacer(modifier = Modifier.height(10.dp))
-
-                //SearchBox()
-
-                //Spacer(modifier = Modifier.height(10.dp))
-
                 // Top (below TopBar)
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -312,23 +309,13 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                 ) {
 
                     Button(onClick = {
-                        // TODO: if done, create list of itemIdAndOwners
-
-                        // TODO: then, submit bill data to database (with list of itemIdAndOwners)
-                        // *******
-
-                        // TODO: need to discuss on qty for ItemAndOwner
-                        // TODO: need to recheck if there is changes since we are implementing additional logic
-
 
                         val itemIdAndOwners = mapItemsToItemAndOwners(listItemsAndOwners)
-
 
                         val splitBillRequest = SplitBillRequest(
                             billOwnerId = viewModel.getBillOwnerId(),
                             itemIdAndOwners = itemIdAndOwners
                         )
-
 
                         runBlocking {
                             splitBillController.addSplitBill(context = context, request = splitBillRequest)
@@ -615,19 +602,19 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
 
     ) {
 
-        // TODO: You can put an image/icon here if needed later
-
         Box(modifier = Modifier.fillMaxSize()) { //  Added Box for layering
 
-            /*
-            // TODO: Your image here
-            Image(
-                painter = painterResource(id = R.drawable.your_image),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-            */
+            var profilePic = profilePictures.firstOrNull(){ it.id == (participant?.profilePictureId ?: 1) }
+
+            if (profilePic != null) {
+                Image(
+                    painter = painterResource(id = profilePic.imageRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
 
             Box(
                 modifier = Modifier
@@ -727,7 +714,7 @@ fun mapItemsToItemAndOwners(items: MutableList<ItemWithUsersList>): List<ItemAnd
 fun UserDot(user: User, color: Color) {
     Box(
         modifier = Modifier
-            .size(24.dp)
+            .size(30.dp) // 24, 40 outer card
             // .padding(end = 4.dp)
             .background(color = color, shape = CircleShape) //  perfect circle
             .border(1.dp, Color.Black, shape = CircleShape),
@@ -738,7 +725,25 @@ fun UserDot(user: User, color: Color) {
         //shape = CircleShape,
         //colors = CardDefaults.cardColors(containerColor = color),
         //elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {}
+    ) {
+
+        var profilePic = profilePictures.firstOrNull(){ it.id == (user.profilePictureId ?: 1) }
+
+        if (profilePic != null) {
+            Image(
+                painter = painterResource(id = profilePic.imageRes),
+                contentDescription = "${user.username}'s profile picture",
+                modifier = Modifier
+                    .size(26.dp) // 20, 36 inner image
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+    }
+
+
+
 }
 
 /*

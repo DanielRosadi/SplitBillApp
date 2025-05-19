@@ -22,13 +22,14 @@ object Seeders {
     val itemRepo : IItemRepository = ItemRepository()
 
     suspend fun seedUsersData() {
-        val users = List(10) { index ->
+        val users = List(5) { index ->
             User(
                 id = UUID.randomUUID().toString(),
                 username = "user${index + 1}",
                 bio = "Hi my name is user${index+1}",
                 email = "user${index + 1}@example.com",
                 password = Util.passwordEncryption("test_1234"),
+                profilePictureId = (2..7).random()
             )
         }
 
@@ -38,7 +39,7 @@ object Seeders {
     }
 
     suspend fun seedStoresData() {
-        val stores = List(10) { index ->
+        val stores = List(3) { index ->
             Store(
                 id = UUID.randomUUID().toString(),
                 name = "Store ${index + 1}",
@@ -55,7 +56,7 @@ object Seeders {
         val stores = this.storeRepo.getList()
 
         for(store in stores) {
-            val items = List(10) { index ->
+            val items = List(3) { index ->
                 Item(
                     id = UUID.randomUUID().toString(),
                     name = "Item ke ${index+1} from ${store.name}",

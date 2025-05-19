@@ -3,6 +3,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -294,14 +297,36 @@ fun PendingCard(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
+
+
+                Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(CircleShape),
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = "Profile Picture",
-                    tint = Color.Gray
-                )
+                        .clip(CircleShape)
+                ) {
+                var profilePic = profilePictures.firstOrNull() {
+                    it.id == (userObject.value?.profilePictureId
+                        ?: 1)
+                }
+
+//                Icon(
+//                    modifier = Modifier
+//                        .size(40.dp)
+//                        .clip(CircleShape),
+//                    imageVector = Icons.Filled.Person,
+//                    contentDescription = "Profile Picture",
+//                    tint = Color.Gray
+//                )
+                if (profilePic != null) {
+                    Image(
+                        painter = painterResource(id = profilePic.imageRes),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+            }
 
                 Spacer(modifier = Modifier.width(12.dp))
 

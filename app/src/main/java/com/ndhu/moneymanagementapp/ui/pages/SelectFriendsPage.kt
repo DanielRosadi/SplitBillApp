@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -42,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -308,8 +312,9 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
     val currentUserId = remember { Util.getUserId(context).toString() }
     val friendUserId = if (friend.senderId == currentUserId) friend.receiverId else friend.senderId
 
-    var friendName = runBlocking { userController.searchUserByUserId(context, friendUserId)?.username
-        ?: "Unknown Contact" }
+    var userObject = runBlocking { userController.searchUserByUserId(context, friendUserId)}
+
+    var friendName = userObject?.username ?: "Unknown Contact"
 
     // val cardColor = if (isSelected) correctTransparentGreen else Color.White
 
@@ -340,13 +345,24 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
             Box(
                 modifier = Modifier.size(50.dp).clip(CircleShape)
             ) {
-                // TODO: Change Icon -> Image later
-                Icon(
-                    Icons.Filled.Person,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier.size(70.dp),
-                    tint = Color.Gray
-                )
+
+                var profilePic = profilePictures.firstOrNull(){ it.id == (userObject?.profilePictureId ?: 1) }
+
+                if (profilePic != null) {
+//                    Icon(
+//                        painter = painterResource(id = profilePic.imageRes),
+//                        // Icons.Filled.Person,
+//                        contentDescription = "Profile Picture",
+//                        modifier = Modifier.size(70.dp),
+//                        tint = Color.Gray
+//                    )
+                    Image(
+                        painter = painterResource(id = profilePic.imageRes),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(1.dp))

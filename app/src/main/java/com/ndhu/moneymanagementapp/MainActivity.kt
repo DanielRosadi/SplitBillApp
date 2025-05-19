@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import com.google.firebase.FirebaseApp
 import com.ndhu.moneymanagementapp.components.OcrScreen
 import com.ndhu.moneymanagementapp.handlers.FirebaseHandler
+import com.ndhu.moneymanagementapp.models.ProfilePicture
 import com.ndhu.moneymanagementapp.navigation.AppNavigation
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.utils.Util

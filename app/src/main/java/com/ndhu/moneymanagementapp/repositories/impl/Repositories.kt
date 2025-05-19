@@ -83,7 +83,17 @@ open class Repositories<T>(private val clazz: Class<T>) : IRepositories<T> {
                 .await()
 
             if (!querySnapshot.isEmpty) {
+
+                // DEBUG
+                val document = querySnapshot.documents.firstOrNull()
+                Log.d("FIRESTORE", "Raw document data: ${document?.data}")
+                val obj = document?.toObject(clazz)
+                Log.d("FIRESTORE", "Deserialized object: $obj")
+                // obj
+                // DEBUG
+
                 querySnapshot.documents.first().toObject(clazz)
+
             } else {
                 null
             }

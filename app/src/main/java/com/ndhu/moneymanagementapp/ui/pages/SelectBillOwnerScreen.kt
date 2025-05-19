@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,21 +33,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import com.ndhu.moneymanagementapp.utils.Util
@@ -183,7 +184,8 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
 
                                 if (user != null) {
                                     ListBillOwners(
-                                        billOwner = user.username,
+                                        billOwnerName = user.username,
+                                        billOwner = user,
                                         isSelected = selectedIndex == globalIndex,
                                         onClick = {
                                             selectedIndex =
@@ -288,11 +290,11 @@ fun filterBillOwners(billOwnerList: MutableList<User?>, query: String): MutableL
 }
 
 @Composable
-fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit) {
+fun ListBillOwners(billOwnerName: String, billOwner: User, isSelected: Boolean, onClick: ()-> Unit) {
 
     // val correctTransparentGreen = Color(0xAA4CAF50)
     // val backgroundColor = if (isSelected) Color.Red else Color.White
-    val backgroundColor = if (isSelected) overlayColor else Color.White
+    val backgroundColor = if (isSelected) overlayColor else Color.Transparent
     // val borderColor = if (isSelected) Color.Red else Color.Gray
     // val borderColor = if (isSelected) correctTransparentGreen else Color.Gray
 
@@ -318,19 +320,19 @@ fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit) {
 
         ) {
         // Removed Text from inside the Card
-        // TODO: You can put an image/icon here if needed later
 
         Box(modifier = Modifier.fillMaxSize()) { //  Added Box for layering
 
-            /*
-            // TODO: Your image here
-            Image(
-                painter = painterResource(id = R.drawable.your_image),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-            */
+            var profilePic = profilePictures.firstOrNull(){ it.id == (billOwner.profilePictureId ?: 1) }
+
+            if (profilePic != null) {
+                Image(
+                    painter = painterResource(id = profilePic.imageRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
             Box(
                 modifier = Modifier
@@ -344,7 +346,7 @@ fun ListBillOwners(billOwner: String, isSelected: Boolean, onClick: ()-> Unit) {
         Spacer(modifier = Modifier.height(1.dp)) // Added spacing between Card and Text
 
         Text(
-            text = billOwner,
+            text = billOwnerName,
             // color = if (isSelected) Color.White else Color.Black,
             color = Color.Black,
             fontWeight = FontWeight.Bold,
