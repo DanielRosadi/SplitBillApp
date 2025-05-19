@@ -91,6 +91,42 @@ class SplitBillController {
         return billList
     }
 
+    suspend fun getBillDetail(billId: String) : List<ListUserSplitBillResponse> {
+        var billList : MutableList<ListUserSplitBillResponse> = mutableListOf()
+        var bill: Bill? = billRepo.getById(billId)
+        if (bill == null) {
+            return billList
+        }
+        var billDetails = billDetailRepo.getByBillId(bill.id)
+        for(billItem in billDetails) {
+            val index = getListUserResponseFromBillId(billList, billItem.billId)
+
+            if (index == -1) {
+                billList.add(
+                    ListUserSplitBillResponse(
+                        billId = billItem.billId,
+                        status = billItem.status,
+                        itemList = mutableListOf()
+                    )
+                )
+            }
+
+            val updatedIndex = getListUserResponseFromBillId(billList, billItem.billId)
+            if (updatedIndex != -1) {
+                var item = itemRepo.getById(billItem.itemId)
+                if(item  != null){
+                    billList[updatedIndex].itemList.add(0, ItemDetail(
+                        id = billItem.itemId,
+                        name = item.name,
+                        price = item.price,
+                        qty = billItem.qty
+                    ))
+                }
+            }
+        }
+        return billList
+    }
+
     private fun getListUserResponseFromBillId(list : List<ListUserSplitBillResponse>, id : String) : Int {
         for (i in 0 until list.size) {
             if(list.get(i).billId == id) {
