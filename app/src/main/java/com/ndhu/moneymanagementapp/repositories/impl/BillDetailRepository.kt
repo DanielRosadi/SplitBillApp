@@ -60,7 +60,4 @@ class BillDetailRepository : Repositories<BillItemDetail>(BillItemDetail::class.
         }
         return billItemList
     }
-    }
-
-
 }
