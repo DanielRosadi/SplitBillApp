@@ -5,9 +5,11 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,12 +19,16 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +39,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,6 +64,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.models.ProfilePicture
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,6 +85,21 @@ fun EditProfile(context: Context, navController: NavController) {
     var usernameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
     var bioError by remember { mutableStateOf<String?>(null) }
+
+    // for profile picture
+    var showEditProfilePictureDialog by remember { mutableStateOf(false) }
+    var selectedPictureId by remember { mutableStateOf<Int?>(null) }
+
+    // for profile picture
+    val profilePictures = listOf(
+        ProfilePicture(1, R.drawable.defaultavatarimage),
+        ProfilePicture(2, R.drawable.black_panther),
+        ProfilePicture(3, R.drawable.banteng),
+        ProfilePicture(4, R.drawable.download),
+        ProfilePicture(5, R.drawable.download_1),
+        ProfilePicture(6, R.drawable.download_2),
+        ProfilePicture(7, R.drawable.download_3),
+    )
 
     LaunchedEffect(Unit) {
         val user = userController.getOnboardUser(context)
@@ -199,7 +222,7 @@ fun EditProfile(context: Context, navController: NavController) {
                         )
 
                         IconButton(
-                            onClick = { /* Handle edit photo */ },
+                            onClick = { showEditProfilePictureDialog = true },
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
@@ -382,6 +405,62 @@ fun EditProfile(context: Context, navController: NavController) {
             onNewPasswordChange = { newPassword = it },
             onConfirmPasswordChange = { confirmPassword = it },
             errorMessage = passwordError
+        )
+    }
+
+    // TODO: for profile pic (need to be moved)
+    if (showEditProfilePictureDialog) {
+        AlertDialog(
+            onDismissRequest = { showEditProfilePictureDialog = false },
+            title = { Text("Choose Your Profile Picture") },
+            text = {
+                LazyVerticalGrid (
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.height(250.dp)
+                ) {
+                    items(profilePictures) { picture ->
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape)
+                                .border(
+                                    width = if (picture.id == selectedPictureId) 4.dp else 2.dp,
+                                    color = if (picture.id == selectedPictureId) primaryGreen else Color.Gray,
+                                    shape = CircleShape
+                                )
+                                .clickable {
+                                    selectedPictureId = picture.id
+                                    // showDialog = false // Close dialog after selection
+                                }
+                        ) {
+                            Image(
+                                painter = painterResource(id = picture.imageRes),
+                                contentDescription = "Profile Picture ${picture.id}",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton (onClick = { showEditProfilePictureDialog = false }) {
+                    selectedPictureId?.let { id ->
+                        // Saved picture id
+                        Toast.makeText(context, "Selected Picture ID: $id", Toast.LENGTH_SHORT).show()
+                    }
+                    Text("Save")
+                }
+
+            },
+            dismissButton = {
+                TextButton (onClick = { showEditProfilePictureDialog = false }) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }
