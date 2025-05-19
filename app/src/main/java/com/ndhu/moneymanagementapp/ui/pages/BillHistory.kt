@@ -22,22 +22,21 @@ import com.ndhu.moneymanagementapp.models.History
 
 @Composable
 fun BillHistory(context: Context, navController: NavController) {
-    // Simulated data — you can replace this with a ViewModel or DB call later
+    // Temporary hardcoded list of bill history records
     val histories = listOf(
         History("100", "Store W", "2024-03-10", "User 1", "Completed"),
         History("200", "Store E", "2024-03-12", "User 2", "PENDING"),
         History("300", "Store S", "2024-03-15", "User 3", "COMPLETED"),
     )
 
-    // val histories = emptyList<History>()
-
+    // Compose screen UI
     ComposeBillHistoryScreen(histories = histories, navController = navController)
 }
 
 @Composable
 fun ComposeBillHistoryScreen(histories: List<History>, navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background
+        // Display background image
         BackgroundImage()
 
         Column(
@@ -56,14 +55,18 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
                     .background(Color(0xFFD9D9D9))
                     .padding(10.dp)
             ) {
+                // Top bar with title and navigation
                 ContentTopBar(navController = navController, topBarText = "Bill History",)
 
+                // Main content container
                 ContactContainer(
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    // Handle empty state
                     if (histories.isEmpty()) {
                         EmptyStateMessage("No bill history available")
                     } else {
+                        // Display list of history items
                         LazyColumn(
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -75,7 +78,7 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp)) // Bottom space
             }
         }
     }
@@ -83,12 +86,13 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
 
 @Composable
 fun HistoryItem(history: History, navController: NavController) {
-    // Determine card background color based on status
+    // Change background color based on transaction status
     val backgroundColor = when (history.status.uppercase()) {
-        "PENDING" -> Color(0xFFFFC8C8) // Red-ish
-        else -> Color.White // Default card
+        "PENDING" -> Color(0xFFFFC8C8) // Light red for pending
+        else -> Color.White // Default white background
     }
 
+    // History card component
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(backgroundColor),
@@ -97,6 +101,7 @@ fun HistoryItem(history: History, navController: NavController) {
             .fillMaxWidth()
             .height(100.dp)
             .clickable {
+                // Navigate to bill details
                 navController.navigate(route = AppScreens.BillDetailsScreen.name)
             }
     ) {
@@ -106,7 +111,7 @@ fun HistoryItem(history: History, navController: NavController) {
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Store info
+            // Left side = store ID and date
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
@@ -125,7 +130,7 @@ fun HistoryItem(history: History, navController: NavController) {
                 )
             }
 
-            // Amount + Owner
+            // Right side = total bill price and bill owner
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.End

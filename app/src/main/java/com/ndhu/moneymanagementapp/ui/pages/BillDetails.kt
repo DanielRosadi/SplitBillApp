@@ -18,13 +18,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
-// Example data class (for clarity only)
+// Data class representing an item associated with a user
 data class UserItemEntry(
     val name: String,
     val quantity: Int,
     val totalPrice: Float
 )
 
+// Data class representing the details of a user in a bill
 data class BillUserDetail(
     val username: String,
     val amount: Double,
@@ -34,6 +35,7 @@ data class BillUserDetail(
 
 @Composable
 fun BillDetails(context: Context, navController: NavController) {
+    // Sample hardcoded bill details for demonstration purposes
     val sampleDetails = listOf(
         BillUserDetail("User 1", 150.0, true, listOf(
             UserItemEntry("Burger", 2, 10.0f),
@@ -49,9 +51,12 @@ fun BillDetails(context: Context, navController: NavController) {
         ))
     )
 
+    // Calculate total unpaid amount
     val totalUnpaid = sampleDetails.filter { !it.paid }.sumOf { it.amount }
+    // Check if all users have paid
     val allPaid = sampleDetails.all { it.paid }
 
+    // Compose screen UI with calculated values and user data
     ComposeBillDetailsScreen(
         userDetails = sampleDetails,
         totalUnpaid = totalUnpaid,
@@ -78,6 +83,7 @@ fun ComposeBillDetailsScreen(
             TitleText()
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Container with rounded corners and background
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -85,10 +91,12 @@ fun ComposeBillDetailsScreen(
                     .background(Color(0xFFD9D9D9))
                     .padding(10.dp)
             ) {
+                // Top navigation bar with a label
                 ContentTopBar(navController = navController, topBarText = "Bill Details")
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Scrollable list of user bill cards
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
@@ -100,6 +108,7 @@ fun ComposeBillDetailsScreen(
                     }
                 }
 
+                // Bottom section: show total unpaid and overall status
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -111,10 +120,12 @@ fun ComposeBillDetailsScreen(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
+
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Status button shows "Pending" or "Completed" depending on payment status
                     Button(
-                        onClick = {},
+                        onClick = {}, // Placeholder action
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (allPaid) Color(0xFFA8E6CF) else Color(0xFFFFC8C8)
                         ),
@@ -137,6 +148,7 @@ fun ComposeBillDetailsScreen(
 
 @Composable
 fun UserBillCard(user: BillUserDetail) {
+    // Change background and text colors based on payment status
     val backgroundColor = if (user.paid) Color.White else Color(0xFFFFE6E6)
     val statusColor = if (user.paid) Color(0xFF388E3C) else Color.Red
     val statusText = if (user.paid) "Paid" else "Not Paid"
@@ -152,7 +164,7 @@ fun UserBillCard(user: BillUserDetail) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // Top row: Username - Amount - Status (centered)
+            // Row with user name, amount, and payment status
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -184,16 +196,16 @@ fun UserBillCard(user: BillUserDetail) {
                 )
             }
 
-            // Divider between user summary and item list
+            // Divider line between user info and item list
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 thickness = 1.dp,
-                color = Color(0xFFCCCCCC) // light gray
+                color = Color(0xFFCCCCCC)
             )
 
-            // Item List
+            // List of purchased items
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 user.items.forEach { item ->
                     Row(
@@ -228,6 +240,3 @@ fun UserBillCard(user: BillUserDetail) {
         }
     }
 }
-
-
-
