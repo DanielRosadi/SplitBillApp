@@ -26,6 +26,8 @@ import com.ndhu.moneymanagementapp.ui.pages.auth.SignUpScreen
 import com.ndhu.moneymanagementapp.ui.pages.SplitItemScreen
 import com.ndhu.moneymanagementapp.ui.pages.TestingScreen
 import com.ndhu.moneymanagementapp.ui.pages.auth.LogInScreen
+import com.ndhu.moneymanagementapp.ui.pages.auth.WelcomeScreen
+import com.ndhu.moneymanagementapp.utils.Util
 
 @Composable
 fun AppNavigation(context : Context){
@@ -34,13 +36,24 @@ fun AppNavigation(context : Context){
     val navController = rememberNavController()
     val sharedViewModel: SharedViewModel = viewModel()
 
+    val startDestination = if (Util.isUserLoggedIn(context)) {
+        AppScreens.HomeScreen.name
+    } else {
+        AppScreens.WelcomeScreen.name
+    }
+
     // the Nav Host, act as a 'Host', in which they contains the screens where
     // navigation will be performed onto
     // starting page/screen will be the Homepage
     NavHost(navController = navController,
-        startDestination = AppScreens.HomeScreen.name){
+        startDestination = startDestination){
         // inside the NavHost, we contains the NavGraph
         // NavGraph will be our collection/list of composable screens of the application
+
+        // Welcome screen
+        composable(AppScreens.WelcomeScreen.name) {
+            WelcomeScreen(navController = navController)
+        }
 
         // Home screen
         composable(AppScreens.HomeScreen.name){

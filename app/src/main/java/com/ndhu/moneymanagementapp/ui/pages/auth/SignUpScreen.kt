@@ -202,10 +202,10 @@ fun SignUpScreen(context: Context, navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "Already registered?", color = Color.White)
+                Text(text = "Already have an account?", color = Color.White)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Sign in",
+                    text = "Login",
                     color = primaryGreen,
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.clickable {
