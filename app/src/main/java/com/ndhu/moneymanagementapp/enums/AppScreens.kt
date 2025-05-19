@@ -2,7 +2,8 @@ package com.ndhu.moneymanagementapp.enums
 
 import java.lang.IllegalArgumentException
 
-enum class AppScreens{
+enum class AppScreens {
+    WelcomeScreen,
     HomeScreen,
     BillHistoryScreen,
     BillDetailsScreen,
@@ -24,9 +25,9 @@ enum class AppScreens{
     ;
     // List the App Screens above
 
-    companion object{
-        fun fromRoute(route: String?): AppScreens
-        = when (route?.substringBefore("/")){
+    companion object {
+        fun fromRoute(route: String?): AppScreens = when (route?.substringBefore("/")) {
+            WelcomeScreen.name -> WelcomeScreen
             HomeScreen.name -> HomeScreen
             BillHistoryScreen.name -> BillHistoryScreen
             BillDetailsScreen.name -> BillDetailsScreen

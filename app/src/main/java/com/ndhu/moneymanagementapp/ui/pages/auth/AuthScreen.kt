@@ -21,7 +21,8 @@ import com.ndhu.moneymanagementapp.ui.pages.primaryGreen
 fun AuthScreen(
     screenTitle: String,
     formContent: @Composable ColumnScope.() -> Unit,
-    footerContent: @Composable () -> Unit = {}
+    footerContent: @Composable () -> Unit = {},
+    showCard: Boolean = true,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         BackgroundImage()
@@ -55,14 +56,18 @@ fun AuthScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Form container
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
-                ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        formContent()
+                if (showCard) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp)) {
+                            formContent()
+                        }
                     }
+                } else {
+                    formContent() // show content directly
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

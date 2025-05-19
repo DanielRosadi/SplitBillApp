@@ -139,4 +139,12 @@ object Util {
         visibility = View.GONE
     }
 
+    // to validate user existence
+    fun isUserLoggedIn(context: Context): Boolean {
+        val userController = com.ndhu.moneymanagementapp.controllers.UserController()
+        return kotlinx.coroutines.runBlocking {
+            userController.getOnboardUser(context) != null
+        }
+    }
+
 }
