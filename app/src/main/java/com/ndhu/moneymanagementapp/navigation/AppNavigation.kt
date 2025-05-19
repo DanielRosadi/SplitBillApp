@@ -19,13 +19,13 @@ import com.ndhu.moneymanagementapp.ui.oldpages.FirstLogin
 import com.ndhu.moneymanagementapp.ui.pages.Home
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
-import com.ndhu.moneymanagementapp.ui.pages.LogIn
 import com.ndhu.moneymanagementapp.ui.pages.PendingRequestScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectBillOwnerScreen
 import com.ndhu.moneymanagementapp.ui.pages.SelectFriendsPage
-import com.ndhu.moneymanagementapp.ui.pages.SignUp
+import com.ndhu.moneymanagementapp.ui.pages.auth.SignUpScreen
 import com.ndhu.moneymanagementapp.ui.pages.SplitItemScreen
 import com.ndhu.moneymanagementapp.ui.pages.TestingScreen
+import com.ndhu.moneymanagementapp.ui.pages.auth.LogInScreen
 
 @Composable
 fun AppNavigation(context : Context){
@@ -119,12 +119,12 @@ fun AppNavigation(context : Context){
 
         // LogIn screen
         composable(AppScreens.LogInScreen.name){
-            LogIn(context, navController = navController)
+            LogInScreen(navController = navController)
         }
 
         // SignUp screen
         composable(AppScreens.SignUpScreen.name){
-            SignUp(context, navController = navController)
+            SignUpScreen(context, navController = navController)
         }
 
         // Testing Screen
