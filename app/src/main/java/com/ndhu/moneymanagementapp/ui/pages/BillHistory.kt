@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,11 +20,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.History
+import com.ndhu.moneymanagementapp.models.Store
+import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun BillHistory(context: Context, navController: NavController) {
+    val splitBillController = SplitBillController()
+
+
+    var billHistory = remember { mutableStateListOf<ListUserSplitBillResponse>() }
+
+    runBlocking {
+        Log.d("LaunchTag", "DEBUG. Accessing Bill History.")  // Prints in Logcat
+
+        // clear stores list and add data from database into the stores list
+        billHistory.clear()
+        billHistory.addAll( splitBillController.getLoginUserListOfBills(context) )
+        // TODO: add view model if needed
+        // viewModel.billHistory = storeController.getListOfStores().toMutableList()
+    }
+
     // Temporary hardcoded list of bill history records
     val histories = listOf(
         History("100", "Store W", "2024-03-10", "User 1", "Completed"),
@@ -56,6 +78,7 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
                     .padding(10.dp)
             ) {
                 // Top bar with title and navigation
+                // TODO: search function
                 ContentTopBar(navController = navController, topBarText = "Bill History",)
 
                 // Main content container
