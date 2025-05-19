@@ -65,7 +65,9 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.ProfilePicture
+import com.ndhu.moneymanagementapp.models.User
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,16 +92,16 @@ fun EditProfile(context: Context, navController: NavController) {
     var showEditProfilePictureDialog by remember { mutableStateOf(false) }
     var selectedPictureId by remember { mutableStateOf<Int?>(null) }
 
-    // for profile picture
-    val profilePictures = listOf(
-        ProfilePicture(1, R.drawable.defaultavatarimage),
-        ProfilePicture(2, R.drawable.black_panther),
-        ProfilePicture(3, R.drawable.banteng),
-        ProfilePicture(4, R.drawable.download),
-        ProfilePicture(5, R.drawable.download_1),
-        ProfilePicture(6, R.drawable.download_2),
-        ProfilePicture(7, R.drawable.download_3),
-    )
+//    // for profile picture
+//    val profilePictures = listOf(
+//        ProfilePicture(1, R.drawable.defaultavatarimage),
+//        ProfilePicture(2, R.drawable.black_panther),
+//        ProfilePicture(3, R.drawable.banteng),
+//        ProfilePicture(4, R.drawable.download),
+//        ProfilePicture(5, R.drawable.download_1),
+//        ProfilePicture(6, R.drawable.download_2),
+//        ProfilePicture(7, R.drawable.download_3),
+//    )
 
     // var profilePicIdRandomizer = (2..7).random()
 
@@ -213,15 +215,26 @@ fun EditProfile(context: Context, navController: NavController) {
                             .size(160.dp)
                             .align(Alignment.CenterHorizontally)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.defaultavatarimage),
-                            contentDescription = "Profile Picture",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(140.dp)
-                                .clip(CircleShape)
-                                .border(2.dp, Color.Gray, CircleShape)
-                        )
+
+                        var user: User? = null
+                        runBlocking {
+                            user = userController.getOnboardUser(context)
+                        }
+
+                        var profilePic = profilePictures.firstOrNull(){ it.id == (user?.profilePictureId ?: 1) }
+
+                        if (profilePic != null) {
+                            Image(
+                                // painter = painterResource(id = R.drawable.defaultavatarimage),
+                                painter = painterResource(id = profilePic.imageRes),
+                                contentDescription = "Profile Picture",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(140.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, Color.Gray, CircleShape)
+                            )
+                        }
 
                         IconButton(
                             onClick = { showEditProfilePictureDialog = true },
@@ -296,6 +309,15 @@ fun EditProfile(context: Context, navController: NavController) {
                             .height(48.dp)
                     ) {
                         Text("Change Password", color = Color.White, fontSize = 16.sp)
+                    }
+
+                    // temporary
+                    Button(onClick = {
+                        coroutineScope.launch {
+                            userController.migrateUserModelForm(context)
+                        }
+                    }){
+                        Text(text = "MIGRATE")
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -452,7 +474,13 @@ fun EditProfile(context: Context, navController: NavController) {
                 TextButton (onClick = { showEditProfilePictureDialog = false }) {
                     selectedPictureId?.let { id ->
                         // Saved picture id
+
+                        coroutineScope.launch {
+                            userController.updateUserProfile(context = context, newProfilePictureId = id)
+                        }
+
                         Toast.makeText(context, "Selected Picture ID: $id", Toast.LENGTH_SHORT).show()
+
                     }
                     Text("Save")
                 }

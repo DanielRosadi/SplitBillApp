@@ -168,7 +168,44 @@ class UserController {
     suspend fun updateUserProfile(
         context: Context,
         newProfilePictureId: Int
-    ){
+    ):String?{
+        val user = getOnboardUser(context)
+        if (user != null) {
 
+            // Check if user change to different profile picture
+            val currentProfilePicture = user.profilePictureId
+            if (currentProfilePicture == newProfilePictureId){
+                return "User is changing to the same profile picture"
+            }
+
+            // If everything valid, proceed to update
+            val updatedUser = user.copy(
+                profilePictureId = newProfilePictureId
+            )
+            userRepo.update(updatedUser.id, updatedUser)
+            Log.d("INFO", "User profile picture updated successfully")
+            return null
+        } else {
+            Log.w("ERROR", "No onboard user found to update")
+            return "User not found."
+        }
+
+    }
+
+    suspend fun migrateUserModelForm(context: Context):String? {
+        val user = getOnboardUser(context)
+        if (user != null) {
+
+            // If everything valid, proceed to update
+            val updatedUser = user.copy(
+                profilePictureId = 5
+            )
+            userRepo.update(updatedUser.id, updatedUser)
+            Log.d("INFO", "User data updated successfully")
+            return null
+        } else {
+            Log.w("ERROR", "No onboard user found to update")
+            return "User not found."
+        }
     }
 }

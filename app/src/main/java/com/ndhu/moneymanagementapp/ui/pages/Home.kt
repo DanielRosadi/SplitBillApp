@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +11,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -29,6 +32,9 @@ import com.ndhu.moneymanagementapp.R
 import kotlinx.coroutines.runBlocking
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.models.User
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun Home(context: Context, navController: NavController) {
@@ -45,6 +51,20 @@ fun Home(context: Context, navController: NavController) {
     val sensationLightFont = FontFamily(
         Font(R.font.sensation_light, FontWeight.Light)
     )
+
+    val coroutineScope = rememberCoroutineScope()
+
+    var user: User? = null
+
+//    LaunchedEffect(Unit) {
+//        coroutineScope.launch {
+//            user = UserController().getOnboardUser(context)
+//        }
+//    }
+
+    runBlocking {
+        user = UserController().getOnboardUser(context)
+    }
 
     Box(
         modifier = Modifier
@@ -102,14 +122,22 @@ fun Home(context: Context, navController: NavController) {
                         navController.navigate(AppScreens.AccountScreen.name)
                     })
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.profile_picture),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .weight(0.2f)
-                        .aspectRatio(1f)
-                        .clip(CircleShape)
-                )
+
+                Log.d("ProfilePic", user?.username ?: "null")
+
+                var profilePic = profilePictures.firstOrNull(){ it.id == (user?.profilePictureId ?: 1) }
+
+                if (profilePic != null) {
+                    Image(
+                        // painter = painterResource(id = R.drawable.profile_picture),
+                        painter = painterResource(id = profilePic.imageRes),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .weight(0.2f)
+                            .aspectRatio(1f)
+                            .clip(CircleShape)
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(
                     verticalArrangement = Arrangement.Center,

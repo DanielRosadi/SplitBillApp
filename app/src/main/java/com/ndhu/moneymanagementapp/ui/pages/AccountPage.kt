@@ -114,14 +114,19 @@ fun AccountPage(context: Context, navController: NavController) {
 
                 Spacer(modifier = Modifier.height(55.dp))
 
+                var profilePic = profilePictures.firstOrNull(){ it.id == (user?.profilePictureId ?: 1) }
+
                 // Profile Image
-                Image(
-                    painter = painterResource(id = R.drawable.profile_picture),
-                    contentDescription = "Avatar",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape)
-                )
+                if (profilePic != null) {
+                    Image(
+            //                    painter = painterResource(id = R.drawable.profile_picture),
+                        painter = painterResource(id = profilePic.imageRes),
+                        contentDescription = "Avatar",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(CircleShape)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(18.dp))
 

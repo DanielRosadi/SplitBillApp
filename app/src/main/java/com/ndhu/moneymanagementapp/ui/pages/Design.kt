@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.components.SearchBoxDefault
+import com.ndhu.moneymanagementapp.models.ProfilePicture
 import com.ndhu.moneymanagementapp.models.Store
 
 // to store repeatable/repetitive/common composables function design
@@ -66,6 +67,17 @@ val darkGrey = Color(0xFF9D9D9D)
 
 val correctTransparentGreen = Color(0xAA4CAF50) // green transparent for selected user card
 val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
+
+// for profile picture
+val profilePictures = listOf(
+    ProfilePicture(1, R.drawable.defaultavatarimage),
+    ProfilePicture(2, R.drawable.black_panther),
+    ProfilePicture(3, R.drawable.banteng),
+    ProfilePicture(4, R.drawable.download),
+    ProfilePicture(5, R.drawable.download_1),
+    ProfilePicture(6, R.drawable.download_2),
+    ProfilePicture(7, R.drawable.download_3),
+)
 
 // Background Image used in most pages
 @Composable

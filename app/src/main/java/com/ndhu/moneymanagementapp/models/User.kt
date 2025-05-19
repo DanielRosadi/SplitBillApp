@@ -10,7 +10,8 @@ data class User(
     var status : UserStatus = UserStatus.ACTIVE,
     var password : String = "",
     var bio: String,
-    var profilePictureId: Int
+    var profilePictureId: Int? = (2..7).random()
 ) {
     constructor() : this("", "", "", UserStatus.ACTIVE, "", "", (2..7).random())
+    // (2..7).random()
 }
