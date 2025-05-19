@@ -9,5 +9,6 @@ interface IBillRepository {
     suspend fun update(documentId: String, data: Bill)
     suspend fun delete(documentId: String)
     suspend fun getBillListBasedOnOwnerId(ownerId : String) : List<Bill>
+    suspend fun getById(id : String) : Bill?
 
 }
