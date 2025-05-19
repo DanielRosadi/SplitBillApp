@@ -13,7 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.History
@@ -90,9 +92,9 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
 @Composable
 fun HistoryItem(history: History, navController: NavController) {
     val backgroundColor = when (history.status) {
-        "Completed" -> CompletedCardColor
+        //"Completed" -> CompletedCardColor
         // "Pending" -> PendingCardColor
-        "Pending", "Cancelled" -> RejectedCardColor
+        //"Pending", "Cancelled" -> RejectedCardColor
         else -> Color.White
     }
 
@@ -120,13 +122,13 @@ fun HistoryItem(history: History, navController: NavController) {
             ) {
                 Text(
                     text = history.storeId,
-                    color = TextPrimary,
+                    //color = TextPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = history.transactionDate,
-                    color = TextSecondary,
+                    //color = TextSecondary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal
                 )
@@ -139,7 +141,7 @@ fun HistoryItem(history: History, navController: NavController) {
             ) {
                 Text(
                     text = history.billOwnerId,
-                    color = TextPrimary,
+                    //color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -152,13 +154,13 @@ fun HistoryItem(history: History, navController: NavController) {
             ) {
                 Text(
                     text = "$ ${history.id}",
-                    color = TextPrimary,
+                    //color = TextPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = history.status,
-                    color = TextSecondary,
+                    //color = TextSecondary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -166,7 +168,6 @@ fun HistoryItem(history: History, navController: NavController) {
         }
     }
 }
-
 
 /*@Composable
 fun HistoryItem(history: History, navController: NavController) {
