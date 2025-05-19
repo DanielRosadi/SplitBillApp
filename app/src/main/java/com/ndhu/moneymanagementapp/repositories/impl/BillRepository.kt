@@ -48,4 +48,8 @@ class BillRepository() : Repositories<Bill>(Bill::class.java), IBillRepository {
         return billList
     }
 
+
+    override suspend fun getById(id: String): Bill? {
+        return this.getById(Collection.BILL.collection, id, Bill::class.java)
+    }
 }

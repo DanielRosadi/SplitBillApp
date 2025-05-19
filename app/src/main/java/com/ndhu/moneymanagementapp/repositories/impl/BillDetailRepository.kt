@@ -44,5 +44,20 @@ class BillDetailRepository : Repositories<BillItemDetail>(BillItemDetail::class.
         return billItemList
     }
 
+    override suspend fun getByBillId(billId: String) : List<BillItemDetail> {
+        var billItemList = mutableListOf<BillItemDetail>()
+        val querySnapshot = firestore.collection(Collection.BILLITEMDETAIL.collection)
+            .whereEqualTo("billId", billId)
+            .get()
+            .await()
 
+        if(!querySnapshot.isEmpty){
+            for(document in querySnapshot.documents) {
+                var bill = document.toObject(BillItemDetail::class.java)?.let {
+                    billItemList.add(it)
+                }
+            }
+        }
+        return billItemList
+    }
 }

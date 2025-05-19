@@ -64,8 +64,6 @@ fun SelectFriendsPage(context : Context, navController: NavController, viewModel
     // TODO: need to save item list in viewModel
     // viewModel.setItemList()
 
-
-
     // val listFriends = List(7) { "Friend ${it + 1}" }
     var listFriends = remember { mutableStateListOf<Contact>() }
 
@@ -79,14 +77,13 @@ fun SelectFriendsPage(context : Context, navController: NavController, viewModel
     ComposeSelectFriends(context, listFriends, navController, contactController, userController, viewModel)
 }
 
-
 @Composable
 fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Contact>, navController: NavController, contactController: ContactController, userController: UserController, viewModel: SharedViewModel){
     // TODO: Bind with Contact
     val selectedFriends = remember { mutableStateListOf<Contact>() }
     // val selectedFriends = remember { mutableStateListOf<String>() }
 
-    var showDialogAddFriend by remember { mutableStateOf(false) }
+    val showAddFriendDialog = remember { mutableStateOf(false) }
 
     var searchQuery = remember { mutableStateOf("") }
 
@@ -105,7 +102,6 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
     val filteredFriends = filterFriends(context, listFriends, searchQuery.value, userController) //  no remember
 
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,8 +110,6 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
         // Background Image
         BackgroundImage()
-
-
 
         // Full page
         Column(
@@ -220,9 +214,8 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
             ){
 
                 Button(
-                    onClick = { showDialogAddFriend = true },
-                    modifier = Modifier.fillMaxWidth().height(60.dp)
-                    ,
+                    onClick = { showAddFriendDialog.value = true },
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
                     shape = RoundedCornerShape(18.dp),
                     colors = ButtonColors(
                         containerColor = primaryGreen,
@@ -270,13 +263,13 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (showDialogAddFriend) {
-                    PopUpAddFriend(
-                        context,
-                        contactController,
-                        userController,
-                        onDismiss = { showDialogAddFriend = false },
-                        listFriends = listFriends
+                if (showAddFriendDialog.value) { // Observe the boolean value
+                    AddFriendDialog(
+                        listFriends = listFriends,
+                        showDialog = showAddFriendDialog, // Pass the same state down
+                        context = context,
+                        contactController = contactController,
+                        userController = userController,
                     )
                 }
 
@@ -396,54 +389,4 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
 
     }
     }
-}
-
-@Composable
-fun PopUpAddFriend(context: Context, contactController: ContactController, userController: UserController, onDismiss: () -> Unit, listFriends: SnapshotStateList<Contact>) {
-    var userName by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Username") },
-        text = {
-            Column {
-                TextField(
-                    value = userName,
-                    onValueChange = { userName = it },
-                    label = { /*Text("Username")*/ }
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-
-
-                    // TODO: try rememberCoroutineScope(), coroutineScope.launch{}
-                    runBlocking {
-                        userController.searchUserByUserName(context, userName)
-                            ?.let { contactController.addContact(context = context, it.id) }
-                    }
-
-
-                    runBlocking {
-                        listFriends.clear()
-                        listFriends.addAll(contactController.getCurrUserLoginContact(context))
-                    }
-
-                    onDismiss()
-                },
-            ) {
-                Text("Save")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss
-            ) {
-                Text("Cancel")
-            }
-        }
-    )
-
 }
