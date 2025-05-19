@@ -51,22 +51,19 @@ fun LogInScreen(navController: NavController) {
         // Footer content (Sign Up prompt)
         footerContent = {
             Spacer(modifier = Modifier.height(20.dp))
-
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
+                    .fillMaxWidth(),
+                    //.padding(top = 16.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Not registered? ",
+                    text = "No Account? ",
                     color = Color.White,
-                    fontSize = 14.sp
                 )
                 Text(
-                    text = "Sign up",
+                    text = "Register",
                     color = primaryGreen,
-                    fontSize = 14.sp,
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.clickable {
                         navController.navigate(AppScreens.SignUpScreen.name) {
