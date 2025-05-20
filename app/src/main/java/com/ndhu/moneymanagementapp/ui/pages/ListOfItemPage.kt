@@ -123,7 +123,9 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
 
     // search for specific store object using passed storeId from previous screen, from global viewModel
     val store = storeId?.let { viewModel.getStoreById(it) }
-    viewModel.setSelectedStore(store)
+    if (store != null) {
+        viewModel.selectedStore = store
+    }
 
     ComposeListItem(context, items, uiItems, store, navController, itemController, viewModel)
 

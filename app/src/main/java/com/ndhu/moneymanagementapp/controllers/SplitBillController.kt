@@ -66,14 +66,18 @@ class SplitBillController {
 
             if (index == -1) {
                 val bill = billRepo.getById(billItem.billId)  // added
-                billList.add(
-                    ListUserSplitBillResponse(
-                        billId = billItem.billId,
-                        status = billItem.status,
-                        itemList = mutableListOf(),
-                        storeId = bill?.storeId ?: "Store Error"          // added
+                if (bill != null) {
+                    billList.add(
+                        ListUserSplitBillResponse(
+                            billId = billItem.billId,
+                            status = billItem.status,
+                            itemList = mutableListOf(),
+                            storeId = bill.storeId, // ?: "Store Error",          // added
+                            createdAt = bill.createdAt,             // <-- ADDED
+                            billOwnerId = bill.ownerId                // <-- ADDED
+                        )
                     )
-                )
+                }
             }
 
             val updatedIndex = getListUserResponseFromBillId(billList, billItem.billId)
@@ -109,7 +113,10 @@ class SplitBillController {
                     ListUserSplitBillResponse(
                         billId = billItem.billId,
                         status = billItem.status,
-                        itemList = mutableListOf()
+                        itemList = mutableListOf(),
+                        storeId = bill.storeId, // ?: "Store Error",          // added
+                        createdAt = bill.createdAt,             // <-- ADDED
+                        billOwnerId = bill.ownerId                // <-- ADDED
                     )
                 )
             }

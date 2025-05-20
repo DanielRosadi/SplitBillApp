@@ -7,7 +7,7 @@ data class BillItemDetail (
     val id : String = "",
     var billId : String = "",
     var itemId : String = "",
-    var qty : Number = 0,
+    var qty : Float = 0f,
     var userId: String = "",
     var status: UserPaymentStatus = UserPaymentStatus.UNPAID,
     var createdAt : Timestamp = Timestamp.now(),

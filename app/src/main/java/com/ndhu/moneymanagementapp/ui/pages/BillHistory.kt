@@ -21,12 +21,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
+import com.ndhu.moneymanagementapp.controllers.StoreController
+import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.History
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import kotlinx.coroutines.runBlocking
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun BillHistory(context: Context, navController: NavController) {
@@ -53,11 +58,11 @@ fun BillHistory(context: Context, navController: NavController) {
     )
 
     // Compose screen UI
-    ComposeBillHistoryScreen(billResponseList = billResponseList, navController = navController)
+    ComposeBillHistoryScreen(context = context, billResponseList = billResponseList, navController = navController)
 }
 
 @Composable
-fun ComposeBillHistoryScreen(billResponseList: SnapshotStateList<ListUserSplitBillResponse>, navController: NavController) {
+fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateList<ListUserSplitBillResponse>, navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image
         BackgroundImage()
@@ -96,7 +101,7 @@ fun ComposeBillHistoryScreen(billResponseList: SnapshotStateList<ListUserSplitBi
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(billResponseList) { billResponse ->
-                                HistoryItem(billResponse = billResponse, navController = navController)
+                                HistoryItem(context = context, billResponse = billResponse, navController = navController)
                             }
                         }
                     }
@@ -109,7 +114,7 @@ fun ComposeBillHistoryScreen(billResponseList: SnapshotStateList<ListUserSplitBi
 }
 
 @Composable
-fun HistoryItem(billResponse: ListUserSplitBillResponse, navController: NavController) {
+fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navController: NavController) {
     // Change background color based on transaction status
     val backgroundColor = when (billResponse.status) {
         UserPaymentStatus.UNPAID -> Color(0xFFFFC8C8) // Light red for pending
@@ -140,15 +145,19 @@ fun HistoryItem(billResponse: ListUserSplitBillResponse, navController: NavContr
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = billResponse.storeId,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = primaryGreen
-                )
+                val store = runBlocking { StoreController().getStore(storeId = billResponse.storeId) }
+                if (store != null) {
+                    Text(
+                        text = store.name,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryGreen
+                    )
+                }
                 // TODO: date
+                var createdAtString = formatTimestamp(billResponse.createdAt)
                 Text(
-                    text = "date here", // billResponse.transactionDate,
+                    text = createdAtString, // billResponse.transactionDate,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF666666)
@@ -161,20 +170,30 @@ fun HistoryItem(billResponse: ListUserSplitBillResponse, navController: NavContr
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = (billResponse.itemList.fold(0.0) { acc, item ->
+                    text = "NTD " + (billResponse.itemList.fold(0.0) { acc, item ->
                         acc + (item.price.toDouble() * item.qty.toDouble())
                     }).toString(),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = primaryGreen
                 )
-                Text(
-                    text = "bill owner here", // billResponse.billOwnerId,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.DarkGray
-                )
+                val billOwner = runBlocking { UserController().searchUserByUserId(context = context, userId = billResponse.billOwnerId) }
+
+                if (billOwner != null) {
+                    Text(
+                        text = billOwner.username, // billResponse.billOwnerId,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.DarkGray
+                    )
+                }
             }
         }
     }
+}
+
+fun formatTimestamp(timestamp: Timestamp): String {
+    val date = timestamp.toDate()
+    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return formatter.format(date)
 }

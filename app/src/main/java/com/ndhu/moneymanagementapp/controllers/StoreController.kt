@@ -51,4 +51,8 @@ class StoreController {
         this.storeRepository.delete(id)
     }
 
+    suspend fun getStore(storeId: String): Store?{
+        return this.storeRepository.getById(storeId)
+    }
+
 }
