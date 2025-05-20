@@ -21,17 +21,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -60,7 +55,7 @@ import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun SelectFriendsPage(context : Context, navController: NavController, viewModel: SharedViewModel){
+fun SelectFriendsPage(context: Context, navController: NavController, viewModel: SharedViewModel) {
 
     var contactController = ContactController()
     var userController = UserController()
@@ -78,11 +73,25 @@ fun SelectFriendsPage(context : Context, navController: NavController, viewModel
         listFriends.addAll(contactController.getCurrUserLoginContact(context))
     }
 
-    ComposeSelectFriends(context, listFriends, navController, contactController, userController, viewModel)
+    ComposeSelectFriends(
+        context,
+        listFriends,
+        navController,
+        contactController,
+        userController,
+        viewModel
+    )
 }
 
 @Composable
-fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Contact>, navController: NavController, contactController: ContactController, userController: UserController, viewModel: SharedViewModel){
+fun ComposeSelectFriends(
+    context: Context,
+    listFriends: SnapshotStateList<Contact>,
+    navController: NavController,
+    contactController: ContactController,
+    userController: UserController,
+    viewModel: SharedViewModel
+) {
     // TODO: Bind with Contact
     val selectedFriends = remember { mutableStateListOf<Contact>() }
     // val selectedFriends = remember { mutableStateListOf<String>() }
@@ -92,19 +101,20 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
     var searchQuery = remember { mutableStateOf("") }
 
     //UniformDesignScaffold(
-        /*
-        topAppBar = {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
-                }
-                Spacer(modifier = Modifier.width(50.dp))
-                Text("Select Friends", fontSize = 40.sp, fontWeight = FontWeight.Bold)
+    /*
+    topAppBar = {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
             }
-        },
-        */
+            Spacer(modifier = Modifier.width(50.dp))
+            Text("Select Friends", fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        }
+    },
+    */
 
-    val filteredFriends = filterFriends(context, listFriends, searchQuery.value, userController) //  no remember
+    val filteredFriends =
+        filterFriends(context, listFriends, searchQuery.value, userController) //  no remember
 
     Box(
         modifier = Modifier
@@ -119,7 +129,7 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                // .fillMaxHeight()
+            // .fillMaxHeight()
             // .padding(paddingValues)
             //.padding(10.dp)
             ,
@@ -137,7 +147,6 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
             // White box
 
 
-
 //body = {paddingValues->
             Column(
                 modifier = Modifier
@@ -148,10 +157,10 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                     .padding(10.dp)
 
 
-                    // .padding(paddingValues)
-                    //.padding(10.dp),
+                // .padding(paddingValues)
+                //.padding(10.dp),
                 //verticalArrangement = Arrangement.Center,
-               // horizontalAlignment = Alignment.CenterHorizontally
+                // horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 // Content Top Bar
@@ -159,7 +168,7 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                 ContentTopBar(navController = navController,
                     topBarText = "Select Friend",
                     searchBox = { SearchBox(searchQuery = searchQuery) }
-                    )
+                )
 
 
                 //Spacer(modifier = Modifier.height(10.dp))
@@ -168,16 +177,16 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                 //SearchBox()
 
                 // Spacer(modifier = Modifier.height(10.dp))
-                Column(
+                ContactContainer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(5.5f)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(darkGrey)
                 ) {
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentPadding = PaddingValues(5.dp)
                     ) {
 
@@ -207,77 +216,82 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
                 // Spacer(modifier = Modifier.height(30.dp))
                 Spacer(modifier = Modifier.height(15.dp))
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    //.fillMaxHeight()
-                    .weight(2.5f)
-                    .padding(2.dp)
-                ,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-
-                Button(
-                    onClick = { showAddFriendDialog.value = true },
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = ButtonColors(
-                        containerColor = primaryGreen,
-                        contentColor = Color.White,
-                        disabledContainerColor = Color.Gray,
-                        disabledContentColor = Color.White
-                    )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.fillMaxHeight()
+                        .weight(2.5f)
+                        .padding(2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // TODO: font family?
-                    Text(text = "Add Friend",
-                        fontSize = 24.sp,
-                        //fontFamily = surannaFont
-                    )
+
+                    Button(
+                        onClick = { showAddFriendDialog.value = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonColors(
+                            containerColor = primaryGreen,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.White
+                        )
+                    ) {
+                        // TODO: font family?
+                        Text(
+                            text = "Add Friend",
+                            fontSize = 24.sp,
+                            //fontFamily = surannaFont
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Button(
+                        onClick = {
+                            navController.navigate(route = AppScreens.SelectBillOwnerScreen.name)
+                            viewModel.setFriendList(selectedFriends) // save the list of friends in SharedViewModel
+
+                            // load and save item and users data for next screen (AssignSplitScreen)
+                            viewModel.listItemAndUserQuantities =
+                                viewModel.itemDetailList.map { item ->
+                                    ItemWithUsersList(item = item, ownership = mutableStateListOf())
+                                }.toMutableStateList()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonColors(
+                            containerColor = primaryGreen,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.White
+                        )
+                    ) {
+                        // TODO: font family?
+                        Text(
+                            text = "Done",
+                            fontSize = 24.sp,
+                            //fontFamily = surannaFont
+                        )
+                    }
+
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    if (showAddFriendDialog.value) { // Observe the boolean value
+                        AddFriendDialog(
+                            listFriends = listFriends,
+                            showDialog = showAddFriendDialog, // Pass the same state down
+                            context = context,
+                            contactController = contactController,
+                            userController = userController,
+                        )
+                    }
+
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Button(
-                    onClick = {
-                        navController.navigate(route = AppScreens.SelectBillOwnerScreen.name)
-                        viewModel.setFriendList(selectedFriends) // save the list of friends in SharedViewModel
-
-                        // load and save item and users data for next screen (AssignSplitScreen)
-                        viewModel.listItemAndUserQuantities = viewModel.itemDetailList.map { item ->
-                            ItemWithUsersList(item = item, ownership = mutableStateListOf())
-                        }.toMutableStateList()
-                    },
-                    modifier = Modifier.fillMaxWidth().height(60.dp)
-                    ,
-                    shape = RoundedCornerShape(18.dp),
-                    colors = ButtonColors(
-                        containerColor = primaryGreen,
-                        contentColor = Color.White,
-                        disabledContainerColor = Color.Gray,
-                        disabledContentColor = Color.White
-                    )
-                ) {
-                    // TODO: font family?
-                    Text(text = "Done",
-                        fontSize = 24.sp,
-                        //fontFamily = surannaFont
-                    )
-                }
-
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                if (showAddFriendDialog.value) { // Observe the boolean value
-                    AddFriendDialog(
-                        listFriends = listFriends,
-                        showDialog = showAddFriendDialog, // Pass the same state down
-                        context = context,
-                        contactController = contactController,
-                        userController = userController,
-                    )
-                }
-
-            }
 
             }
             //})
@@ -287,7 +301,12 @@ fun ComposeSelectFriends(context : Context, listFriends: SnapshotStateList<Conta
 
 // filter function for search box
 @Composable
-fun filterFriends(context: Context, friendList: SnapshotStateList<Contact>, query: String, userController: UserController): SnapshotStateList<Contact> {
+fun filterFriends(
+    context: Context,
+    friendList: SnapshotStateList<Contact>,
+    query: String,
+    userController: UserController
+): SnapshotStateList<Contact> {
     val result = if (query.isBlank()) {
         friendList
     } else {
@@ -295,8 +314,10 @@ fun filterFriends(context: Context, friendList: SnapshotStateList<Contact>, quer
             val currentUserId = remember { Util.getUserId(context).toString() }
             val friendUserId = if (it.senderId == currentUserId) it.receiverId else it.senderId
 
-            var friendName = runBlocking { userController.searchUserByUserId(context, friendUserId)?.username
-                ?: "Unknown Contact" }
+            var friendName = runBlocking {
+                userController.searchUserByUserId(context, friendUserId)?.username
+                    ?: "Unknown Contact"
+            }
 
             friendName.contains(query, ignoreCase = true)
         }.toMutableStateList() // Convert result to SnapshotStateList
@@ -307,12 +328,18 @@ fun filterFriends(context: Context, friendList: SnapshotStateList<Contact>, quer
 }
 
 @Composable
-fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit, userController: UserController){
+fun ListFriends(
+    context: Context,
+    friend: Contact,
+    isSelected: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    userController: UserController
+) {
 
     val currentUserId = remember { Util.getUserId(context).toString() }
     val friendUserId = if (friend.senderId == currentUserId) friend.receiverId else friend.senderId
 
-    var userObject = runBlocking { userController.searchUserByUserId(context, friendUserId)}
+    var userObject = runBlocking { userController.searchUserByUserId(context, friendUserId) }
 
     var friendName = userObject?.username ?: "Unknown Contact"
 
@@ -320,12 +347,11 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
 
     // val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
 
-
-    Card (
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
-            .clickable{onCheckedChange(!isSelected)},
+            .clickable { onCheckedChange(!isSelected) },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
         // colors = CardDefaults.cardColors(containerColor = cardColor)
@@ -333,22 +359,28 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
 
         Box(modifier = Modifier.fillMaxWidth()) {
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(15.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Spacer(modifier = Modifier.width(5.dp))
-
-            // Box (canvas) to show profile picture
-            Box(
-                modifier = Modifier.size(50.dp).clip(CircleShape)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
-                var profilePic = profilePictures.firstOrNull(){ it.id == (userObject?.profilePictureId ?: 1) }
+                Spacer(modifier = Modifier.width(5.dp))
 
-                if (profilePic != null) {
+                // Box (canvas) to show profile picture
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape)
+                ) {
+
+                    var profilePic = profilePictures.firstOrNull() {
+                        it.id == (userObject?.profilePictureId ?: 1)
+                    }
+
+                    if (profilePic != null) {
 //                    Icon(
 //                        painter = painterResource(id = profilePic.imageRes),
 //                        // Icons.Filled.Person,
@@ -356,44 +388,42 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
 //                        modifier = Modifier.size(70.dp),
 //                        tint = Color.Gray
 //                    )
-                    Image(
-                        painter = painterResource(id = profilePic.imageRes),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                        Image(
+                            painter = painterResource(id = profilePic.imageRes),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.width(1.dp))
-
-
-            Text(
-                text = friendName,
-                color = primaryGreen,
-                fontSize = 20.sp,
-                fontFamily = alexandriaFont,
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            // Added checkbox based on whether friend/contact is selected or not
-            // If user clicks the Friend's card, isSelected is true. Else, if unclicks, isSelected is false
-            // Using the defined onCheckedChange function, it gets evaluated in this code block
-            // This is done separately in each card/friend/record
+                Spacer(modifier = Modifier.width(1.dp))
 
 
-            // TODO: no need spacer if dont use checkbox
-            Spacer(modifier = Modifier.width(120.dp))
+                Text(
+                    text = friendName,
+                    color = primaryGreen,
+                    fontSize = 20.sp,
+                    fontFamily = alexandriaFont,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                // Added checkbox based on whether friend/contact is selected or not
+                // If user clicks the Friend's card, isSelected is true. Else, if unclicks, isSelected is false
+                // Using the defined onCheckedChange function, it gets evaluated in this code block
+                // This is done separately in each card/friend/record
 
 
+                // TODO: no need spacer if dont use checkbox
+                Spacer(modifier = Modifier.width(120.dp))
 
 
-            // TODO: should save checked friends for when user navigates back?
+                // TODO: should save checked friends for when user navigates back?
 //            Checkbox(
 //                checked = isSelected,
 //                onCheckedChange = onCheckedChange
 //            )
-        }
+            }
             // Overlay when selected
             if (isSelected) {
                 Box(
@@ -403,6 +433,6 @@ fun ListFriends(context: Context, friend: Contact, isSelected: Boolean, onChecke
                 )
             }
 
-    }
+        }
     }
 }
