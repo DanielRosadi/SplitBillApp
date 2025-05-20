@@ -71,8 +71,6 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
         // viewModel.billHistory = storeController.getListOfStores().toMutableList()
     }
 
-
-
     // Sample hardcoded bill details for demonstration purposes
 //    val sampleDetails = listOf(
 //        BillUserDetail("User 1", 150.0, true, listOf(
