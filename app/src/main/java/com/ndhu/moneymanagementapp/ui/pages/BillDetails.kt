@@ -107,8 +107,6 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
         else{
             0f
         }
-
-
     })
     }
 
