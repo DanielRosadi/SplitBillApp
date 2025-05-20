@@ -8,7 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -59,7 +58,7 @@ fun AccountPage(context: Context, navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.5f)
+                .weight(1f)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.background_dark),
@@ -148,34 +147,43 @@ fun AccountPage(context: Context, navController: NavController) {
             color = Color(0xFFF5F5F5),
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.5f)
+                .weight(1f)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp, vertical = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(30.dp)
+                    .padding(horizontal = 20.dp, vertical = 20.dp)
+                ,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text("Settings", fontSize = 18.sp, color = Color.Gray)
-                Spacer(modifier = Modifier.weight(0.1f))
+                Text("Settings", fontSize = 20.sp, color = Color.Gray)
+                Spacer(modifier = Modifier.height(10.dp))
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 30.dp),
-                    verticalArrangement = Arrangement.spacedBy(30.dp)
+                        .padding(horizontal = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     ColoredSettingsButton(
                         text = "Edit Profile",
                         backgroundColor = Color(0xFF009669),
-                        modifier = Modifier.weight(0.3f)
+                        modifier = Modifier.weight(1f)
                     ) {
                         navigateToEditAccountScreen(navController)
                     }
 
                     ColoredSettingsButton(
+                        text = "Change Password",
+                        backgroundColor = Color(0xFF009669),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        //navigateToChangePasswordScreen(navController)
+                    }
+
+                    ColoredSettingsButton(
                         text = "Delete Account",
                         backgroundColor = Color(0xFF961400),
-                        modifier = Modifier.weight(0.3f)
+                        modifier = Modifier.weight(1f)
                     ) {
                         showDeleteAccountDialog.value = true
                     }
@@ -183,7 +191,7 @@ fun AccountPage(context: Context, navController: NavController) {
                     ColoredSettingsButton(
                         text = "Log Out",
                         backgroundColor = Color(0xFF009669),
-                        modifier = Modifier.weight(0.3f)
+                        modifier = Modifier.weight(1f)
                     ) {
                         showLogOutDialog.value = true
                     }
@@ -236,10 +244,10 @@ fun ColoredSettingsButton(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .shadow(4.dp, shape = RoundedCornerShape(12.dp)),
+            //.shadow(4.dp, shape = RoundedCornerShape(1.dp))
+        ,
         shape = RoundedCornerShape(12.dp)
     ) {
-        //Text(text, fontSize = 20.sp, fontFamily = surannaFont)
         Text(text, fontSize = 20.sp)
     }
 }
@@ -273,7 +281,7 @@ fun LogoutDialog(
         confirmText = "Log Out",
         cancelText = "Cancel",
         confirmColor = dangerRed,
-        icon = Icons.Default.ExitToApp,
+        icon = Icons.AutoMirrored.Filled.ExitToApp,
         iconTint = Color.Red,
         showDialog = showDialog,
         onConfirm = onConfirm
