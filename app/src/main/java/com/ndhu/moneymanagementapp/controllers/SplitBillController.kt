@@ -5,6 +5,8 @@ import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.BillItemDetail
+import com.ndhu.moneymanagementapp.models.FullBillDetail
+import com.ndhu.moneymanagementapp.models.UserItemGroup
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
@@ -29,7 +31,8 @@ class SplitBillController {
             id = UUID.randomUUID().toString(),
             ownerId = request.billOwnerId,
             createdAt = Timestamp.now(),
-            updatedAt = Timestamp.now()
+            updatedAt = Timestamp.now(),
+            storeId = request.storeId                      // added
         )
 
         billRepo.add(bill)
@@ -64,13 +67,19 @@ class SplitBillController {
             val index = getListUserResponseFromBillId(billList, billItem.billId)
 
             if (index == -1) {
-                billList.add(
-                    ListUserSplitBillResponse(
-                        billId = billItem.billId,
-                        status = billItem.status,
-                        itemList = mutableListOf()
+                val bill = billRepo.getById(billItem.billId)  // added
+                if (bill != null) {
+                    billList.add(
+                        ListUserSplitBillResponse(
+                            billId = billItem.billId,
+                            status = billItem.status,
+                            itemList = mutableListOf(),
+                            storeId = bill.storeId, // ?: "Store Error",          // added
+                            createdAt = bill.createdAt,             // <-- ADDED
+                            billOwnerId = bill.ownerId                // <-- ADDED
+                        )
                     )
-                )
+                }
             }
 
             val updatedIndex = getListUserResponseFromBillId(billList, billItem.billId)
@@ -91,6 +100,46 @@ class SplitBillController {
         return billList
     }
 
+
+    // New method for getting bill details grouped by user
+    suspend fun getBillDetailGroupedByUser(billId: String): FullBillDetail? {
+        val bill = billRepo.getById(billId) ?: return null
+        val billDetails = billDetailRepo.getByBillId(billId)
+
+        val userToItems: MutableMap<String, MutableList<ItemDetail>> = mutableMapOf()
+        val userToStatus: MutableMap<String, UserPaymentStatus> = mutableMapOf()
+
+        for (billItem in billDetails) {
+            val item = itemRepo.getById(billItem.itemId) ?: continue
+
+            val itemDetail = ItemDetail(
+                id = billItem.itemId,
+                name = item.name,
+                price = item.price,
+                qty = billItem.qty
+            )
+
+            userToItems.getOrPut(billItem.userId) { mutableListOf() }.add(itemDetail)
+            userToStatus[billItem.userId] = billItem.status
+        }
+
+        val userItemGroups = userToItems.map { (userId, items) ->
+            UserItemGroup(
+                userId = userId,
+                status = userToStatus[userId] ?: UserPaymentStatus.UNPAID,
+                items = items
+            )
+        }
+
+        return FullBillDetail(
+            billId = bill.id,
+            billOwnerId = bill.ownerId,
+            createdAt = bill.createdAt,
+            storeId = bill.storeId,
+            users = userItemGroups
+        )
+    }
+
     suspend fun getBillDetail(billId: String) : List<ListUserSplitBillResponse> {
         var billList : MutableList<ListUserSplitBillResponse> = mutableListOf()
         var bill: Bill? = billRepo.getById(billId)
@@ -106,7 +155,10 @@ class SplitBillController {
                     ListUserSplitBillResponse(
                         billId = billItem.billId,
                         status = billItem.status,
-                        itemList = mutableListOf()
+                        itemList = mutableListOf(),
+                        storeId = bill.storeId, // ?: "Store Error",          // added
+                        createdAt = bill.createdAt,             // <-- ADDED
+                        billOwnerId = bill.ownerId                // <-- ADDED
                     )
                 )
             }

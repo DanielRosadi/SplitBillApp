@@ -7,5 +7,6 @@ data class Bill (
     var ownerId : String = "",
     var billDate: Timestamp = Timestamp.now(),
     var createdAt : Timestamp = Timestamp.now(),
-    var updatedAt : Timestamp = Timestamp.now()
+    var updatedAt : Timestamp = Timestamp.now(),
+    var storeId: String = ""                         // added
 )

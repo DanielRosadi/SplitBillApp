@@ -298,7 +298,10 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
             .padding(5.dp)
             //.background(Color.White)
             // pass respective storeId to the screen
-            .clickable { navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + storeObject.id) },
+            .clickable {
+                navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + storeObject.id)
+                       viewModel.selectedStore = storeObject
+                       },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)

@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +9,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,6 +24,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.controllers.SplitBillController
+import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
+import com.ndhu.moneymanagementapp.models.FullBillDetail
+import com.ndhu.moneymanagementapp.models.User
+import com.ndhu.moneymanagementapp.models.UserItemGroup
+import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import kotlinx.coroutines.runBlocking
 
 // Data class representing an item associated with a user
 data class UserItemEntry(
@@ -34,43 +50,73 @@ data class BillUserDetail(
 )
 
 @Composable
-fun BillDetails(context: Context, navController: NavController) {
+fun BillDetails(context: Context, navController: NavController, viewModel: SharedViewModel) {
+    val splitBillController = SplitBillController()
+
+    // var billDetail = remember { mutableStateOf<FullBillDetail?>(null) }
+
+    var billDetail = remember { mutableStateOf<FullBillDetail?>(null) }
+
+
+    runBlocking {
+        Log.d("LaunchTag", "DEBUG. Accessing Bill History.")  // Prints in Logcat
+
+        // clear stores list and add data from database into the stores list
+        // billDetail.clear()
+        // billDetail.addAll( splitBillController.getLoginUserListOfBills(context) )
+
+        billDetail.value = splitBillController.getBillDetailGroupedByUser(viewModel.currentBillId)
+
+    // TODO: add view model if needed
+        // viewModel.billHistory = storeController.getListOfStores().toMutableList()
+    }
+
     // Sample hardcoded bill details for demonstration purposes
-    val sampleDetails = listOf(
-        BillUserDetail("User 1", 150.0, true, listOf(
-            UserItemEntry("Burger", 2, 10.0f),
-            UserItemEntry("Soda", 1, 4.0f)
-        )),
-        BillUserDetail("User 3", 200.0, false, listOf(
-            UserItemEntry("Pizza", 2, 15.0f),
-            UserItemEntry("Fries", 1, 5.0f)
-        )),
-        BillUserDetail("User 5", 100.0, true, listOf(
-            UserItemEntry("Noodles", 1, 6.0f),
-            UserItemEntry("Water", 2, 4.0f)
-        ))
-    )
+//    val sampleDetails = listOf(
+//        BillUserDetail("User 1", 150.0, true, listOf(
+//            UserItemEntry("Burger", 2, 10.0f),
+//            UserItemEntry("Soda", 1, 4.0f)
+//        )),
+//        BillUserDetail("User 3", 200.0, false, listOf(
+//            UserItemEntry("Pizza", 2, 15.0f),
+//            UserItemEntry("Fries", 1, 5.0f)
+//        )),
+//        BillUserDetail("User 5", 100.0, true, listOf(
+//            UserItemEntry("Noodles", 1, 6.0f),
+//            UserItemEntry("Water", 2, 4.0f)
+//        ))
+//    )
 
     // Calculate total unpaid amount
-    val totalUnpaid = sampleDetails.filter { !it.paid }.sumOf { it.amount }
+    val unpaidUsers = billDetail.value?.users?.filter { it.status == UserPaymentStatus.UNPAID }
+    val totalUnpaid = unpaidUsers?.fold(0f) {
+                                            sum, userItemGroup -> sum + (userItemGroup.items.fold(0f){
+                                                                                                     innerSum, item -> innerSum + item.price.toFloat()
+    })
+    }
+
     // Check if all users have paid
-    val allPaid = sampleDetails.all { it.paid }
+    val allPaid = billDetail.value?.users?.all { it.status == UserPaymentStatus.PAID }
 
     // Compose screen UI with calculated values and user data
     ComposeBillDetailsScreen(
-        userDetails = sampleDetails,
+        context = context,
+        billDetails = billDetail,
         totalUnpaid = totalUnpaid,
         allPaid = allPaid,
-        navController = navController
+        navController = navController,
+        viewModel = viewModel
     )
 }
 
 @Composable
 fun ComposeBillDetailsScreen(
-    userDetails: List<BillUserDetail>,
-    totalUnpaid: Double,
-    allPaid: Boolean,
-    navController: NavController
+    context: Context,
+    billDetails: MutableState<FullBillDetail?>,
+    totalUnpaid: Float?,
+    allPaid: Boolean?,
+    navController: NavController,
+    viewModel: SharedViewModel
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         BackgroundImage()
@@ -103,8 +149,10 @@ fun ComposeBillDetailsScreen(
                         .weight(1f)
                         .fillMaxWidth()
                 ) {
-                    items(userDetails) { user ->
-                        UserBillCard(user)
+                    billDetails.value?.let {
+                        items(it.users) { user ->
+                            UserBillCard(context, user)
+                        }
                     }
                 }
 
@@ -127,7 +175,7 @@ fun ComposeBillDetailsScreen(
                     Button(
                         onClick = {}, // Placeholder action
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (allPaid) Color(0xFFA8E6CF) else Color(0xFFFFC8C8)
+                            containerColor = if (allPaid == true) Color(0xFFA8E6CF) else Color(0xFFFFC8C8)
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -135,7 +183,7 @@ fun ComposeBillDetailsScreen(
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Text(
-                            text = if (allPaid) "Completed" else "Pending",
+                            text = if (allPaid == true) "Completed" else "Pending",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -147,11 +195,11 @@ fun ComposeBillDetailsScreen(
 }
 
 @Composable
-fun UserBillCard(user: BillUserDetail) {
+fun UserBillCard(context: Context, user: UserItemGroup) {
     // Change background and text colors based on payment status
-    val backgroundColor = if (user.paid) Color.White else Color(0xFFFFE6E6)
-    val statusColor = if (user.paid) Color(0xFF388E3C) else Color.Red
-    val statusText = if (user.paid) "Paid" else "Not Paid"
+    val backgroundColor = if (user.status == UserPaymentStatus.PAID) Color.White else Color(0xFFFFE6E6)
+    val statusColor = if (user.status == UserPaymentStatus.PAID) Color(0xFF388E3C) else Color.Red
+    val statusText = if (user.status == UserPaymentStatus.PAID) "Paid" else "Not Paid"
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -169,16 +217,23 @@ fun UserBillCard(user: BillUserDetail) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = user.username,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = Color(0xFF388E3C),
-                    modifier = Modifier.weight(1f)
-                )
+
+                var userObject: User?
+
+                runBlocking { userObject = UserController().searchUserByUserId(context = context, userId = user.userId) }
+
+                userObject?.let {
+                    Text(
+                        text = it.username,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color(0xFF388E3C),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
                 Text(
-                    text = "$${"%.2f".format(user.amount)}",
+                    text = "$${"%.2f".format(user.items.fold(0f) {sum, item -> sum + item.price.toFloat()})}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = Color.Black,
@@ -220,7 +275,7 @@ fun UserBillCard(user: BillUserDetail) {
                         )
 
                         Text(
-                            text = "x${item.quantity}",
+                            text = "x${item.qty}",
                             fontSize = 13.sp,
                             color = Color.DarkGray,
                             textAlign = TextAlign.Center,
@@ -228,7 +283,7 @@ fun UserBillCard(user: BillUserDetail) {
                         )
 
                         Text(
-                            text = "$${"%.2f".format(item.totalPrice)}",
+                            text = "$${"%.2f".format(item.price)}",
                             fontSize = 13.sp,
                             color = Color.Black,
                             textAlign = TextAlign.End,

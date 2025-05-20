@@ -34,7 +34,7 @@ class SharedViewModel : ViewModel() {
     var storeList: MutableList<Store>? = null
 
     // selectedStore for the bill
-    private var selectedStore: Store? = null
+    var selectedStore: Store = Store("", "INIT STORE", "", "")
 
     // list of items for the bill
     private var itemList: MutableList<Item>? = null
@@ -76,6 +76,9 @@ class SharedViewModel : ViewModel() {
     // to save user profile pic in case its need to be fetch again (save time)
     // var currentUserProfilePic: ProfilePicture? = null
 
+    // save current billId to be able to retrieve respective bill details
+    var currentBillId = ""
+
     // --------------- functions (getters, setters)
 
     fun getStoreById(id: String): Store? {
@@ -84,10 +87,6 @@ class SharedViewModel : ViewModel() {
 
     fun addStore(store: Store){
         storeList?.add(store)
-    }
-
-    fun setSelectedStore(store: Store?){
-        selectedStore = store
     }
 
     fun addItem(item: Item){
