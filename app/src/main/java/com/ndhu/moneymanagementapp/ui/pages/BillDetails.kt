@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,13 +23,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.Timestamp
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
+import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.FullBillDetail
 import com.ndhu.moneymanagementapp.models.FullItemDetail
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.models.UserItemGroup
+import com.ndhu.moneymanagementapp.payloads.ItemDetail
+import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 
@@ -135,6 +142,14 @@ fun ComposeBillDetailsScreen(
     totalItemQuantities: MutableMap<String, Float>,
     viewModel: SharedViewModel
 ) {
+    var searchQuery = remember { mutableStateOf("") }
+
+
+    // var filteredDetails = listOf(UserItemGroup("0000000", UserPaymentStatus.PAID, listOf(ItemDetail())))
+    var filteredDetails = filterDetails(context, billDetails.value!!.users, searchQuery.value)
+
+
+
     Box(modifier = Modifier.fillMaxSize()) {
         BackgroundImage()
 
@@ -155,7 +170,10 @@ fun ComposeBillDetailsScreen(
                     .padding(10.dp)
             ) {
                 // Top navigation bar with a label
-                ContentTopBar(navController = navController, topBarText = "Bill Details")
+                ContentTopBar(navController = navController,
+                    topBarText = "Bill Details",
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -167,7 +185,7 @@ fun ComposeBillDetailsScreen(
                         .fillMaxWidth()
                 ) {
                     billDetails.value?.let {
-                        items(it.users) { user ->
+                        items(filteredDetails) { user ->
                             UserBillCard(context, user, totalItemQuantities)
                         }
                     }
@@ -210,6 +228,41 @@ fun ComposeBillDetailsScreen(
         }
     }
 }
+
+fun filterDetails(
+    context: Context,
+    users: List<UserItemGroup>,
+    query: String
+): List<UserItemGroup> {
+    // TODO: search item price, item quantity, and total price may not work
+
+    val queryLower = query.trim().lowercase()
+    val queryNumber = query.toFloatOrNull()
+
+    return if (queryLower.isBlank()) {
+        users
+    } else {
+        users.mapNotNull { user ->
+            val userObject = runBlocking { UserController().searchUserByUserId(context, user.userId) }
+            val matchesUsername = userObject?.username?.contains(queryLower, ignoreCase = true) == true
+
+            val totalPrice = user.items.fold(0f) { sum, item -> sum + item.price }
+            val matchesTotalPrice = queryNumber != null && totalPrice == queryNumber
+
+            val matchesItem = user.items.any { item ->
+                item.name.contains(queryLower, ignoreCase = true) ||
+                        (queryNumber != null && (item.qty == queryNumber || item.price == queryNumber))
+            }
+
+            if (matchesUsername || matchesItem || matchesTotalPrice) {
+                user // include this user in the result
+            } else {
+                null // filter out
+            }
+        }
+    }
+}
+
 
 @Composable
 fun UserBillCard(context: Context, user: UserItemGroup, totalItemQuantities: MutableMap<String, Float>) {
