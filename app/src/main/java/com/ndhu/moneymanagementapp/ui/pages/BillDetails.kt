@@ -94,7 +94,7 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
     }
 
 
-
+    // TODO: calculation time expensive due to hot-fix, need to refactor backend data classes
     // Calculate total unpaid amount
     val unpaidUsers = billDetail.value?.users?.filter { it.status == UserPaymentStatus.UNPAID }
     val totalUnpaid = unpaidUsers?.fold(0f) {
@@ -219,6 +219,7 @@ fun UserBillCard(context: Context, user: UserItemGroup, totalItemQuantities: Mut
     val statusText = if (user.status == UserPaymentStatus.PAID) "Paid" else "Not Paid"
 
 
+    // TODO: calculation time expensive due to hot-fix, need to refactor backend data classes
     // var userTotal = remember { mutableStateOf(0f) }
     // complete the totalQuality and user price share
     var completeItemDetail = user.items.map { itemDetail ->

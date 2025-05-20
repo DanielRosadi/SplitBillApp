@@ -11,8 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.Timestamp
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.controllers.UserController
@@ -66,6 +69,10 @@ fun BillHistory(context: Context, navController: NavController, viewModel: Share
 
 @Composable
 fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateList<ListUserSplitBillResponse>, navController: NavController, viewModel: SharedViewModel) {
+    var searchQuery = remember { mutableStateOf("") }
+
+    val filteredHistories = filterHistories(context, billResponseList, searchQuery.value) //  no remember
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image
         BackgroundImage()
@@ -88,7 +95,10 @@ fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateLi
             ) {
                 // Top bar with title and navigation
                 // TODO: search function
-                ContentTopBar(navController = navController, topBarText = "Bill History",)
+                ContentTopBar(navController = navController,
+                    topBarText = "Bill History",
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
+                    )
 
                 // Main content container
                 ContactContainer(
@@ -103,7 +113,7 @@ fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateLi
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(billResponseList) { billResponse ->
+                            items(filteredHistories) { billResponse ->
                                 HistoryItem(context = context, billResponse = billResponse, navController = navController, viewModel = viewModel)
                             }
                         }
@@ -115,6 +125,32 @@ fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateLi
         }
     }
 }
+
+
+
+// filter function for search box
+fun filterHistories(context: Context, billResponseList: SnapshotStateList<ListUserSplitBillResponse>, query: String): SnapshotStateList<ListUserSplitBillResponse> {
+    val result = if (query.isBlank()) {
+        billResponseList
+    } else {
+        billResponseList.filter {
+
+            var storeObject = runBlocking { StoreController().getStore(storeId = it.storeId) }
+            var billOwner = runBlocking { UserController().searchUserByUserId(context, it.billOwnerId) }
+
+            storeObject?.name?.contains(query, ignoreCase = true) ?: true ||
+                    billOwner?.username?.contains(query, ignoreCase = true) ?: true ||
+                    formatTimestamp(it.createdAt).contains(query, ignoreCase = true)
+            // || it.status.toString().contains(query, ignoreCase = true) // pointless to search for status
+            // we do not implement to price search, too time expensive
+
+        }.toMutableStateList() // Convert result to SnapshotStateList
+    }
+
+    // println("Filtered ${result.size} items for query: '$query'") // <-- DEBUG
+    return result
+}
+
 
 @Composable
 fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navController: NavController, viewModel: SharedViewModel) {
