@@ -40,9 +40,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,7 +53,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.enums.AppScreens
@@ -247,7 +244,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                         .fillMaxWidth()
                         .weight(6f)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(darkGrey)
+                        .background(darkGreyContainer)
 
                 ){
                 LazyColumn(modifier = Modifier.weight(1f), contentPadding = PaddingValues(5.dp)) {
@@ -280,7 +277,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                         .padding(2.dp)
                         .weight(2.7f)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(darkGrey)
+                        .background(darkGreyContainer)
                 ) {
                     LazyRow (
                     ) {

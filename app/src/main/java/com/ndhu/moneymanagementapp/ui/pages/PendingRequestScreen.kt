@@ -81,7 +81,8 @@ private fun ComposePendingRequest(
     val showAcceptAllDialog = remember { mutableStateOf(false) }
 
     val searchQuery = remember { mutableStateOf("") }
-    val filteredFriends = filterFriends(context, contacts, searchQuery.value, userController) //  no remember
+    val filteredFriends =
+        filterFriends(context, contacts, searchQuery.value, userController) //  no remember
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -296,18 +297,18 @@ fun PendingCard(
                     val profilePic = profilePictures.firstOrNull() {
                         it.id == (userObject.value?.profilePictureId
                             ?: 1)
-                }
+                    }
 
-                if (profilePic != null) {
-                    Image(
-                        painter = painterResource(id = profilePic.imageRes),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                    if (profilePic != null) {
+                        Image(
+                            painter = painterResource(id = profilePic.imageRes),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
 
-            }
+                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
@@ -438,7 +439,7 @@ fun PendingCard(
 @Composable
 fun ContactContainer(
     modifier: Modifier = Modifier,
-    containerColor: Color = darkGrey,
+    containerColor: Color = darkGreyContainer,
     content: @Composable () -> Unit
 ) {
     Card(

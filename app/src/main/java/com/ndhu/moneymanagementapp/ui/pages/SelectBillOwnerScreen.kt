@@ -163,7 +163,7 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
                     .fillMaxWidth()
                     .weight(7f)
                     .clip(RoundedCornerShape(20.dp))
-                    //.background(darkGrey)
+                    //.background(darkGreyContainer)
                     .background(Color(0xFFD9D9D9))
 
             ) {

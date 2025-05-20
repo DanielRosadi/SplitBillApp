@@ -114,12 +114,13 @@ fun AccountPage(context: Context, navController: NavController) {
 
                 Spacer(modifier = Modifier.height(55.dp))
 
-                var profilePic = profilePictures.firstOrNull(){ it.id == (user?.profilePictureId ?: 1) }
+                var profilePic =
+                    profilePictures.firstOrNull() { it.id == (user?.profilePictureId ?: 1) }
 
                 // Profile Image
                 if (profilePic != null) {
                     Image(
-            //                    painter = painterResource(id = R.drawable.profile_picture),
+                        //                    painter = painterResource(id = R.drawable.profile_picture),
                         painter = painterResource(id = profilePic.imageRes),
                         contentDescription = "Avatar",
                         modifier = Modifier
@@ -242,7 +243,8 @@ fun ColoredSettingsButton(
             .shadow(4.dp, shape = RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text, fontSize = 20.sp, fontFamily = surannaFont)
+        //Text(text, fontSize = 20.sp, fontFamily = surannaFont)
+        Text(text, fontSize = 20.sp)
     }
 }
 
@@ -270,7 +272,12 @@ fun DeleteAccountDialog(
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(
-                    modifier = Modifier.padding(top = 40.dp, bottom = 20.dp, start = 16.dp, end = 16.dp),
+                    modifier = Modifier.padding(
+                        top = 40.dp,
+                        bottom = 20.dp,
+                        start = 16.dp,
+                        end = 16.dp
+                    ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(

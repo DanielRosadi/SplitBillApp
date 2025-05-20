@@ -35,7 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -265,7 +264,7 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
                             .fillMaxWidth()
                             .weight(6.5f)
                             .clip(RoundedCornerShape(20.dp))
-                            .background(darkGrey)
+                            .background(darkGreyContainer)
                     ) {
 
                         LazyColumn(

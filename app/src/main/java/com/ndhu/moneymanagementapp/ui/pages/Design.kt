@@ -63,7 +63,11 @@ val alexandriaFont = FontFamily(
 // Colors
 val dangerRed = Color(0xFF961400)
 val primaryGreen = Color(0xFF009669) // Main brand color
-val darkGrey = Color(0xFF9D9D9D)
+val darkGreyContainer = Color(0xFF9D9D9D) // mostly used for dark grey container
+
+
+// val softWhite = Color(0xFFF9F9F9), // old dialog container color
+// val whiteSmoke = Color(0xFFF5F5F5) // new dialog container color
 
 val correctTransparentGreen = Color(0xAA4CAF50) // green transparent for selected user card
 val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
