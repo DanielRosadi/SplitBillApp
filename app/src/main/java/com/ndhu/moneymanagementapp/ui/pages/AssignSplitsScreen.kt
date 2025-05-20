@@ -314,7 +314,8 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
 
                         val splitBillRequest = SplitBillRequest(
                             billOwnerId = viewModel.getBillOwnerId(),
-                            itemIdAndOwners = itemIdAndOwners
+                            itemIdAndOwners = itemIdAndOwners,
+                            storeId = viewModel.selectedStore.id
                         )
 
                         runBlocking {

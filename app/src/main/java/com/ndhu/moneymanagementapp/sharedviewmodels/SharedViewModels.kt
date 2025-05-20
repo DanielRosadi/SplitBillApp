@@ -34,7 +34,7 @@ class SharedViewModel : ViewModel() {
     var storeList: MutableList<Store>? = null
 
     // selectedStore for the bill
-    private var selectedStore: Store? = null
+    var selectedStore: Store = Store("", "INIT STORE", "", "")
 
     // list of items for the bill
     private var itemList: MutableList<Item>? = null
@@ -84,10 +84,6 @@ class SharedViewModel : ViewModel() {
 
     fun addStore(store: Store){
         storeList?.add(store)
-    }
-
-    fun setSelectedStore(store: Store?){
-        selectedStore = store
     }
 
     fun addItem(item: Item){

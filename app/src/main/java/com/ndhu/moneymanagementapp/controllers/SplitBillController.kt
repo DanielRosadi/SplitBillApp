@@ -29,7 +29,8 @@ class SplitBillController {
             id = UUID.randomUUID().toString(),
             ownerId = request.billOwnerId,
             createdAt = Timestamp.now(),
-            updatedAt = Timestamp.now()
+            updatedAt = Timestamp.now(),
+            storeId = request.storeId                      // added
         )
 
         billRepo.add(bill)
@@ -64,11 +65,13 @@ class SplitBillController {
             val index = getListUserResponseFromBillId(billList, billItem.billId)
 
             if (index == -1) {
+                val bill = billRepo.getById(billItem.billId)  // added
                 billList.add(
                     ListUserSplitBillResponse(
                         billId = billItem.billId,
                         status = billItem.status,
-                        itemList = mutableListOf()
+                        itemList = mutableListOf(),
+                        storeId = bill?.storeId ?: "Store Error"          // added
                     )
                 )
             }

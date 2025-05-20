@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,8 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.History
-import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import kotlinx.coroutines.runBlocking
 
@@ -32,14 +33,14 @@ fun BillHistory(context: Context, navController: NavController) {
     val splitBillController = SplitBillController()
 
 
-    var billHistory = remember { mutableStateListOf<ListUserSplitBillResponse>() }
+    var billResponseList = remember { mutableStateListOf<ListUserSplitBillResponse>() }
 
     runBlocking {
         Log.d("LaunchTag", "DEBUG. Accessing Bill History.")  // Prints in Logcat
 
         // clear stores list and add data from database into the stores list
-        billHistory.clear()
-        billHistory.addAll( splitBillController.getLoginUserListOfBills(context) )
+        billResponseList.clear()
+        billResponseList.addAll( splitBillController.getLoginUserListOfBills(context) )
         // TODO: add view model if needed
         // viewModel.billHistory = storeController.getListOfStores().toMutableList()
     }
@@ -52,11 +53,11 @@ fun BillHistory(context: Context, navController: NavController) {
     )
 
     // Compose screen UI
-    ComposeBillHistoryScreen(histories = histories, navController = navController)
+    ComposeBillHistoryScreen(billResponseList = billResponseList, navController = navController)
 }
 
 @Composable
-fun ComposeBillHistoryScreen(histories: List<History>, navController: NavController) {
+fun ComposeBillHistoryScreen(billResponseList: SnapshotStateList<ListUserSplitBillResponse>, navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image
         BackgroundImage()
@@ -86,7 +87,7 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
                     modifier = Modifier.fillMaxSize()
                 ) {
                     // Handle empty state
-                    if (histories.isEmpty()) {
+                    if (billResponseList.isEmpty()) {
                         EmptyStateMessage("No bill history available")
                     } else {
                         // Display list of history items
@@ -94,8 +95,8 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(histories) { history ->
-                                HistoryItem(history = history, navController = navController)
+                            items(billResponseList) { billResponse ->
+                                HistoryItem(billResponse = billResponse, navController = navController)
                             }
                         }
                     }
@@ -108,10 +109,10 @@ fun ComposeBillHistoryScreen(histories: List<History>, navController: NavControl
 }
 
 @Composable
-fun HistoryItem(history: History, navController: NavController) {
+fun HistoryItem(billResponse: ListUserSplitBillResponse, navController: NavController) {
     // Change background color based on transaction status
-    val backgroundColor = when (history.status.uppercase()) {
-        "PENDING" -> Color(0xFFFFC8C8) // Light red for pending
+    val backgroundColor = when (billResponse.status) {
+        UserPaymentStatus.UNPAID -> Color(0xFFFFC8C8) // Light red for pending
         else -> Color.White // Default white background
     }
 
@@ -140,13 +141,14 @@ fun HistoryItem(history: History, navController: NavController) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = history.storeId,
+                    text = billResponse.storeId,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = primaryGreen
                 )
+                // TODO: date
                 Text(
-                    text = history.transactionDate,
+                    text = "date here", // billResponse.transactionDate,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF666666)
@@ -159,13 +161,15 @@ fun HistoryItem(history: History, navController: NavController) {
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = "$ ${history.id}",
+                    text = (billResponse.itemList.fold(0.0) { acc, item ->
+                        acc + (item.price.toDouble() * item.qty.toDouble())
+                    }).toString(),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = primaryGreen
                 )
                 Text(
-                    text = history.billOwnerId,
+                    text = "bill owner here", // billResponse.billOwnerId,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.DarkGray

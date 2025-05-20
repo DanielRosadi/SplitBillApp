@@ -12,5 +12,6 @@ data class ItemDetail(
 data class ListUserSplitBillResponse (
     var billId : String = "",
     var status : UserPaymentStatus = UserPaymentStatus.UNPAID,
-    var itemList : MutableList<ItemDetail> = mutableListOf()
+    var itemList : MutableList<ItemDetail> = mutableListOf(),
+    var storeId: String = ""                        // added
 )

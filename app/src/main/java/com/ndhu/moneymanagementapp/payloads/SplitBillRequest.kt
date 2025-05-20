@@ -8,5 +8,6 @@ data class ItemAndOwner (
 
 data class SplitBillRequest (
     var billOwnerId : String = "",
-    var itemIdAndOwners: List<ItemAndOwner?> = emptyList()
+    var itemIdAndOwners: List<ItemAndOwner?> = emptyList(),
+    val storeId: String                             // added
 )
