@@ -6,8 +6,8 @@ import com.google.firebase.Timestamp
 data class ItemDetail(
     var id : String = "",
     var name : String = "",
-    var price : Number = 0,
-    var qty: Number = 0
+    var price : Float = 0f,
+    var qty: Float = 0f
 )
 
 data class ListUserSplitBillResponse(

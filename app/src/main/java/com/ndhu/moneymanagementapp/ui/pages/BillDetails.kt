@@ -10,11 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,9 +25,9 @@ import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.FullBillDetail
+import com.ndhu.moneymanagementapp.models.FullItemDetail
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.models.UserItemGroup
-import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 
@@ -59,7 +56,7 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
 
 
     runBlocking {
-        Log.d("LaunchTag", "DEBUG. Accessing Bill History.")  // Prints in Logcat
+        Log.d("LaunchTag", "DEBUG. Accessing Bill Details.")  // Prints in Logcat
 
         // clear stores list and add data from database into the stores list
         // billDetail.clear()
@@ -87,11 +84,31 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
 //        ))
 //    )
 
+    val totalItemQuantities = mutableMapOf<String, Float>()
+
+    billDetail.value?.users?.forEach { user ->
+        user.items.forEach { item ->
+            val current = totalItemQuantities[item.id] ?: 0f
+            totalItemQuantities[item.id] = current + item.qty
+        }
+    }
+
+
+
     // Calculate total unpaid amount
     val unpaidUsers = billDetail.value?.users?.filter { it.status == UserPaymentStatus.UNPAID }
     val totalUnpaid = unpaidUsers?.fold(0f) {
                                             sum, userItemGroup -> sum + (userItemGroup.items.fold(0f){
-                                                                                                     innerSum, item -> innerSum + item.price.toFloat()
+                                                                                                     innerSum, item ->
+        var itemTotalQuantity = totalItemQuantities[item.id]
+        if (itemTotalQuantity != null && itemTotalQuantity != 0f) {
+            innerSum + (item.price / itemTotalQuantity * item.qty)
+        }
+        else{
+            0f
+        }
+
+
     })
     }
 
@@ -105,6 +122,7 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
         totalUnpaid = totalUnpaid,
         allPaid = allPaid,
         navController = navController,
+        totalItemQuantities = totalItemQuantities,
         viewModel = viewModel
     )
 }
@@ -116,6 +134,7 @@ fun ComposeBillDetailsScreen(
     totalUnpaid: Float?,
     allPaid: Boolean?,
     navController: NavController,
+    totalItemQuantities: MutableMap<String, Float>,
     viewModel: SharedViewModel
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -151,7 +170,7 @@ fun ComposeBillDetailsScreen(
                 ) {
                     billDetails.value?.let {
                         items(it.users) { user ->
-                            UserBillCard(context, user)
+                            UserBillCard(context, user, totalItemQuantities)
                         }
                     }
                 }
@@ -164,7 +183,7 @@ fun ComposeBillDetailsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Total not paid = $${"%.2f".format(totalUnpaid)}",
+                        text = "Total not paid = NTD ${"%.2f".format(totalUnpaid)}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -195,11 +214,38 @@ fun ComposeBillDetailsScreen(
 }
 
 @Composable
-fun UserBillCard(context: Context, user: UserItemGroup) {
+fun UserBillCard(context: Context, user: UserItemGroup, totalItemQuantities: MutableMap<String, Float>) {
     // Change background and text colors based on payment status
     val backgroundColor = if (user.status == UserPaymentStatus.PAID) Color.White else Color(0xFFFFE6E6)
     val statusColor = if (user.status == UserPaymentStatus.PAID) Color(0xFF388E3C) else Color.Red
     val statusText = if (user.status == UserPaymentStatus.PAID) "Paid" else "Not Paid"
+
+
+    // var userTotal = remember { mutableStateOf(0f) }
+    // complete the totalQuality and user price share
+    var completeItemDetail = user.items.map { itemDetail ->
+
+        var itemTotalQuantity = totalItemQuantities[itemDetail.id]
+
+        if (itemTotalQuantity != null && itemTotalQuantity != 0f){
+            FullItemDetail(
+                itemId = itemDetail.id,
+                itemName = itemDetail.name,
+                userPriceShare = itemDetail.price / itemTotalQuantity * itemDetail.qty,
+                userItemQuantity = itemDetail.qty,
+                itemTotalQuantity = itemTotalQuantity
+            )
+        }
+        else{
+            FullItemDetail(
+                itemId = "",
+                itemName = "ITEM ERROR",
+                userPriceShare = 0f,
+                userItemQuantity = 0f,
+                itemTotalQuantity = 0f
+            )
+        }
+    }
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -233,7 +279,8 @@ fun UserBillCard(context: Context, user: UserItemGroup) {
                 }
 
                 Text(
-                    text = "$${"%.2f".format(user.items.fold(0f) {sum, item -> sum + item.price.toFloat()})}",
+                    // text = "$${"%.2f".format(user.items.fold(0f) {sum, item -> sum + item.price/item.qty })}",
+                    text = "NTD ${"%.2f".format(completeItemDetail.fold(0f) {sum, item -> sum + item.userPriceShare})}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = Color.Black,
@@ -262,28 +309,36 @@ fun UserBillCard(context: Context, user: UserItemGroup) {
 
             // List of purchased items
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                user.items.forEach { item ->
+                completeItemDetail.forEach { item ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = item.name,
+                            text = item.itemName,
                             fontSize = 13.sp,
                             color = Color.DarkGray,
                             modifier = Modifier.weight(1f)
                         )
 
                         Text(
-                            text = "x${item.qty}",
+                            text = "x${item.userItemQuantity}",
                             fontSize = 13.sp,
                             color = Color.DarkGray,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.weight(1f)
                         )
 
+//                        var itemTotalQuantity = totalItemQuantities[item.id]
+//                        var pricePerUnit = if (itemTotalQuantity != null && itemTotalQuantity != 0f) {
+//                            item.price / itemTotalQuantity
+//                        } else {
+//                            0f
+//                        }
+//                        var userShare = pricePerUnit * item.qty
+
                         Text(
-                            text = "$${"%.2f".format(item.price)}",
+                            text = "NTD ${"%.2f".format(item.userPriceShare)}",
                             fontSize = 13.sp,
                             color = Color.Black,
                             textAlign = TextAlign.End,
