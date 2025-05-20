@@ -62,12 +62,12 @@ fun AppNavigation(context : Context){
 
         // BillHistory screen
         composable(AppScreens.BillHistoryScreen.name){
-            BillHistory(context, navController = navController)
+            BillHistory(context, navController = navController, viewModel = sharedViewModel)
         }
 
         // BillDetails screen
         composable(AppScreens.BillDetailsScreen.name){
-            BillDetails(context, navController = navController)
+            BillDetails(context, navController = navController, viewModel = sharedViewModel)
         }
 
         // ListOfStore screen

@@ -76,6 +76,9 @@ class SharedViewModel : ViewModel() {
     // to save user profile pic in case its need to be fetch again (save time)
     // var currentUserProfilePic: ProfilePicture? = null
 
+    // save current billId to be able to retrieve respective bill details
+    var currentBillId = ""
+
     // --------------- functions (getters, setters)
 
     fun getStoreById(id: String): Store? {

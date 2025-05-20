@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
@@ -29,12 +30,13 @@ import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.History
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
+import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun BillHistory(context: Context, navController: NavController) {
+fun BillHistory(context: Context, navController: NavController, viewModel: SharedViewModel) {
     val splitBillController = SplitBillController()
 
 
@@ -48,21 +50,22 @@ fun BillHistory(context: Context, navController: NavController) {
         billResponseList.addAll( splitBillController.getLoginUserListOfBills(context) )
         // TODO: add view model if needed
         // viewModel.billHistory = storeController.getListOfStores().toMutableList()
+
     }
 
     // Temporary hardcoded list of bill history records
-    val histories = listOf(
-        History("100", "Store W", "2024-03-10", "User 1", "Completed"),
-        History("200", "Store E", "2024-03-12", "User 2", "PENDING"),
-        History("300", "Store S", "2024-03-15", "User 3", "COMPLETED"),
-    )
+//    val histories = listOf(
+//        History("100", "Store W", "2024-03-10", "User 1", "Completed"),
+//        History("200", "Store E", "2024-03-12", "User 2", "PENDING"),
+//        History("300", "Store S", "2024-03-15", "User 3", "COMPLETED"),
+//    )
 
     // Compose screen UI
-    ComposeBillHistoryScreen(context = context, billResponseList = billResponseList, navController = navController)
+    ComposeBillHistoryScreen(context = context, billResponseList = billResponseList, navController = navController, viewModel = viewModel)
 }
 
 @Composable
-fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateList<ListUserSplitBillResponse>, navController: NavController) {
+fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateList<ListUserSplitBillResponse>, navController: NavController, viewModel: SharedViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image
         BackgroundImage()
@@ -101,7 +104,7 @@ fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateLi
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(billResponseList) { billResponse ->
-                                HistoryItem(context = context, billResponse = billResponse, navController = navController)
+                                HistoryItem(context = context, billResponse = billResponse, navController = navController, viewModel = viewModel)
                             }
                         }
                     }
@@ -114,12 +117,14 @@ fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateLi
 }
 
 @Composable
-fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navController: NavController) {
+fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navController: NavController, viewModel: SharedViewModel) {
     // Change background color based on transaction status
     val backgroundColor = when (billResponse.status) {
         UserPaymentStatus.UNPAID -> Color(0xFFFFC8C8) // Light red for pending
         else -> Color.White // Default white background
     }
+
+    viewModel.currentBillId = billResponse.billId
 
     // History card component
     Card(

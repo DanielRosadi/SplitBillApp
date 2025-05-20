@@ -5,6 +5,8 @@ import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.BillItemDetail
+import com.ndhu.moneymanagementapp.models.FullBillDetail
+import com.ndhu.moneymanagementapp.models.UserItemGroup
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
@@ -96,6 +98,46 @@ class SplitBillController {
 
 
         return billList
+    }
+
+
+    // New method for getting bill details grouped by user
+    suspend fun getBillDetailGroupedByUser(billId: String): FullBillDetail? {
+        val bill = billRepo.getById(billId) ?: return null
+        val billDetails = billDetailRepo.getByBillId(billId)
+
+        val userToItems: MutableMap<String, MutableList<ItemDetail>> = mutableMapOf()
+        val userToStatus: MutableMap<String, UserPaymentStatus> = mutableMapOf()
+
+        for (billItem in billDetails) {
+            val item = itemRepo.getById(billItem.itemId) ?: continue
+
+            val itemDetail = ItemDetail(
+                id = billItem.itemId,
+                name = item.name,
+                price = item.price,
+                qty = billItem.qty
+            )
+
+            userToItems.getOrPut(billItem.userId) { mutableListOf() }.add(itemDetail)
+            userToStatus[billItem.userId] = billItem.status
+        }
+
+        val userItemGroups = userToItems.map { (userId, items) ->
+            UserItemGroup(
+                userId = userId,
+                status = userToStatus[userId] ?: UserPaymentStatus.UNPAID,
+                items = items
+            )
+        }
+
+        return FullBillDetail(
+            billId = bill.id,
+            billOwnerId = bill.ownerId,
+            createdAt = bill.createdAt,
+            storeId = bill.storeId,
+            users = userItemGroups
+        )
     }
 
     suspend fun getBillDetail(billId: String) : List<ListUserSplitBillResponse> {
