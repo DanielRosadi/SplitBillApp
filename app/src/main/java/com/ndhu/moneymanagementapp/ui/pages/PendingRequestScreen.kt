@@ -540,6 +540,7 @@ fun ConfirmationDialog(
                 Text(
                     text = message,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
                     fontSize = 14.sp,
                     color = Color.DarkGray // Dark Gray
                 )
