@@ -110,7 +110,7 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
                                                                                                      innerSum, item ->
         var itemTotalQuantity = totalItemQuantities[item.id]
         if (itemTotalQuantity != null && itemTotalQuantity != 0f) {
-            innerSum + (item.price / itemTotalQuantity * item.qty)
+            innerSum + (item.price * item.qty)
         }
         else{
             0f
@@ -292,7 +292,7 @@ fun UserBillCard(context: Context,
             FullItemDetail(
                 itemId = itemDetail.id,
                 itemName = itemDetail.name,
-                userPriceShare = itemDetail.price / itemTotalQuantity * itemDetail.qty,
+                userPriceShare = itemDetail.price * itemDetail.qty,
                 userItemQuantity = itemDetail.qty,
                 itemTotalQuantity = itemTotalQuantity
             )
