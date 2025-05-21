@@ -34,7 +34,8 @@ data class FormField(
     val value: String,
     val onValueChange: (String) -> Unit,
     val keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    val visualTransformation: VisualTransformation = VisualTransformation.None // e.g., password masking
+    val visualTransformation: VisualTransformation = VisualTransformation.None, // e.g., password masking
+    val error: String? = null
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,63 +98,60 @@ fun CustomFormDialog(
             ) {
                 // Render each form field
                 fields.forEachIndexed { index, field ->
-                    // Determine if the current field is a password field
                     val isPasswordField = field.visualTransformation is PasswordVisualTransformation
-
-                    // Retrieve or initialize the visibility state for this field
                     val isVisible = passwordVisibilityStates.getOrPut(index) { false }
 
-                    OutlinedTextField(
-                        value = field.value,
-                        onValueChange = field.onValueChange,
-                        label = {
-                            Text(
-                                text = field.label,
-                                color = primaryGreen,
-                                fontSize = 14.sp
-                            )
-                        },
-                        keyboardOptions = field.keyboardOptions,
-
-                        // If it's a password field and not visible, apply masking
-                        visualTransformation = if (isPasswordField && !isVisible)
-                            PasswordVisualTransformation()
-                        else
-                            VisualTransformation.None,
-
-                        singleLine = true,
-                        shape = RoundedCornerShape(20.dp),
-
-                        // Show the visibility toggle icon only for password fields
-                        trailingIcon = {
-                            if (isPasswordField) {
-                                IconButton(onClick = {
-                                    // Toggle visibility state for this field
-                                    passwordVisibilityStates[index] = !isVisible
-                                }) {
-                                    Icon(
-                                        imageVector = if (isVisible)
-                                            Icons.Default.VisibilityOff
-                                        else
-                                            Icons.Default.Visibility,
-                                        contentDescription = if (isVisible) "Hide password" else "Show password",
-                                        tint = primaryGreen
-                                    )
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = field.value,
+                            onValueChange = field.onValueChange,
+                            isError = field.error != null,
+                            label = {
+                                Text(
+                                    text = field.label,
+                                    color = primaryGreen,
+                                    fontSize = 14.sp
+                                )
+                            },
+                            keyboardOptions = field.keyboardOptions,
+                            visualTransformation = if (isPasswordField && !isVisible)
+                                PasswordVisualTransformation() else VisualTransformation.None,
+                            singleLine = true,
+                            shape = RoundedCornerShape(20.dp),
+                            trailingIcon = {
+                                if (isPasswordField) {
+                                    IconButton(onClick = {
+                                        passwordVisibilityStates[index] = !isVisible
+                                    }) {
+                                        Icon(
+                                            imageVector = if (isVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                            contentDescription = if (isVisible) "Hide password" else "Show password",
+                                            tint = primaryGreen
+                                        )
+                                    }
                                 }
-                            }
-                        },
+                            },
+                            colors = TextFieldDefaults.textFieldColors(
+                                containerColor = Color.White,
+                                focusedIndicatorColor = primaryGreen,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = primaryGreen
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                        )
 
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.White,
-                            focusedIndicatorColor = primaryGreen,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = primaryGreen
-                        ),
-
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                    )
+                        // Show error text if present
+                        if (field.error != null) {
+                            Text(
+                                text = field.error,
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                            )
+                        }
+                    }
                 }
 
                 // Display error message if present
