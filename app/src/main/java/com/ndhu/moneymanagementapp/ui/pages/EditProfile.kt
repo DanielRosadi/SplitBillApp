@@ -56,7 +56,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -64,7 +63,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.controllers.UserController
-import com.ndhu.moneymanagementapp.models.ProfilePicture
 import com.ndhu.moneymanagementapp.models.User
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -73,37 +71,21 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun EditProfile(context: Context, navController: NavController) {
     val userController = UserController()
+    val coroutineScope = rememberCoroutineScope()
 
+    // State variables for user info
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var bio by remember { mutableStateOf(TextFieldValue("")) }
 
-    var showChangePasswordDialog by remember { mutableStateOf(false) }
-    var newPassword by remember { mutableStateOf(TextFieldValue("")) }
-    var confirmPassword by remember { mutableStateOf(TextFieldValue("")) }
-    var passwordError by remember { mutableStateOf<String?>(null) }
-
-    val coroutineScope = rememberCoroutineScope()
+    // State for input validation errors
     var usernameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
     var bioError by remember { mutableStateOf<String?>(null) }
 
-    // for profile picture
+    // State for profile picture dialog
     var showEditProfilePictureDialog by remember { mutableStateOf(false) }
     var selectedPictureId by remember { mutableStateOf<Int?>(null) }
-
-//    // for profile picture
-//    val profilePictures = listOf(
-//        ProfilePicture(1, R.drawable.defaultavatarimage),
-//        ProfilePicture(2, R.drawable.black_panther),
-//        ProfilePicture(3, R.drawable.banteng),
-//        ProfilePicture(4, R.drawable.download),
-//        ProfilePicture(5, R.drawable.download_1),
-//        ProfilePicture(6, R.drawable.download_2),
-//        ProfilePicture(7, R.drawable.download_3),
-//    )
-
-    // var profilePicIdRandomizer = (2..7).random()
 
     LaunchedEffect(Unit) {
         val user = userController.getOnboardUser(context)
@@ -118,7 +100,7 @@ fun EditProfile(context: Context, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Top section
+        // --- Top Banner with Logo and Back Button ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -155,7 +137,7 @@ fun EditProfile(context: Context, navController: NavController) {
                         )
                     }
 
-                    // We Split text
+                    // App title
                     Row(
                         modifier = Modifier.align(Alignment.Center),
                         verticalAlignment = Alignment.CenterVertically
@@ -180,7 +162,7 @@ fun EditProfile(context: Context, navController: NavController) {
             }
         }
 
-        // Bottom Section
+        // --- Main Form Section ---
         Surface(
             color = Color(0xFFF5F5F5),
             modifier = Modifier
@@ -191,7 +173,9 @@ fun EditProfile(context: Context, navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp, vertical = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(30.dp)) {
+                verticalArrangement = Arrangement.spacedBy(30.dp)
+            ) {
+                // Container for form content
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -208,7 +192,7 @@ fun EditProfile(context: Context, navController: NavController) {
                         modifier = Modifier.padding(vertical = 12.dp)
                     )
 
-                    // Profile Image
+                    // --- Profile Picture Section ---
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -221,8 +205,10 @@ fun EditProfile(context: Context, navController: NavController) {
                             user = userController.getOnboardUser(context)
                         }
 
-                        var profilePic = profilePictures.firstOrNull(){ it.id == (user?.profilePictureId ?: 1) }
+                        var profilePic =
+                            profilePictures.firstOrNull() { it.id == (user?.profilePictureId ?: 1) }
 
+                        // Display selected profile picture
                         if (profilePic != null) {
                             Image(
                                 // painter = painterResource(id = R.drawable.defaultavatarimage),
@@ -236,6 +222,7 @@ fun EditProfile(context: Context, navController: NavController) {
                             )
                         }
 
+                        // Edit picture button
                         IconButton(
                             onClick = { showEditProfilePictureDialog = true },
                             modifier = Modifier
@@ -254,7 +241,7 @@ fun EditProfile(context: Context, navController: NavController) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Input Fields
+                    // --- Input Fields ---
                     RoundedInputField(
                         label = "username",
                         value = username,
@@ -294,43 +281,16 @@ fun EditProfile(context: Context, navController: NavController) {
                         error = bioError
                     )
 
-                    Button(
-                        onClick = {
-                            // Reset states each time it's opened
-                            newPassword = TextFieldValue("")
-                            confirmPassword = TextFieldValue("")
-                            passwordError = null
-                            showChangePasswordDialog = true
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                    ) {
-                        Text("Change Password", color = Color.White, fontSize = 16.sp)
-                    }
-
-                    // temporary
-                    /*
-                    Button(onClick = {
-                        coroutineScope.launch {
-                            userController.migrateUserModelForm(context)
-                        }
-                    }){
-                        Text(text = "MIGRATE (TEMP)")
-                    }
-                    */
-
                     Spacer(modifier = Modifier.weight(1f))
 
-                    // Buttons
+                    // --- Save/Cancel Buttons ---
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
+                        // Cancel
                         Button(
                             onClick = { navController.popBackStack() },
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -343,8 +303,10 @@ fun EditProfile(context: Context, navController: NavController) {
                             Text("Cancel", color = Color.White, fontSize = 16.sp)
                         }
 
+                        // Save
                         Button(
                             onClick = {
+                                // Reset previous errors
                                 usernameError = null
                                 emailError = null
 
@@ -353,6 +315,7 @@ fun EditProfile(context: Context, navController: NavController) {
 
                                 var isValid = true
 
+                                // Validate fields
                                 if (trimmedUsername.length < 3) {
                                     usernameError = "Username must be at least 3 characters"
                                     isValid = false
@@ -368,6 +331,7 @@ fun EditProfile(context: Context, navController: NavController) {
                                     isValid = false
                                 }
 
+                                // Submit if valid
                                 if (isValid) {
                                     coroutineScope.launch {
                                         val result = userController.updateUserData(
@@ -376,10 +340,10 @@ fun EditProfile(context: Context, navController: NavController) {
                                             newEmail = trimmedEmail,
                                             newBio = bio.text
                                         )
-                                        if(result != null){
-                                            Toast.makeText(context, result, Toast.LENGTH_SHORT).show()
-                                        }
-                                        else{
+                                        if (result != null) {
+                                            Toast.makeText(context, result, Toast.LENGTH_SHORT)
+                                                .show()
+                                        } else {
                                             navController.popBackStack()
                                         }
                                     }
@@ -399,48 +363,15 @@ fun EditProfile(context: Context, navController: NavController) {
             }
         }
     }
-    if (showChangePasswordDialog) {
-        ChangePasswordDialog(
-            onDismiss = {
-                showChangePasswordDialog = false
-                newPassword = TextFieldValue("")
-                confirmPassword = TextFieldValue("")
-                passwordError = null
-            },
-            onSave = { password ->
-                when {
-                    password.isEmpty() -> {
-                        passwordError = "Passwords do not match"
-                    }
-                    password == "INVALID" -> {
-                        passwordError = "Password must be at least 8 characters, with uppercase, lowercase, digit, and special character"
-                    }
-                    else -> {
-                        coroutineScope.launch {
-                            userController.updateUserPassword(context, password)
-                            showChangePasswordDialog = false
-                            newPassword = TextFieldValue("")
-                            confirmPassword = TextFieldValue("")
-                            passwordError = null
-                        }
-                    }
-                }
-            },
-            newPassword = newPassword,
-            confirmPassword = confirmPassword,
-            onNewPasswordChange = { newPassword = it },
-            onConfirmPasswordChange = { confirmPassword = it },
-            errorMessage = passwordError
-        )
-    }
 
     // TODO: for profile pic (need to be moved)
+    // --- Profile Picture Selection Dialog ---
     if (showEditProfilePictureDialog) {
         AlertDialog(
             onDismissRequest = { showEditProfilePictureDialog = false },
             title = { Text("Choose Your Profile Picture") },
             text = {
-                LazyVerticalGrid (
+                LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -473,15 +404,19 @@ fun EditProfile(context: Context, navController: NavController) {
                 }
             },
             confirmButton = {
-                TextButton (onClick = { showEditProfilePictureDialog = false }) {
+                TextButton(onClick = { showEditProfilePictureDialog = false }) {
                     selectedPictureId?.let { id ->
                         // Saved picture id
 
                         coroutineScope.launch {
-                            userController.updateUserProfile(context = context, newProfilePictureId = id)
+                            userController.updateUserProfile(
+                                context = context,
+                                newProfilePictureId = id
+                            )
                         }
 
-                        Toast.makeText(context, "Selected Picture ID: $id", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Selected Picture ID: $id", Toast.LENGTH_SHORT)
+                            .show()
 
                     }
                     Text("Save")
@@ -489,7 +424,7 @@ fun EditProfile(context: Context, navController: NavController) {
 
             },
             dismissButton = {
-                TextButton (onClick = { showEditProfilePictureDialog = false }) {
+                TextButton(onClick = { showEditProfilePictureDialog = false }) {
                     Text("Cancel")
                 }
             }
@@ -505,7 +440,7 @@ fun RoundedInputField(
     maxLines: Int = 1,
     centerPlaceholder: Boolean = false,
     modifier: Modifier = Modifier,
-    error: String? = null, // ✅ New parameter
+    error: String? = null,
     onValueChange: (TextFieldValue) -> Unit
 ) {
     Column(modifier = modifier) {
@@ -548,88 +483,7 @@ fun RoundedInputField(
     }
 }
 
-@Composable
-fun ChangePasswordDialog(
-    onDismiss: () -> Unit,
-    onSave: (String) -> Unit,
-    newPassword: TextFieldValue,
-    confirmPassword: TextFieldValue,
-    onNewPasswordChange: (TextFieldValue) -> Unit,
-    onConfirmPasswordChange: (TextFieldValue) -> Unit,
-    errorMessage: String?
-) {
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {},
-        dismissButton = {},
-        title = {
-            Text("Change Password", fontWeight = FontWeight.Bold)
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = newPassword,
-                    onValueChange = onNewPasswordChange,
-                    label = { Text("New Password") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = onConfirmPasswordChange,
-                    label = { Text("Confirm Password") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (!errorMessage.isNullOrEmpty()) {
-                    Text(text = errorMessage, color = Color.Red, fontSize = 12.sp)
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Button(
-                        onClick = {
-                            onDismiss()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-                    ) {
-                        Text("Cancel")
-                    }
-
-                    Button(
-                        onClick = {
-                            when {
-                                newPassword.text != confirmPassword.text -> {
-                                    onSave("") // Trigger error: passwords do not match
-                                }
-                                !isValidPassword(newPassword.text) -> {
-                                    onSave("INVALID") // Trigger error: invalid format
-                                }
-                                else -> {
-                                    onSave(newPassword.text)
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        }
-    )
-}
-
 fun isValidEmail(email: String): Boolean {
     val regex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
     return regex.matches(email)
-}
-
-fun isValidPassword(password: String): Boolean {
-    val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
-    return regex.matches(password)
 }

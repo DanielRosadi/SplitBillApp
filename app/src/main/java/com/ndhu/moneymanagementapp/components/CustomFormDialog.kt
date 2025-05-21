@@ -3,11 +3,15 @@ package com.ndhu.moneymanagementapp.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -47,6 +51,9 @@ fun CustomFormDialog(
     onCancel: () -> Unit                    // Action when cancel is clicked
 ) {
     val context = LocalContext.current
+
+    // Track visibility for password fields using index-based mapping
+    val passwordVisibilityStates = remember { mutableStateMapOf<Int, Boolean>() }
 
     // Main dialog
     AlertDialog(
@@ -89,7 +96,13 @@ fun CustomFormDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Render each form field
-                fields.forEach { field ->
+                fields.forEachIndexed { index, field ->
+                    // Determine if the current field is a password field
+                    val isPasswordField = field.visualTransformation is PasswordVisualTransformation
+
+                    // Retrieve or initialize the visibility state for this field
+                    val isVisible = passwordVisibilityStates.getOrPut(index) { false }
+
                     OutlinedTextField(
                         value = field.value,
                         onValueChange = field.onValueChange,
@@ -101,15 +114,42 @@ fun CustomFormDialog(
                             )
                         },
                         keyboardOptions = field.keyboardOptions,
-                        visualTransformation = field.visualTransformation,
+
+                        // If it's a password field and not visible, apply masking
+                        visualTransformation = if (isPasswordField && !isVisible)
+                            PasswordVisualTransformation()
+                        else
+                            VisualTransformation.None,
+
                         singleLine = true,
                         shape = RoundedCornerShape(20.dp),
+
+                        // Show the visibility toggle icon only for password fields
+                        trailingIcon = {
+                            if (isPasswordField) {
+                                IconButton(onClick = {
+                                    // Toggle visibility state for this field
+                                    passwordVisibilityStates[index] = !isVisible
+                                }) {
+                                    Icon(
+                                        imageVector = if (isVisible)
+                                            Icons.Default.VisibilityOff
+                                        else
+                                            Icons.Default.Visibility,
+                                        contentDescription = if (isVisible) "Hide password" else "Show password",
+                                        tint = primaryGreen
+                                    )
+                                }
+                            }
+                        },
+
                         colors = TextFieldDefaults.textFieldColors(
                             containerColor = Color.White,
                             focusedIndicatorColor = primaryGreen,
                             unfocusedIndicatorColor = Color.Transparent,
                             cursorColor = primaryGreen
                         ),
+
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
@@ -139,7 +179,6 @@ fun CustomFormDialog(
                 OutlinedButton(
                     onClick = {
                         onCancel()
-                        showDialog.value = false
                     },
                     modifier = Modifier
                         .height(48.dp)
@@ -159,7 +198,6 @@ fun CustomFormDialog(
                 Button(
                     onClick = {
                         onConfirm()
-                        showDialog.value = false
                     },
                     modifier = Modifier
                         .height(48.dp)

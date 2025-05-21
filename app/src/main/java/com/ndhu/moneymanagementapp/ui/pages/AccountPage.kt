@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -26,11 +27,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.CustomFormDialog
+import com.ndhu.moneymanagementapp.components.FormField
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.enums.AppScreens
@@ -43,6 +48,12 @@ fun AccountPage(context: Context, navController: NavController) {
 
     val showDeleteAccountDialog  = remember { mutableStateOf(false) }
     val showLogOutDialog = remember { mutableStateOf(false) }
+
+    // Change Password Dialog States
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+    var newPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var confirmPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
 
     var user by remember { mutableStateOf<User?>(null) }
     var bio by remember { mutableStateOf(TextFieldValue("")) }
@@ -177,7 +188,7 @@ fun AccountPage(context: Context, navController: NavController) {
                         backgroundColor = Color(0xFF009669),
                         modifier = Modifier.weight(1f)
                     ) {
-                        //navigateToChangePasswordScreen(navController)
+                        showChangePasswordDialog = true
                     }
 
                     ColoredSettingsButton(
@@ -198,6 +209,70 @@ fun AccountPage(context: Context, navController: NavController) {
                 }
             }
         }
+    }
+
+    // --- Password Change Dialog using CustomFormDialog ---
+    if (showChangePasswordDialog) {
+        val showDialogState = remember { mutableStateOf(true) }
+
+        CustomFormDialog(
+            showDialog = showDialogState,
+            title = "Change Password",
+            fields = listOf(
+                FormField(
+                    label = "New Password",
+                    value = newPassword.text,
+                    onValueChange = { newPassword = TextFieldValue(it) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    visualTransformation = PasswordVisualTransformation()
+                ),
+                FormField(
+                    label = "Confirm Password",
+                    value = confirmPassword.text,
+                    onValueChange = { confirmPassword = TextFieldValue(it) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    visualTransformation = PasswordVisualTransformation()
+                )
+            ),
+            errorMessage = passwordError,
+            confirmButtonText = "Save",
+            cancelButtonText = "Cancel",
+            onCancel = {
+                // Reset dialog state
+                showDialogState.value = false
+                showChangePasswordDialog = false
+                newPassword = TextFieldValue("")
+                confirmPassword = TextFieldValue("")
+                passwordError = null
+            },
+            onConfirm = {
+                // Validate password
+                val np = newPassword.text
+                val cp = confirmPassword.text
+
+                when {
+                    np != cp -> {
+                        passwordError = "Passwords do not match"
+                    }
+
+                    !isValidPassword(np) -> {
+                        passwordError =
+                            "Password must be at least 8 characters, with uppercase, lowercase, digit, and special character"
+                    }
+
+                    else -> {
+                        coroutine.launch {
+                            userController.updateUserPassword(context, np)
+                            showDialogState.value = false
+                            showChangePasswordDialog = false
+                            newPassword = TextFieldValue("")
+                            confirmPassword = TextFieldValue("")
+                            passwordError = null
+                        }
+                    }
+                }
+            }
+        )
     }
 
     if (showDeleteAccountDialog.value) {
@@ -291,3 +366,9 @@ fun LogoutDialog(
 fun navigateToEditAccountScreen(navController: NavController) {
     navController.navigate(route = AppScreens.EditProfileScreen.name)
 }
+
+fun isValidPassword(password: String): Boolean {
+    val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
+    return regex.matches(password)
+}
+
