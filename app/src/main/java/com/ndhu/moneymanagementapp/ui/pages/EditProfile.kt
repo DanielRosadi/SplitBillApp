@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -36,10 +37,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -164,7 +165,7 @@ fun EditProfile(context: Context, navController: NavController) {
 
         // --- Main Form Section ---
         Surface(
-            color = Color(0xFFF5F5F5),
+            color = Color(0xFFD9D9D9),
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.9f)
@@ -173,193 +174,175 @@ fun EditProfile(context: Context, navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp, vertical = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(30.dp)
+                //verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Container for form content
-                Column(
+                Text(
+                    text = "Account",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
+
+                // Profile Picture
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Color(0xFFD9D9D9),
-                            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
-                        )
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .size(160.dp)
+                        .align(Alignment.CenterHorizontally)
                 ) {
-                    Text(
-                        text = "Account",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(vertical = 12.dp)
-                    )
-
-                    // --- Profile Picture Section ---
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(160.dp)
-                            .align(Alignment.CenterHorizontally)
-                    ) {
-
-                        var user: User? = null
-                        runBlocking {
-                            user = userController.getOnboardUser(context)
-                        }
-
-                        var profilePic =
-                            profilePictures.firstOrNull() { it.id == (user?.profilePictureId ?: 1) }
-
-                        // Display selected profile picture
-                        if (profilePic != null) {
-                            Image(
-                                // painter = painterResource(id = R.drawable.defaultavatarimage),
-                                painter = painterResource(id = profilePic.imageRes),
-                                contentDescription = "Profile Picture",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(140.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, Color.Gray, CircleShape)
-                            )
-                        }
-
-                        // Edit picture button
-                        IconButton(
-                            onClick = { showEditProfilePictureDialog = true },
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray)
-                                .align(Alignment.TopEnd)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit Icon",
-                                tint = Color.White
-                            )
-                        }
+                    var user: User? = null
+                    runBlocking {
+                        user = userController.getOnboardUser(context)
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    val profilePic = profilePictures.firstOrNull { it.id == (user?.profilePictureId ?: 1) }
 
-                    // --- Input Fields ---
-                    RoundedInputField(
-                        label = "username",
-                        value = username,
-                        onValueChange = {
-                            if (it.text.length <= 20) {
-                                username = it
-                            }
-                        },
-                        centerPlaceholder = true,
+                    if (profilePic != null) {
+                        Image(
+                            painter = painterResource(id = profilePic.imageRes),
+                            contentDescription = "Profile Picture",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(140.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, Color.Gray, CircleShape)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { showEditProfilePictureDialog = true },
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        error = usernameError
-                    )
-
-                    RoundedInputField(
-                        label = "email",
-                        value = email,
-                        keyboardType = KeyboardType.Email,
-                        onValueChange = { email = it },
-                        centerPlaceholder = true,
-                        error = emailError
-                    )
-
-                    RoundedInputField(
-                        label = "bio",
-                        value = bio,
-                        maxLines = 2,
-                        centerPlaceholder = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 60.dp),
-                        onValueChange = {
-                            if (it.text.length <= 50) {
-                                bio = it
-                            }
-                        },
-                        error = bioError
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // --- Save/Cancel Buttons ---
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                            .align(Alignment.TopEnd)
                     ) {
-                        // Cancel
-                        Button(
-                            onClick = { navController.popBackStack() },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp)
-                                .padding(end = 8.dp)
-                        ) {
-                            Text("Cancel", color = Color.White, fontSize = 16.sp)
-                        }
-
-                        // Save
-                        Button(
-                            onClick = {
-                                // Reset previous errors
-                                usernameError = null
-                                emailError = null
-
-                                val trimmedUsername = username.text.trim()
-                                val trimmedEmail = email.text.trim()
-
-                                var isValid = true
-
-                                // Validate fields
-                                if (trimmedUsername.length < 3) {
-                                    usernameError = "Username must be at least 3 characters"
-                                    isValid = false
-                                }
-
-                                if (!isValidEmail(trimmedEmail)) {
-                                    emailError = "Invalid email format"
-                                    isValid = false
-                                }
-
-                                if (bio.text.length > 50) {
-                                    bioError = "Bio: max 50 characters"
-                                    isValid = false
-                                }
-
-                                // Submit if valid
-                                if (isValid) {
-                                    coroutineScope.launch {
-                                        val result = userController.updateUserData(
-                                            context = context,
-                                            newUsername = trimmedUsername,
-                                            newEmail = trimmedEmail,
-                                            newBio = bio.text
-                                        )
-                                        if (result != null) {
-                                            Toast.makeText(context, result, Toast.LENGTH_SHORT)
-                                                .show()
-                                        } else {
-                                            navController.popBackStack()
-                                        }
-                                    }
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)), // Green
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp)
-                                .padding(start = 8.dp)
-                        ) {
-                            Text("Save", color = Color.White, fontSize = 16.sp)
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit Icon",
+                            tint = Color.White
+                        )
                     }
                 }
+
+                // Input Fields with controlled spacing
+                RoundedInputField(
+                    label = "username",
+                    value = username,
+                    onValueChange = {
+                        if (it.text.length <= 20) {
+                            username = it
+                        }
+                    },
+                    centerPlaceholder = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    error = usernameError
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                RoundedInputField(
+                    label = "email",
+                    value = email,
+                    keyboardType = KeyboardType.Email,
+                    onValueChange = { email = it },
+                    centerPlaceholder = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    error = emailError
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                RoundedInputField(
+                    label = "bio",
+                    value = bio,
+                    maxLines = 2,
+                    centerPlaceholder = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 60.dp),
+                    onValueChange = {
+                        if (it.text.length <= 50) {
+                            bio = it
+                        }
+                    },
+                    error = bioError
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
+                ) {
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        colors = ButtonDefaults.buttonColors(containerColor = dangerRed),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .width(140.dp)
+                            .height(56.dp)
+                    ) {
+                        Text("Cancel", color = Color.White, fontSize = 18.sp)
+                    }
+
+                    Button(
+                        onClick = {
+                            // Reset previous errors
+                            usernameError = null
+                            emailError = null
+
+                            val trimmedUsername = username.text.trim()
+                            val trimmedEmail = email.text.trim()
+
+                            var isValid = true
+
+                            // Validate fields
+                            if (trimmedUsername.length < 3) {
+                                usernameError = "Username must be at least 3 characters"
+                                isValid = false
+                            }
+
+                            if (!isValidEmail(trimmedEmail)) {
+                                emailError = "Invalid email format"
+                                isValid = false
+                            }
+
+                            if (bio.text.length > 50) {
+                                bioError = "Bio: max 50 characters"
+                                isValid = false
+                            }
+
+                            // Submit if valid
+                            if (isValid) {
+                                coroutineScope.launch {
+                                    val result = userController.updateUserData(
+                                        context = context,
+                                        newUsername = trimmedUsername,
+                                        newEmail = trimmedEmail,
+                                        newBio = bio.text
+                                    )
+                                    if (result != null) {
+                                        Toast.makeText(context, result, Toast.LENGTH_SHORT)
+                                            .show()
+                                    } else {
+                                        navController.popBackStack()
+                                    }
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryGreen),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .width(140.dp)
+                            .height(56.dp)
+                    ) {
+                        Text("Save", color = Color.White, fontSize = 18.sp)
+                    }
+                }
+
             }
         }
     }
@@ -432,6 +415,7 @@ fun EditProfile(context: Context, navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoundedInputField(
     label: String,
@@ -452,27 +436,40 @@ fun RoundedInputField(
                 Text(
                     text = label,
                     textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    color = if (error != null) Color.Red else primaryGreen
                 )
+            },
+            trailingIcon = {
+                if (value.text.isNotEmpty()) {
+                    IconButton(onClick = { onValueChange(TextFieldValue("")) }) {
+                        Icon(
+                            imageVector = Icons.Default.Close, // You can also use Icons.Filled.Clear
+                            contentDescription = "Clear text",
+                            tint = primaryGreen
+                        )
+                    }
+                }
             },
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             maxLines = maxLines,
             singleLine = true,
             shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 6.dp),
+            modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Gray,
-                unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedPlaceholderColor = Color.Gray,
-                unfocusedPlaceholderColor = Color.Gray
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.White,
+                focusedIndicatorColor = if (error != null) Color.Red else primaryGreen,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                errorIndicatorColor = Color.Red,
+                cursorColor = if (error != null) Color.Red else primaryGreen,
+                focusedLabelColor = primaryGreen,
+                unfocusedLabelColor = Color.Gray
             )
         )
         if (error != null) {
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = error,
                 color = Color.Red,
@@ -482,6 +479,9 @@ fun RoundedInputField(
         }
     }
 }
+
+
+
 
 fun isValidEmail(email: String): Boolean {
     val regex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
