@@ -135,6 +135,10 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
 private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>, uiItems:SnapshotStateList<UIItem>, store: Store?, navController: NavController, itemController: ItemController, viewModel: SharedViewModel) {
 
     var showDialogAddItem by remember { mutableStateOf(false) }
+    
+    // Add this to check if at least one item has quantity >= 1
+    // because n users can share 1 item (fractional quantity), this is the base case
+    // val isDoneEnabled = uiItems.any { it.quantity >= 1 }
 
     //Scaffold (
 //        topBar = {
