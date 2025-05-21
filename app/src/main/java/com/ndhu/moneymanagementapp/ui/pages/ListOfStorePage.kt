@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,19 +18,21 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
@@ -37,10 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.CustomFormDialog
+import com.ndhu.moneymanagementapp.components.FormField
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
@@ -48,9 +54,8 @@ import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.*
 
-
 @Composable
-fun ListStorePage(context : Context, navController: NavController, viewModel: SharedViewModel){
+fun ListStorePage(context: Context, navController: NavController, viewModel: SharedViewModel) {
 //    // Get the actual window size (container size)
 //    val windowInfo = LocalWindowInfo.current
 //    val screenWidthPx = windowInfo?.containerSize?.width ?: 0
@@ -64,7 +69,11 @@ fun ListStorePage(context : Context, navController: NavController, viewModel: Sh
 }
 
 @Composable
-fun GetStoreListFromDatabase(context : Context, navController: NavController, viewModel: SharedViewModel){
+fun GetStoreListFromDatabase(
+    context: Context,
+    navController: NavController,
+    viewModel: SharedViewModel
+) {
 
     val storeController = StoreController() // Initialize object
 
@@ -77,7 +86,7 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
 
         // clear stores list and add data from database into the stores list
         stores.clear()
-        stores.addAll( storeController.getListOfStores() )
+        stores.addAll(storeController.getListOfStores())
         viewModel.storeList = storeController.getListOfStores().toMutableList()
 
     }
@@ -87,7 +96,12 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
 }
 
 @Composable
-fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel) {
+fun ComposeListStore(
+    storeController: StoreController,
+    data: SnapshotStateList<Store>,
+    navController: NavController,
+    viewModel: SharedViewModel
+) {
     var showDialogAddStore by remember { mutableStateOf(false) }
 
     var searchQuery = remember { mutableStateOf("") }
@@ -156,14 +170,16 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                         .clip(RoundedCornerShape(20.dp))
                         .background(darkGreyContainer)
 
-                ){
+                ) {
 
 //                    LaunchedEffect(searchQuery.value) {
 //                        println("Search query updated to: ${searchQuery.value}")
 //                    }
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentPadding = PaddingValues(5.dp)
                     ) {
 
@@ -184,8 +200,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                         .fillMaxWidth()
                         //.fillMaxHeight()
                         .weight(1f)
-                        .padding(2.dp)
-                    ,
+                        .padding(2.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // we no longer need delete item, keep it for possible future change
@@ -205,7 +220,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                             .fillMaxWidth()
                             .fillMaxHeight()
 
-                            //.weight(1f)
+                        //.weight(1f)
                         ,
                         shape = RoundedCornerShape(18.dp),
                         colors = ButtonColors(
@@ -230,7 +245,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                     }
 
                     if (showDialogAddStore) {
-                        PopUpAddStore(
+                        AddStoreDialog(
                             storeController = storeController,
                             onDismiss = { showDialogAddStore = false },
                             data,
@@ -240,8 +255,8 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
 
                 }
             }
+        }
     }
-}
 }
 
 // filter function for search box
@@ -259,28 +274,17 @@ fun filterStores(storeList: SnapshotStateList<Store>, query: String): SnapshotSt
     return result
 }
 
-
-
 @Composable
-fun LazyColumnTest(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel){
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-        contentPadding = PaddingValues(5.dp)) {
-
-        // items(data) { item ->
-        items(data) { item ->
-            ListDataStore(storeController, item, navController, data, viewModel)
-        }
-
-    }
-}
-
-
-@Composable
-fun ListDataStore(storeController: StoreController, storeObject: Store, navController: NavController, data: SnapshotStateList<Store>, viewModel: SharedViewModel) {
+fun ListDataStore(
+    storeController: StoreController,
+    storeObject: Store,
+    navController: NavController,
+    data: SnapshotStateList<Store>,
+    viewModel: SharedViewModel
+) {
     var showDialogEditStore by remember { mutableStateOf(false) }
 
-    Card (
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(90.dp)
@@ -289,8 +293,8 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
             // pass respective storeId to the screen
             .clickable {
                 navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + storeObject.id)
-                       viewModel.selectedStore = storeObject
-                       },
+                viewModel.selectedStore = storeObject
+            },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
@@ -347,176 +351,196 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
             )
          */
         }
-        if (showDialogEditStore){
-            PopUpEditStore(storeObject = storeObject, storeController = storeController,
-                onDismiss = {showDialogEditStore = false}, storeList = data, viewModel = viewModel
+        if (showDialogEditStore) {
+            EditStoreDialog(
+                storeObject = storeObject, storeController = storeController,
+                onDismiss = { showDialogEditStore = false }, storeList = data, viewModel = viewModel
             )
         }
     }
 }
 
-// TODO: rework design
 @Composable
-fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedViewModel) {
+fun AddStoreDialog(
+    storeController: StoreController,
+    onDismiss: () -> Unit,
+    storeList: SnapshotStateList<Store>,
+    viewModel: SharedViewModel
+) {
+    val showDialog = remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // Form state
     var storeName by remember { mutableStateOf("") }
     var storeAddress by remember { mutableStateOf("") }
     var storeDescription by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    // Trimmed input for validation
+    val trimmedName = storeName.trim()
 
-            AlertDialog(
-                onDismissRequest = onDismiss,
-                title = { Text(text = "Add Store") },
-                text = {
-                    Column {
-                        TextField(
-                            value = storeName,
-                            onValueChange = { storeName = it },
-                            label = { Text("Store Name") }
-                        )
-                        TextField(
-                            value = storeAddress,
-                            onValueChange = { storeAddress = it },
-                            label = { Text("Store Address") }
-                        )
-                        TextField(
-                            value = storeDescription,
-                            onValueChange = { storeDescription = it },
-                            label = { Text("Store Description") }
-                        )
-                    }
+    // Validation checks
+    val isNameDuplicate = storeList.any { it.name.equals(trimmedName, ignoreCase = true) }
+    val isFormValid = trimmedName.isNotEmpty() && !isNameDuplicate
+
+    CustomFormDialog(
+        showDialog = showDialog,
+        title = "Add Store",
+        icon = Icons.Default.Store,
+        fields = listOf(
+            FormField(
+                label = "Store Name",
+                value = storeName,
+                onValueChange = {
+                    storeName = it
+                    errorMessage = null // Clear error on change
                 },
-                confirmButton = {
-                    Button(
-                        onClick = {
-
-                            // add store record to the database
-                            runBlocking {
-                                storeController.addStore(
-                                    storeName,
-                                    storeAddress,
-                                    storeDescription
-                                )
-                            }
-                            // add store to the LazyColumn data
-                            // this approach can only generate different id, which different from db
-                            // storeList.add(Store(storeName, storeAddress, storeDescription))
-                            runBlocking {
-                                storeList.clear()
-                                storeList.addAll(storeController.getListOfStores())
-                                viewModel.storeList = storeController.getListOfStores().toMutableList()
-
-                            }
-
-                            // add store to SharedViewModel
-                            // TODO: need to check for possibility of having different Store object.
-                            // TODO: if yes, then need to use the same Store object created at the top.
-                            // viewModel.storeList?.add(Store(storeName, storeAddress, storeDescription))
-
-                            // println("User entered: $storeName $storeAddress $storeDescription") // Handle input
-
-                            onDismiss()
-                        }
-                    ) {
-                        Text("Save")
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = onDismiss
-                    ) {
-                        Text("Cancel")
-                    }
+                // Inline error shown under text field
+                error = when {
+                    trimmedName.isEmpty() -> "Store Name cannot be empty."
+                    isNameDuplicate       -> "Store Name already exists."
+                    else                  -> null
                 }
+            ),
+            FormField(
+                label = "Store Address",
+                value = storeAddress,
+                onValueChange = { storeAddress = it }
+            ),
+            FormField(
+                label = "Store Description",
+                value = storeDescription,
+                onValueChange = { storeDescription = it }
             )
+        ),
+        confirmButtonText = "Save",
+        cancelButtonText = "Cancel",
+        confirmButtonEnabled = isFormValid, // Only enable if input is valid
 
-}
-
-// TODO: rework design
-@Composable
-fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedViewModel) {
-    var storeName by remember { mutableStateOf("") }
-    var storeAddress by remember { mutableStateOf("") }
-    var storeDescription by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Edit Store") },
-        text = {
-            Column {
-                TextField(
-                    value = storeName,
-                    onValueChange = { storeName = it },
-                    label = { Text("Store Name") }
-                )
-                TextField(
-                    value = storeAddress,
-                    onValueChange = { storeAddress = it },
-                    label = { Text("Store Address") }
-                )
-                TextField(
-                    value = storeDescription,
-                    onValueChange = { storeDescription = it },
-                    label = { Text("Store Description") }
-                )
-            }
+        // Cancel closes the dialog
+        onCancel = {
+            showDialog.value = false
+            onDismiss()
         },
-        confirmButton = {
-            Button(
-                onClick = {
 
-                    runBlocking {
-                        storeController.updateStore(
-                            storeObject.id,
-                            storeName,
-                            storeAddress,
-                            storeDescription
-                        )
-                    }
+        // Confirm saves the data using coroutine
+        onConfirm = {
+            scope.launch {
+                // Add store to database
+                storeController.addStore(
+                    trimmedName,
+                    storeAddress.trim(),
+                    storeDescription.trim()
+                )
 
+                // Refresh store list from DB
+                val updatedStores = storeController.getListOfStores()
+                storeList.clear()
+                storeList.addAll(updatedStores)
+                viewModel.storeList = updatedStores.toMutableList()
 
-                    runBlocking {
-                        storeList.clear()
-                        storeList.addAll(storeController.getListOfStores())
-                        viewModel.storeList = storeController.getListOfStores().toMutableList()
+                // Show toast
+                Toast.makeText(context, "Store added successfully", Toast.LENGTH_SHORT).show()
 
-                    }
-
-
-                    // println("User edited: ${storeObject.id} $storeName $storeAddress $storeDescription") // Handle input
-
-                    onDismiss()
-                }
-            ) {
-                Text("Save")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss
-            ) {
-                Text("Cancel")
+                // Close dialog
+                showDialog.value = false
+                onDismiss()
             }
         }
     )
-
 }
 
+@Composable
+fun EditStoreDialog(
+    storeObject: Store,
+    storeController: StoreController,
+    onDismiss: () -> Unit,
+    storeList: SnapshotStateList<Store>,
+    viewModel: SharedViewModel
+) {
+    val showDialog = remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
+    // Pre-fill with current store data
+    var storeName by remember { mutableStateOf(storeObject.name) }
+    var storeAddress by remember { mutableStateOf(storeObject.address) }
+    var storeDescription by remember { mutableStateOf(storeObject.description) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-
-
-fun testPrintStoreAttributes(obj: Store){
-    print("Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
-    Log.d("StoreTag", "Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
-}
-
-fun testGetStoreListFromDatabase(){
-    val storeList = StoreController() // Initialize object
-
-    runBlocking {
-        storeList.getListOfStores()
-        println(storeList)
-        Log.d("MyTag", "This is a debug message")  // Prints in Logcat
+    // Validation logic
+    val trimmedName = storeName.trim()
+    val isNameDuplicate = storeList.any {
+        it.name.equals(trimmedName, ignoreCase = true) && it.id != storeObject.id
     }
+    val isFormValid = trimmedName.isNotEmpty() && !isNameDuplicate
+
+    // Show the form dialog
+    CustomFormDialog(
+        showDialog = showDialog,
+        title = "Edit Store",
+        icon = Icons.Default.Edit,
+        fields = listOf(
+            FormField(
+                label = "Store Name",
+                value = storeName,
+                onValueChange = {
+                    storeName = it
+                    errorMessage = null // Clear error on edit
+                },
+                error = when {
+                    trimmedName.isEmpty() -> "Store Name cannot be empty."
+                    isNameDuplicate       -> "Store Name already exists."
+                    else                  -> null
+                }
+            ),
+            FormField(
+                label = "Store Address",
+                value = storeAddress,
+                onValueChange = { storeAddress = it }
+            ),
+            FormField(
+                label = "Store Description",
+                value = storeDescription,
+                onValueChange = { storeDescription = it }
+            )
+        ),
+        confirmButtonText = "Save",
+        cancelButtonText = "Cancel",
+        confirmButtonEnabled = isFormValid, // Disable confirm if invalid
+
+        // Cancel logic
+        onCancel = {
+            showDialog.value = false
+            onDismiss()
+        },
+
+        // Save logic (async)
+        onConfirm = {
+            scope.launch {
+                // Update store in database
+                storeController.updateStore(
+                    id = storeObject.id,
+                    newName = trimmedName,
+                    newAddress = storeAddress.trim(),
+                    newDescription = storeDescription.trim()
+                )
+
+                // Refresh store list
+                val updatedStores = storeController.getListOfStores()
+                storeList.clear()
+                storeList.addAll(updatedStores)
+                viewModel.storeList = updatedStores.toMutableList()
+
+                // Show toast
+                Toast.makeText(context, "Store updated successfully", Toast.LENGTH_SHORT).show()
+
+                // Close dialog
+                showDialog.value = false
+                onDismiss()
+            }
+        }
+    )
 }
 
