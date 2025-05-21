@@ -41,34 +41,34 @@ data class FormField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomFormDialog(
-    showDialog: MutableState<Boolean>,      // Controls dialog visibility
-    title: String,                          // Dialog title
-    icon: ImageVector? = null,              // Optional icon at the top
-    fields: List<FormField>,                // List of input fields to display
-    errorMessage: String? = null,           // Optional error message
-    confirmButtonText: String = "Confirm",  // Text for confirm button
-    cancelButtonText: String = "Cancel",    // Text for cancel button
-    onConfirm: () -> Unit,                  // Action when confirm is clicked
-    onCancel: () -> Unit                    // Action when cancel is clicked
+    showDialog: MutableState<Boolean>,       // Controls dialog visibility
+    title: String,                           // Dialog title
+    icon: ImageVector? = null,               // Optional top icon
+    fields: List<FormField>,                 // List of form input fields
+    errorMessage: String? = null,            // Optional general error message
+    confirmButtonText: String = "Confirm",   // Confirm button label
+    cancelButtonText: String = "Cancel",     // Cancel button label
+    onConfirm: () -> Unit,                   // Logic when confirm is clicked
+    onCancel: () -> Unit,                    // Logic when cancel is clicked
+    confirmButtonEnabled: Boolean = true     // Whether confirm button is enabled
 ) {
     val context = LocalContext.current
 
-    // Track visibility for password fields using index-based mapping
+    // Map to track password visibility toggles for each field
     val passwordVisibilityStates = remember { mutableStateMapOf<Int, Boolean>() }
 
-    // Main dialog
+    // Dialog container
     AlertDialog(
-        onDismissRequest = { showDialog.value = false }, // Dismiss when clicking outside
-        containerColor = Color(0xFFF5F5F5), // White Smoke
+        onDismissRequest = { showDialog.value = false },
+        containerColor = Color(0xFFF5F5F5),
         shape = RoundedCornerShape(20.dp),
 
-        // Title section with optional icon
+        // Header section with optional icon and title
         title = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Display icon if provided
                 if (icon != null) {
                     Icon(
                         imageVector = icon,
@@ -79,8 +79,6 @@ fun CustomFormDialog(
                             .padding(bottom = 4.dp)
                     )
                 }
-
-                // Title text
                 Text(
                     text = title,
                     fontSize = 20.sp,
@@ -90,7 +88,7 @@ fun CustomFormDialog(
             }
         },
 
-        // Main content area with form fields and error message
+        // Main form content
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -102,6 +100,7 @@ fun CustomFormDialog(
                     val isVisible = passwordVisibilityStates.getOrPut(index) { false }
 
                     Column(modifier = Modifier.fillMaxWidth()) {
+                        // Input field
                         OutlinedTextField(
                             value = field.value,
                             onValueChange = field.onValueChange,
@@ -142,7 +141,7 @@ fun CustomFormDialog(
                                 .height(56.dp)
                         )
 
-                        // Show error text if present
+                        // Inline field-specific error message
                         if (field.error != null) {
                             Text(
                                 text = field.error,
@@ -154,7 +153,7 @@ fun CustomFormDialog(
                     }
                 }
 
-                // Display error message if present
+                // General error message (if any)
                 if (!errorMessage.isNullOrEmpty()) {
                     Text(
                         text = errorMessage,
@@ -166,7 +165,7 @@ fun CustomFormDialog(
             }
         },
 
-        // Confirm and cancel buttons
+        // Confirm + Cancel buttons
         confirmButton = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -175,15 +174,13 @@ fun CustomFormDialog(
             ) {
                 // Cancel button
                 OutlinedButton(
-                    onClick = {
-                        onCancel()
-                    },
+                    onClick = { onCancel() },
                     modifier = Modifier
                         .height(48.dp)
                         .weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF666666) // cancelGray
+                        contentColor = Color(0xFF666666)
                     ),
                     border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
                 ) {
@@ -192,11 +189,10 @@ fun CustomFormDialog(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // Confirm button
+                // Confirm button (conditionally enabled)
                 Button(
-                    onClick = {
-                        onConfirm()
-                    },
+                    onClick = { onConfirm() },
+                    enabled = confirmButtonEnabled, // Button disables if form is invalid
                     modifier = Modifier
                         .height(48.dp)
                         .weight(1f),

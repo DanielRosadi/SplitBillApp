@@ -2,6 +2,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,19 +21,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Store
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -244,7 +245,7 @@ fun ComposeListStore(
                     }
 
                     if (showDialogAddStore) {
-                        PopUpAddStore(
+                        AddStoreDialog(
                             storeController = storeController,
                             onDismiss = { showDialogAddStore = false },
                             data,
@@ -351,7 +352,7 @@ fun ListDataStore(
          */
         }
         if (showDialogEditStore) {
-            PopUpEditStore(
+            EditStoreDialog(
                 storeObject = storeObject, storeController = storeController,
                 onDismiss = { showDialogEditStore = false }, storeList = data, viewModel = viewModel
             )
@@ -360,17 +361,28 @@ fun ListDataStore(
 }
 
 @Composable
-fun PopUpAddStore(
+fun AddStoreDialog(
     storeController: StoreController,
     onDismiss: () -> Unit,
     storeList: SnapshotStateList<Store>,
     viewModel: SharedViewModel
 ) {
+    val showDialog = remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // Form state
     var storeName by remember { mutableStateOf("") }
     var storeAddress by remember { mutableStateOf("") }
     var storeDescription by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val showDialog = remember { mutableStateOf(true) }
+    // Trimmed input for validation
+    val trimmedName = storeName.trim()
+
+    // Validation checks
+    val isNameDuplicate = storeList.any { it.name.equals(trimmedName, ignoreCase = true) }
+    val isFormValid = trimmedName.isNotEmpty() && !isNameDuplicate
 
     CustomFormDialog(
         showDialog = showDialog,
@@ -380,7 +392,16 @@ fun PopUpAddStore(
             FormField(
                 label = "Store Name",
                 value = storeName,
-                onValueChange = { storeName = it }
+                onValueChange = {
+                    storeName = it
+                    errorMessage = null // Clear error on change
+                },
+                // Inline error shown under text field
+                error = when {
+                    trimmedName.isEmpty() -> "Store Name cannot be empty."
+                    isNameDuplicate       -> "Store Name already exists."
+                    else                  -> null
+                }
             ),
             FormField(
                 label = "Store Address",
@@ -395,41 +416,67 @@ fun PopUpAddStore(
         ),
         confirmButtonText = "Save",
         cancelButtonText = "Cancel",
+        confirmButtonEnabled = isFormValid, // Only enable if input is valid
+
+        // Cancel closes the dialog
         onCancel = {
             showDialog.value = false
             onDismiss()
         },
+
+        // Confirm saves the data using coroutine
         onConfirm = {
-            runBlocking {
+            scope.launch {
+                // Add store to database
                 storeController.addStore(
-                    storeName.trim(),
+                    trimmedName,
                     storeAddress.trim(),
                     storeDescription.trim()
                 )
+
+                // Refresh store list from DB
+                val updatedStores = storeController.getListOfStores()
                 storeList.clear()
-                storeList.addAll(storeController.getListOfStores())
-                viewModel.storeList = storeController.getListOfStores().toMutableList()
+                storeList.addAll(updatedStores)
+                viewModel.storeList = updatedStores.toMutableList()
+
+                // Show toast
+                Toast.makeText(context, "Store added successfully", Toast.LENGTH_SHORT).show()
+
+                // Close dialog
+                showDialog.value = false
+                onDismiss()
             }
-            showDialog.value = false
-            onDismiss()
         }
     )
 }
 
 @Composable
-fun PopUpEditStore(
+fun EditStoreDialog(
     storeObject: Store,
     storeController: StoreController,
     onDismiss: () -> Unit,
     storeList: SnapshotStateList<Store>,
     viewModel: SharedViewModel
 ) {
+    val showDialog = remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // Pre-fill with current store data
     var storeName by remember { mutableStateOf(storeObject.name) }
     var storeAddress by remember { mutableStateOf(storeObject.address) }
     var storeDescription by remember { mutableStateOf(storeObject.description) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val showDialog = remember { mutableStateOf(true) }
+    // Validation logic
+    val trimmedName = storeName.trim()
+    val isNameDuplicate = storeList.any {
+        it.name.equals(trimmedName, ignoreCase = true) && it.id != storeObject.id
+    }
+    val isFormValid = trimmedName.isNotEmpty() && !isNameDuplicate
 
+    // Show the form dialog
     CustomFormDialog(
         showDialog = showDialog,
         title = "Edit Store",
@@ -438,7 +485,15 @@ fun PopUpEditStore(
             FormField(
                 label = "Store Name",
                 value = storeName,
-                onValueChange = { storeName = it }
+                onValueChange = {
+                    storeName = it
+                    errorMessage = null // Clear error on edit
+                },
+                error = when {
+                    trimmedName.isEmpty() -> "Store Name cannot be empty."
+                    isNameDuplicate       -> "Store Name already exists."
+                    else                  -> null
+                }
             ),
             FormField(
                 label = "Store Address",
@@ -453,24 +508,39 @@ fun PopUpEditStore(
         ),
         confirmButtonText = "Save",
         cancelButtonText = "Cancel",
+        confirmButtonEnabled = isFormValid, // Disable confirm if invalid
+
+        // Cancel logic
         onCancel = {
             showDialog.value = false
             onDismiss()
         },
+
+        // Save logic (async)
         onConfirm = {
-            runBlocking {
+            scope.launch {
+                // Update store in database
                 storeController.updateStore(
                     id = storeObject.id,
-                    newName = storeName.trim(),
+                    newName = trimmedName,
                     newAddress = storeAddress.trim(),
                     newDescription = storeDescription.trim()
                 )
+
+                // Refresh store list
+                val updatedStores = storeController.getListOfStores()
                 storeList.clear()
-                storeList.addAll(storeController.getListOfStores())
-                viewModel.storeList = storeController.getListOfStores().toMutableList()
+                storeList.addAll(updatedStores)
+                viewModel.storeList = updatedStores.toMutableList()
+
+                // Show toast
+                Toast.makeText(context, "Store updated successfully", Toast.LENGTH_SHORT).show()
+
+                // Close dialog
+                showDialog.value = false
+                onDismiss()
             }
-            showDialog.value = false
-            onDismiss()
         }
     )
 }
+
