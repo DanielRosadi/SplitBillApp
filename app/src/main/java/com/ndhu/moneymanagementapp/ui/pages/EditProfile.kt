@@ -27,7 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -225,6 +225,8 @@ fun EditProfile(context: Context, navController: NavController) {
                     }
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
                 // Input Fields with controlled spacing
                 RoundedInputField(
                     label = "username",
@@ -234,7 +236,7 @@ fun EditProfile(context: Context, navController: NavController) {
                             username = it
                         }
                     },
-                    centerPlaceholder = true,
+                    centerText = true,
                     modifier = Modifier.fillMaxWidth(),
                     error = usernameError
                 )
@@ -246,7 +248,7 @@ fun EditProfile(context: Context, navController: NavController) {
                     value = email,
                     keyboardType = KeyboardType.Email,
                     onValueChange = { email = it },
-                    centerPlaceholder = true,
+                    centerText = true,
                     modifier = Modifier.fillMaxWidth(),
                     error = emailError
                 )
@@ -257,7 +259,7 @@ fun EditProfile(context: Context, navController: NavController) {
                     label = "bio",
                     value = bio,
                     maxLines = 2,
-                    centerPlaceholder = true,
+                    centerText = true,
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 60.dp),
@@ -422,7 +424,7 @@ fun RoundedInputField(
     value: TextFieldValue,
     keyboardType: KeyboardType = KeyboardType.Text,
     maxLines: Int = 1,
-    centerPlaceholder: Boolean = false,
+    centerText: Boolean = false,
     modifier: Modifier = Modifier,
     error: String? = null,
     onValueChange: (TextFieldValue) -> Unit
@@ -432,11 +434,9 @@ fun RoundedInputField(
             value = value,
             onValueChange = onValueChange,
             isError = error != null,
-            placeholder = {
+            label = {
                 Text(
                     text = label,
-                    textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth(),
                     color = if (error != null) Color.Red else primaryGreen
                 )
             },
@@ -444,7 +444,7 @@ fun RoundedInputField(
                 if (value.text.isNotEmpty()) {
                     IconButton(onClick = { onValueChange(TextFieldValue("")) }) {
                         Icon(
-                            imageVector = Icons.Default.Close, // You can also use Icons.Filled.Clear
+                            imageVector = Icons.Filled.Clear,
                             contentDescription = "Clear text",
                             tint = primaryGreen
                         )
@@ -452,11 +452,14 @@ fun RoundedInputField(
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            singleLine = maxLines == 1,
             maxLines = maxLines,
-            singleLine = true,
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(textAlign = if (centerPlaceholder) TextAlign.Center else TextAlign.Start),
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                textAlign = if (centerText) TextAlign.Center else TextAlign.Start
+            ),
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.White,
                 focusedIndicatorColor = if (error != null) Color.Red else primaryGreen,
@@ -468,6 +471,7 @@ fun RoundedInputField(
                 unfocusedLabelColor = Color.Gray
             )
         )
+
         if (error != null) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -479,9 +483,6 @@ fun RoundedInputField(
         }
     }
 }
-
-
-
 
 fun isValidEmail(email: String): Boolean {
     val regex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
