@@ -1,6 +1,10 @@
 package com.ndhu.moneymanagementapp.ui.pages
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.ndhu.moneymanagementapp.models.Item
+
+// INTERNAL USE for ListOfItemPage.kt only !
 
 // UIItem is used for ListOfItemPage.kt only (internal usage)
 // It is required that item quantity to be of type Integer
@@ -8,5 +12,5 @@ import com.ndhu.moneymanagementapp.models.Item
 // for partial portion, user can add new item instead (e.g 1/2 portion of fried rice with integer item quantity )
 data class UIItem(
     val item: Item,
-    var quantity: Int = 0
+    var quantity: MutableState<Int> = mutableStateOf(0)
 )
