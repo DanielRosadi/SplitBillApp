@@ -3,6 +3,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +23,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -32,13 +33,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
@@ -46,9 +47,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.CustomFormDialog
+import com.ndhu.moneymanagementapp.components.FormField
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
@@ -56,8 +60,8 @@ import com.ndhu.moneymanagementapp.controllers.ItemController
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.UUID
 
 /*
 To pay attention when performing change in item data (database or UI):
@@ -81,7 +85,12 @@ this runBlocking block is not protected and will keep running.
  */
 
 @Composable
-fun ListOfItemPage(context : Context, navController: NavController, storeId: String?, viewModel: SharedViewModel){
+fun ListOfItemPage(
+    context: Context,
+    navController: NavController,
+    storeId: String?,
+    viewModel: SharedViewModel
+) {
 
     val itemController = ItemController()
 
@@ -103,8 +112,11 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
         // for tracking Item data in the UI (with quantity)
 
         storeId?.let {
-            itemController.getItemListBasedStoreId(it).map { dbItem->
-                UIItem(item = dbItem, quantity = mutableStateOf(0)) // initialise UI Item with quantity of 0
+            itemController.getItemListBasedStoreId(it).map { dbItem ->
+                UIItem(
+                    item = dbItem,
+                    quantity = mutableStateOf(0)
+                ) // initialise UI Item with quantity of 0
             }
         }?.let {
             // clear items list and add data from database into the stores list (this helps to avoid multiple/duplicate data being taken/shown. use clear() for similar operation)
@@ -116,7 +128,9 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
         }
 
         // viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it) })
-        viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it).toMutableList() })
+        viewModel.setItemList(storeId?.let {
+            itemController.getItemListBasedStoreId(it).toMutableList()
+        })
 
     }
 
@@ -131,36 +145,19 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
 }
 
 @Composable
-private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>, uiItems:SnapshotStateList<UIItem>, store: Store?, navController: NavController, itemController: ItemController, viewModel: SharedViewModel) {
+private fun ComposeListItem(
+    context: Context,
+    listItem: SnapshotStateList<Item>,
+    uiItems: SnapshotStateList<UIItem>,
+    store: Store?,
+    navController: NavController,
+    itemController: ItemController,
+    viewModel: SharedViewModel
+) {
 
     var showDialogAddItem by remember { mutableStateOf(false) }
 
-    //Scaffold (
-//        topBar = {
-//            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
-//                IconButton(onClick = { navController.popBackStack() }) {
-//                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
-//                }
-//
-//                Column() {
-//                    Card (modifier = Modifier.fillMaxWidth().clickable { }) {
-//                        Text(
-//                            text = store?.name ?: "Unknown Store",
-//                            fontSize = 25.sp,
-//                            fontWeight = FontWeight.Bold
-//                        )
-//                        Text(
-//                            text = store?.address ?: "Unknown Store",
-//                            fontSize = 15.sp,
-//                            fontWeight = FontWeight.Bold)
-//                    }
-//            }
-//            }
-//        }
-    // )
-    //{paddingValues->
-
-    var searchQuery = remember { mutableStateOf("") }
+    val searchQuery = remember { mutableStateOf("") }
 
     val filteredItems = filterItems(uiItems, searchQuery.value) //  no remember
 
@@ -180,167 +177,110 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
         // Background Image
         BackgroundImage()
 
-            // Full Page
+        // Full Page
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+            //.fillMaxHeight()
+            // .padding(paddingValues)
+            //.padding(10.dp)
+            ,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            TitleText()
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // White Box
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                //.fillMaxHeight()
-                // .padding(paddingValues)
-                //.padding(10.dp)
-                ,
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color(0xFFD9D9D9))
+                    .padding(10.dp),
+                //.padding(paddingValues)
+                //verticalArrangement = Arrangement.Top,
+                //horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Spacer(modifier = Modifier.height(30.dp))
+                // Content Top Bar
+                // TODO: search func
+                ItemContentTopBar(navController = navController,
+                    store = store,
+                    searchBox = { SearchBox(searchQuery = searchQuery) }
+                )
 
-                TitleText()
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                // White Box
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                        .background(Color(0xFFD9D9D9))
-                        .padding(10.dp)
-                    //.padding(paddingValues)
-                    ,
-                    //verticalArrangement = Arrangement.Top,
-                    //horizontalAlignment = Alignment.CenterHorizontally
+                        .weight(6f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(darkGreyContainer)
+
                 ) {
 
-                    // Content Top Bar
-                    // TODO: search func
-                    ItemContentTopBar(navController = navController,
-                        store = store,
-                        searchBox = { SearchBox(searchQuery = searchQuery) }
-                        )
-
-                    Column(
+                    LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(6f)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(darkGreyContainer)
-
-                    ){
-
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                                .weight(1f),
-                            contentPadding = PaddingValues(5.dp)
-                        ) {
-
-                            items(filteredItems) { uiItem ->
-                                ListDataItem(
-                                    uiItem,
-                                    store,
-                                    itemController,
-                                    listItem,
-                                    viewModel,
-                                    uiItems
-                                )
-
-                            }
-
-                        }
-                }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-
-                    Column(
-                        // modifier = Modifier.padding(20.dp)
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            //.fillMaxHeight()
-                            .weight(2.5f)
-                            .padding(2.dp)
-                        ,
-                        horizontalAlignment = Alignment.CenterHorizontally
-
+                            .fillMaxHeight()
+                            .weight(1f),
+                        contentPadding = PaddingValues(5.dp)
                     ) {
 
-                        Row {
-                            // we no longer need delete item, keep it for possible future change
-                            /*
-                                Button(
-                                    onClick = {}, modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(60.dp)
-                                        .weight(1f)
-                                ) {
-                                    Text(text = "Delete (Temp)")
-                                }
-                                Spacer(modifier = Modifier.width(20.dp))
-                                 */
-
-                            Button(
-                                onClick = { showDialogAddItem = true },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp)
-                                    .weight(1f),
-                                shape = RoundedCornerShape(18.dp),
-                                colors = ButtonColors(
-                                    containerColor = primaryGreen,
-                                    contentColor = Color.White,
-                                    disabledContainerColor = Color.Gray,
-                                    disabledContentColor = Color.White
-                                )
-                            ) {
-                                Text(text = "Add item",
-                                    fontSize = 24.sp)
-                            }
-
-                            if (showDialogAddItem) {
-                                if (store != null) {
-                                    PopUpAddItem(
-                                        itemController = itemController,
-                                        onDismiss = { showDialogAddItem = false },
-                                        storeId = store.id,
-                                        itemList = listItem,
-                                        viewModel = viewModel,
-                                        uiItems = uiItems
-                                    )
-                                }
-                            }
-
+                        items(filteredItems) { uiItem ->
+                            ListDataItem(
+                                uiItem,
+                                store,
+                                itemController,
+                                listItem,
+                                viewModel,
+                                uiItems
+                            )
 
                         }
 
-                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+
+                Column(
+                    // modifier = Modifier.padding(20.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.fillMaxHeight()
+                        .weight(2.5f)
+                        .padding(2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+
+                ) {
+
+                    Row {
+                        // we no longer need delete item, keep it for possible future change
+                        /*
+                            Button(
+                                onClick = {}, modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp)
+                                    .weight(1f)
+                            ) {
+                                Text(text = "Delete (Temp)")
+                            }
+                            Spacer(modifier = Modifier.width(20.dp))
+                             */
 
                         Button(
-                            // TODO: need to pass item list
-                            onClick = {
-                                navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
-                                val result = uiItems
-                                    .filter { uiItem -> uiItem.quantity.value > 0 } // we don't send items data that are not in the transaction
-                                    .map { uiItem ->
-                                        ItemDetail(
-                                            id = uiItem.item.id,
-                                            name = uiItem.item.name,
-                                            price = uiItem.item.price,
-                                            qty = uiItem.quantity.value.toFloat()
-                                        )
-                                    }
-
-                                // TODO: what to do with result? e.g onDoneClicked(result)
-                                // save the items for Assign_Split page
-                                viewModel.itemDetailList = result.toMutableList()
-
-                                // TODO: should notify user if there is item with 0 quantity (that is, the item is unassign)
-                            },
+                            onClick = { showDialogAddItem = true },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(60.dp),
-                            enabled = isDoneEnabled, // <-- CHANGES HERE
+                                .height(60.dp)
+                                .weight(1f),
                             shape = RoundedCornerShape(18.dp),
                             colors = ButtonColors(
                                 containerColor = primaryGreen,
@@ -349,20 +289,76 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                                 disabledContentColor = Color.White
                             )
                         ) {
-                            Text(text = "Done",
-                                fontSize = 24.sp)
+                            Text(
+                                text = "Add item",
+                                fontSize = 24.sp
+                            )
+                        }
+
+                        if (showDialogAddItem) {
+                            if (store != null) {
+                                AddItemDialog(
+                                    itemController = itemController,
+                                    onDismiss = { showDialogAddItem = false },
+                                    storeId = store.id,
+                                    itemList = listItem,
+                                    viewModel = viewModel,
+                                    uiItems = uiItems
+                                )
+                            }
                         }
 
 
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    Button(
+                        // TODO: need to pass item list
+                        onClick = {
+                            navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
+                            val result = uiItems
+                                .filter { uiItem -> uiItem.quantity.value > 0 } // we don't send items data that are not in the transaction
+                                .map { uiItem ->
+                                    ItemDetail(
+                                        id = uiItem.item.id,
+                                        name = uiItem.item.name,
+                                        price = uiItem.item.price,
+                                        qty = uiItem.quantity.value.toFloat()
+                                    )
+                                }
+
+                            // TODO: what to do with result? e.g onDoneClicked(result)
+                            // save the items for Assign_Split page
+                            viewModel.itemDetailList = result.toMutableList()
+
+                            // TODO: should notify user if there is item with 0 quantity (that is, the item is unassign)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        enabled = isDoneEnabled, // <-- CHANGES HERE
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonColors(
+                            containerColor = primaryGreen,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.White
+                        )
+                    ) {
+                        Text(
+                            text = "Done",
+                            fontSize = 24.sp
+                        )
+                    }
+
 
                 }
+                Spacer(modifier = Modifier.height(10.dp))
+
+            }
+        }
     }
-}
-
-//}
-
 }
 
 // filter function for search box
@@ -380,7 +376,6 @@ fun filterItems(itemList: SnapshotStateList<UIItem>, query: String): SnapshotSta
     return result
 }
 
-
 @Composable
 private fun ListDataItem(
     // item: Item,
@@ -396,7 +391,7 @@ private fun ListDataItem(
     var itemQuantity by remember { mutableStateOf(uiItem.quantity.value) }
 
     // inner function only for updating item quantity
-    fun updateItemQuantity(newItemQuantity: Int){
+    fun updateItemQuantity(newItemQuantity: Int) {
         itemQuantity = newItemQuantity
         uiItem.quantity.value = newItemQuantity
     }
@@ -419,9 +414,12 @@ private fun ListDataItem(
             Spacer(modifier = Modifier.width(10.dp))
 
             Column(
-                modifier = Modifier.fillMaxHeight().weight(1f)
-            ){
-                Text(text = uiItem.item.name,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            ) {
+                Text(
+                    text = uiItem.item.name,
                     color = primaryGreen,
                     fontSize = 20.sp,
                     fontFamily = alexandriaFont,
@@ -438,13 +436,14 @@ private fun ListDataItem(
                 }
 
 
-                Text(text = "NTD $priceText",
+                Text(
+                    text = "NTD $priceText",
                     fontSize = 17.sp,
                     // fontWeight = FontWeight.W600,
                     fontFamily = surannaFont,
                     //modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyLarge
-                    )
+                )
             }
 
             // Spacer(modifier = Modifier.width(20.dp))
@@ -453,16 +452,23 @@ private fun ListDataItem(
             Spacer(modifier = Modifier.width(25.dp))
 
             Row(
-                modifier = Modifier.fillMaxHeight().weight(1f),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
 
-                IconButton(onClick = { if (itemQuantity > 0) {
-                    updateItemQuantity(itemQuantity - 1)
-                }
+                IconButton(onClick = {
+                    if (itemQuantity > 0) {
+                        updateItemQuantity(itemQuantity - 1)
+                    }
                 }) {
-                    Icon(Icons.Default.Remove, contentDescription = "Remove", modifier = Modifier.size(30.dp))
+                    Icon(
+                        Icons.Default.Remove,
+                        contentDescription = "Remove",
+                        modifier = Modifier.size(30.dp)
+                    )
                 }
 
                 /*
@@ -474,18 +480,23 @@ private fun ListDataItem(
                 */
                 Spacer(modifier = Modifier.width(20.dp))
 
-                Text(text = itemQuantity.toString(),
+                Text(
+                    text = itemQuantity.toString(),
                     fontSize = 22.sp,
                     fontFamily = surannaFont,
                     //modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyLarge
-                    )
+                )
                 Spacer(modifier = Modifier.width(20.dp))
 
                 // Button(onClick = { updateItemQuantity(itemQuantity + 1) }) { Text(text = "+") }
 
                 IconButton(onClick = { updateItemQuantity(itemQuantity + 1) }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add", modifier = Modifier.size(30.dp) )
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = "Add",
+                        modifier = Modifier.size(30.dp)
+                    )
                 }
 
             }
@@ -495,7 +506,7 @@ private fun ListDataItem(
 
         if (showDialogEditItem) {
             if (store != null) {
-                PopUpEditItem(
+                EditItemDialog(
                     itemObject = uiItem.item,
                     storeId = store.id,
                     itemController = itemController,
@@ -511,167 +522,218 @@ private fun ListDataItem(
 }
 
 @Composable
-fun PopUpAddItem(itemController: ItemController, onDismiss: () -> Unit, storeId: String, itemList: SnapshotStateList<Item>, viewModel: SharedViewModel, uiItems: SnapshotStateList<UIItem>) {
+fun AddItemDialog(
+    itemController: ItemController,
+    onDismiss: () -> Unit,
+    storeId: String,
+    itemList: SnapshotStateList<Item>,
+    viewModel: SharedViewModel,
+    uiItems: SnapshotStateList<UIItem>
+) {
+    // Dialog visibility state
+    val showDialog = remember { mutableStateOf(true) }
+
+    // For showing toast
+    val context = LocalContext.current
+
+    // For running suspend functions from UI
+    val scope = rememberCoroutineScope()
+
+    // Form input state
     var itemName by remember { mutableStateOf("") }
-    var itemPrice by remember { mutableStateOf(0f) }
+    var itemPrice by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // TODO: omitted, it does not fit current Item model
-    // var itemDescription by remember { mutableStateOf("") }
+    // Trim and parse input for validation
+    val trimmedName = itemName.trim()
+    val parsedPrice = itemPrice.toFloatOrNull() ?: 0f
 
+    // Check if item with same name already exists (case-insensitive)
+    val isDuplicate = itemList.any {
+        it.name.equals(trimmedName, ignoreCase = true)
+    }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Add Item") },
-        text = {
-            Column {
-                TextField(
-                    value = itemName,
-                    onValueChange = { itemName = it },
-                    label = { Text("Item Name") }
-                )
-                TextField(
-                    // TextField works with String values, but your itemPrice is a MutableState<Float>, so mismatches
-                    value = itemPrice.toString(), // Converts the Float to String for displaying.
-                    onValueChange = { itemPrice = it.toFloatOrNull() ?: 0f }, // Safely parses the string input to Float, avoiding crashes.
-                    label = { Text("Item Price") }
-                )
+    // Determine whether the form is valid
+    val isFormValid = trimmedName.isNotEmpty() && parsedPrice > 0 && !isDuplicate
 
-                /*
-                TODO: add/remove according to next discussion
-                TextField(
-                    value = itemDescription,
-                    onValueChange = { itemDescription = it },
-                    label = { Text("Item Description") }
-                )
-                */
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
+    // Show custom input dialog
+    CustomFormDialog(
+        showDialog = showDialog,
+        title = "Add Item",
+        icon = Icons.Default.Add,
 
-                    // add item record to the database
-                    runBlocking {
-                        itemController.addItem(
-                            storeId,
-                            itemName,
-                            itemPrice
-                            // itemDescription
-                        )
-                    }
-                    // add item to the LazyColumn data
-                    // this approach can only generate different id, which different from db
-                    // itemList.add(Item(itemName, itemPrice))
-                    runBlocking {
-                        itemList.clear()
-                        itemList.addAll(itemController.getItemListBasedStoreId(storeId))
-
-                        // add item to SharedViewModel
-                        viewModel.setItemList(itemController.getItemListBasedStoreId(storeId).toMutableList())
-
-                        // sync data addition from database to observed UI Items
-                        syncUiItemsFromDb(itemController.getItemListBasedStoreId(storeId), uiItems)
-
-                    }
-
-                    // println("User entered: $itemName $itemPrice") // Handle input
-
-                    onDismiss()
+        // Input fields
+        fields = listOf(
+            FormField(
+                label = "Item Name",
+                value = itemName,
+                onValueChange = {
+                    itemName = it
+                    errorMessage = null // Clear error on edit
+                },
+                error = when {
+                    trimmedName.isEmpty() -> "Item name cannot be empty."
+                    isDuplicate -> "Item with this name already exists."
+                    else -> null
                 }
-            ) {
-                Text("Save")
-            }
+            ),
+            FormField(
+                label = "Item Price",
+                value = itemPrice,
+                onValueChange = {
+                    itemPrice = it
+                    errorMessage = null
+                },
+                error = if (parsedPrice <= 0f) "Price must be greater than 0." else null
+            )
+        ),
+
+        confirmButtonText = "Save",
+        cancelButtonText = "Cancel",
+        confirmButtonEnabled = isFormValid,
+
+        // Cancel action
+        onCancel = {
+            showDialog.value = false
+            onDismiss()
         },
-        dismissButton = {
-            Button(
-                onClick = onDismiss
-            ) {
-                Text("Cancel")
+
+        // Save action
+        onConfirm = {
+            scope.launch {
+                // Add item to DB
+                itemController.addItem(storeId, trimmedName, parsedPrice)
+
+                // Refresh local and viewModel data
+                val updatedItems = itemController.getItemListBasedStoreId(storeId)
+                itemList.clear()
+                itemList.addAll(updatedItems)
+                viewModel.setItemList(updatedItems.toMutableList())
+
+                // Sync UI list (with quantities)
+                syncUiItemsFromDb(updatedItems, uiItems)
+
+                // Show toast
+                Toast.makeText(context, "Item added successfully", Toast.LENGTH_SHORT).show()
+
+                // Close dialog
+                showDialog.value = false
+                onDismiss()
             }
         }
     )
-
 }
 
-
 @Composable
-fun PopUpEditItem(itemObject: Item, storeId: String, itemController: ItemController, onDismiss: () -> Unit, itemList: SnapshotStateList<Item>, viewModel: SharedViewModel, uiItems: SnapshotStateList<UIItem>) {
-    var itemName by remember { mutableStateOf("") }
-    var itemPrice by remember { mutableStateOf(0f) }
-    // var itemDescription by remember { mutableStateOf("") }
+fun EditItemDialog(
+    itemObject: Item,
+    storeId: String,
+    itemController: ItemController,
+    onDismiss: () -> Unit,
+    itemList: SnapshotStateList<Item>,
+    viewModel: SharedViewModel,
+    uiItems: SnapshotStateList<UIItem>
+) {
+    // Dialog visibility state
+    val showDialog = remember { mutableStateOf(true) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Edit Item") },
-        text = {
-            Column {
-                TextField(
-                    value = itemName,
-                    onValueChange = { itemName = it },
-                    label = { Text("Item Name") }
-                )
-                TextField(
-                    // TextField works with String values, but your itemPrice is a MutableState<Float>, so mismatches
-                    value = itemPrice.toString(), // Converts the Float to String for displaying.
-                    onValueChange = { itemPrice = it.toFloatOrNull() ?: 0f }, // Safely parses the string input to Float, avoiding crashes.
-                    label = { Text("Item Price") }
-                )
-                /*
-                TextField(
-                    value = itemDescription,
-                    onValueChange = { itemDescription = it },
-                    label = { Text("Item Description") }
-                )
+    // For toast messages
+    val context = LocalContext.current
 
-                 */
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
+    // Coroutine scope for background work
+    val scope = rememberCoroutineScope()
 
-                    runBlocking {
-                        itemController.updateItem(itemObject.id,
-                            Item(
-                                id = UUID.randomUUID().toString(),
-                                name = itemName,
-                                price = itemPrice,
-                                storeId = storeId
-                            )
-                        )
-                    }
+    // Pre-filled form state
+    var itemName by remember { mutableStateOf(itemObject.name) }
+    var itemPrice by remember { mutableStateOf(itemObject.price.toString()) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-                    runBlocking {
-                        itemList.clear()
+    // Trimmed name and parsed price
+    val trimmedName = itemName.trim()
+    val parsedPrice = itemPrice.toFloatOrNull() ?: 0f
 
-                        // load items based on store id
-                        storeId.let { itemController.getItemListBasedStoreId(it) }.let { itemList.addAll(it) }
+    // Check for duplicate name (excluding the current item itself)
+    val isDuplicate = itemList.any {
+        it.name.equals(trimmedName, ignoreCase = true) && it.id != itemObject.id
+    }
 
-                        // viewModel.setItemList(storeId?.let { itemController.getItemListBasedStoreId(it) })
-                        viewModel.setItemList(storeId.let { itemController.getItemListBasedStoreId(it).toMutableList() })
+    // Form validity check
+    val isFormValid = trimmedName.isNotEmpty() && parsedPrice > 0 && !isDuplicate
 
-                        // sync data addition from database to observed UI Items
-                        syncUiItemsFromDb(itemController.getItemListBasedStoreId(storeId), uiItems)
+    // Show reusable form dialog
+    CustomFormDialog(
+        showDialog = showDialog,
+        title = "Edit Item",
+        icon = Icons.Default.Edit,
 
-                    }
-
-                    // println("User edited: ${storeObject.id} $storeName $storeAddress $storeDescription") // Handle input
-
-                    onDismiss()
+        // Input fields
+        fields = listOf(
+            FormField(
+                label = "Item Name",
+                value = itemName,
+                onValueChange = {
+                    itemName = it
+                    errorMessage = null
+                },
+                error = when {
+                    trimmedName.isEmpty() -> "Item name cannot be empty."
+                    isDuplicate -> "Item with this name already exists."
+                    else -> null
                 }
-            ) {
-                Text("Save")
-            }
+            ),
+            FormField(
+                label = "Item Price",
+                value = itemPrice,
+                onValueChange = {
+                    itemPrice = it
+                    errorMessage = null
+                },
+                error = if (parsedPrice <= 0f) "Price must be greater than 0." else null
+            )
+        ),
+
+        confirmButtonText = "Save",
+        cancelButtonText = "Cancel",
+        confirmButtonEnabled = isFormValid,
+
+        // Cancel button closes the dialog
+        onCancel = {
+            showDialog.value = false
+            onDismiss()
         },
-        dismissButton = {
-            Button(
-                onClick = onDismiss
-            ) {
-                Text("Cancel")
+
+        // Confirm and save changes
+        onConfirm = {
+            scope.launch {
+                // Update item in the database
+                itemController.updateItem(
+                    itemObject.id,
+                    Item(
+                        id = itemObject.id,
+                        name = trimmedName,
+                        price = parsedPrice,
+                        storeId = storeId
+                    )
+                )
+
+                // Refresh item list and view model
+                val updatedItems = itemController.getItemListBasedStoreId(storeId)
+                itemList.clear()
+                itemList.addAll(updatedItems)
+                viewModel.setItemList(updatedItems.toMutableList())
+
+                // Sync UI item list (with quantities)
+                syncUiItemsFromDb(updatedItems, uiItems)
+
+                // Show success toast
+                Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
+
+                // Close dialog
+                showDialog.value = false
+                onDismiss()
             }
         }
     )
-
 }
 
 // whenever we add/edit item data, the current observed UI items need to also sync with the database changes
@@ -691,8 +753,3 @@ fun syncUiItemsFromDb(
     currentUiItems.clear()
     currentUiItems.addAll(newUiItems)
 }
-
-
-
-
-
