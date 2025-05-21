@@ -3,11 +3,17 @@ package com.ndhu.moneymanagementapp.payloads
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.google.firebase.Timestamp
 
+// WARNING
+// careful when changing this!
+// ListOfItem accidentally uses this data class!!!
+// so refactor will break the features, unless you also fix it
 data class ItemDetail(
     var id : String = "",
     var name : String = "",
-    var price : Float = 0f,
-    var qty: Float = 0f
+    var oneItemPrice : Float = 0f, // price of one item quantity bought
+    var userTakenQuantity: Float = 0f // quantity taken by user
+    // so, user share price = price * qty
+    // TODO: missing corresponding user, need to refactor with existing complement data classes
 )
 
 data class ListUserSplitBillResponse(

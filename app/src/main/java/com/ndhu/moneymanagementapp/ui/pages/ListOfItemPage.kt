@@ -326,8 +326,8 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                                         ItemDetail(
                                             id = uiItem.item.id,
                                             name = uiItem.item.name,
-                                            price = uiItem.item.price,
-                                            qty = uiItem.quantity.value.toFloat()
+                                            oneItemPrice = uiItem.item.price,
+                                            userTakenQuantity = uiItem.quantity.value.toFloat()
                                         )
                                     }
 
