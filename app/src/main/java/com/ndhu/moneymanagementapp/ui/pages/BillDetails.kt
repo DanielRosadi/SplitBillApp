@@ -3,6 +3,7 @@ package com.ndhu.moneymanagementapp.ui.pages
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -103,7 +104,7 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
 
     // TODO: calculation time expensive due to hot-fix, need to refactor backend data classes
     // Calculate total unpaid amount
-    val unpaidUsers = billDetail.value?.users?.filter { it.status == UserPaymentStatus.UNPAID }
+    val unpaidUsers = billDetail.value?.users?.filter { it.status.value == UserPaymentStatus.UNPAID }
     val totalUnpaid = unpaidUsers?.fold(0f) {
                                             sum, userItemGroup -> sum + (userItemGroup.items.fold(0f){
                                                                                                      innerSum, item ->
@@ -118,7 +119,7 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
     }
 
     // Check if all users have paid
-    val allPaid = billDetail.value?.users?.all { it.status == UserPaymentStatus.PAID }
+    val allPaid = billDetail.value?.users?.all { it.status.value == UserPaymentStatus.PAID }
 
     // Compose screen UI with calculated values and user data
     ComposeBillDetailsScreen(
@@ -128,6 +129,7 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
         allPaid = allPaid,
         navController = navController,
         totalItemQuantities = totalItemQuantities,
+        splitBillController = splitBillController,
         viewModel = viewModel
     )
 }
@@ -140,6 +142,7 @@ fun ComposeBillDetailsScreen(
     allPaid: Boolean?,
     navController: NavController,
     totalItemQuantities: MutableMap<String, Float>,
+    splitBillController: SplitBillController,
     viewModel: SharedViewModel
 ) {
     var searchQuery = remember { mutableStateOf("") }
@@ -186,7 +189,7 @@ fun ComposeBillDetailsScreen(
                 ) {
                     billDetails.value?.let {
                         items(filteredDetails) { user ->
-                            UserBillCard(context, user, totalItemQuantities)
+                            UserBillCard(context, billDetails, user, totalItemQuantities, splitBillController)
                         }
                     }
                 }
@@ -265,12 +268,18 @@ fun filterDetails(
 
 
 @Composable
-fun UserBillCard(context: Context, user: UserItemGroup, totalItemQuantities: MutableMap<String, Float>) {
+fun UserBillCard(context: Context,
+                 billDetails: MutableState<FullBillDetail?>,
+                 user: UserItemGroup,
+                 totalItemQuantities: MutableMap<String, Float>,
+                 splitBillController: SplitBillController) {
     // Change background and text colors based on payment status
-    val backgroundColor = if (user.status == UserPaymentStatus.PAID) Color.White else Color(0xFFFFE6E6)
-    val statusColor = if (user.status == UserPaymentStatus.PAID) Color(0xFF388E3C) else Color.Red
-    val statusText = if (user.status == UserPaymentStatus.PAID) "Paid" else "Not Paid"
+    val backgroundColor = if (user.status.value == UserPaymentStatus.PAID) Color.White else Color(0xFFFFE6E6)
+    val statusColor = if (user.status.value == UserPaymentStatus.PAID) Color(0xFF388E3C) else Color.Red
 
+    // Add to top of UserBillCard, near other states
+    val userStatus = remember { mutableStateOf(user.status) } // <-- CHANGES
+    val statusText = remember { mutableStateOf(if (userStatus.value.value == UserPaymentStatus.PAID) "Paid" else "Not Paid") } // <-- CHANGES
 
     // TODO: calculation time expensive due to hot-fix, need to refactor backend data classes
     // var userTotal = remember { mutableStateOf(0f) }
@@ -340,14 +349,33 @@ fun UserBillCard(context: Context, user: UserItemGroup, totalItemQuantities: Mut
                     textAlign = TextAlign.Center
                 )
 
-                Text(
-                    text = statusText,
-                    color = statusColor,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.End
-                )
+                    Text(
+                        text = statusText.value,
+                        color = if (userStatus.value.value == UserPaymentStatus.PAID) Color(0xFF388E3C) else Color.Red, // <-- CHANGES
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1f).clickable {
+                            val currentUserId = user.userId
+                            val currentGroup = billDetails.value?.users?.find { it.userId == currentUserId }
+
+                            if (currentGroup != null) {
+                                currentGroup.status.value =
+                                    if (currentGroup.status.value == UserPaymentStatus.PAID) {
+                                    userStatus.value.value = UserPaymentStatus.UNPAID              // <-- CHANGES
+                                    statusText.value = "Not Paid"                            // <-- CHANGES
+                                        runBlocking { splitBillController.updateStatus(billId = billDetails.value!!.billId, userId = currentUserId, newStatus = UserPaymentStatus.UNPAID ) }
+                                    UserPaymentStatus.UNPAID
+                                } else {
+                                    userStatus.value.value = UserPaymentStatus.PAID                // <-- CHANGES
+                                    statusText.value = "Paid"                                // <-- CHANGES
+                                        runBlocking { splitBillController.updateStatus(billId = billDetails.value!!.billId, userId = currentUserId, newStatus = UserPaymentStatus.PAID ) }
+                                        UserPaymentStatus.PAID
+                                }
+                            }
+                                                                 },
+                        textAlign = TextAlign.End
+                    )
+
             }
 
             // Divider line between user info and item list

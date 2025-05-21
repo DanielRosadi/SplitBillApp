@@ -7,6 +7,7 @@ interface IBillItemDetailRepository {
     suspend fun add(data: BillItemDetail)
     suspend fun getList(): List<BillItemDetail>
     suspend fun update(documentId: String, data: BillItemDetail)
+    suspend fun updateWithDateFields(documentId: String, data: BillItemDetail)
     suspend fun delete(documentId: String)
     suspend fun getBillListBasedOnUserId(userId : String) : List<BillItemDetail>
     suspend fun getByBillId(billId: String) : List<BillItemDetail>
