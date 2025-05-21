@@ -233,6 +233,7 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
                         navController.navigate(route = AppScreens.AssignSplitsScreen.name)
                     } else {
                         // feedback when user forgets to select a bill owner
+                        // redundant for now, as we use enabled button feature
                         Toast.makeText(
                             context,
                             "Please select a user for Bill Owner",
@@ -245,6 +246,7 @@ fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<Use
                     //.height(60.dp)
                     .fillMaxHeight()
                 ,
+                enabled = selectedIndex != -1, // <-- CHANGES: disable if no selection
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonColors(
                     containerColor = primaryGreen,

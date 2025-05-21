@@ -262,6 +262,7 @@ fun ComposeSelectFriends(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp),
+                        enabled = selectedFriends.isNotEmpty(),
                         shape = RoundedCornerShape(18.dp),
                         colors = ButtonColors(
                             containerColor = primaryGreen,

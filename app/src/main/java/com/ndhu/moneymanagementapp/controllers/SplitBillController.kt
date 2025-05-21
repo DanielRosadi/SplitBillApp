@@ -1,6 +1,9 @@
 package com.ndhu.moneymanagementapp.controllers
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.Bill
@@ -126,7 +129,7 @@ class SplitBillController {
         val userItemGroups = userToItems.map { (userId, items) ->
             UserItemGroup(
                 userId = userId,
-                status = userToStatus[userId] ?: UserPaymentStatus.UNPAID,
+                status = mutableStateOf( userToStatus[userId] ?: UserPaymentStatus.UNPAID ) ,
                 items = items
             )
         }
@@ -136,7 +139,7 @@ class SplitBillController {
             billOwnerId = bill.ownerId,
             createdAt = bill.createdAt,
             storeId = bill.storeId,
-            users = userItemGroups
+            users = userItemGroups.toMutableStateList()
         )
     }
 
@@ -187,5 +190,37 @@ class SplitBillController {
         }
         return -1
     }
+
+    suspend fun updateStatus(billId: String, userId: String, newStatus: UserPaymentStatus): Boolean {
+        val billDetails = billDetailRepo.getByBillId(billId)
+
+        val userItems = billDetails.filter { it.userId == userId }
+
+        if (userItems.isEmpty()) return false
+
+        for (billItem in userItems) {
+//            val updatedBillItem = billItem.copy(
+//                status = newStatus,
+//                // TODO: update date safely, this causes error due to Timestamp() type
+//                updatedAt = Timestamp.now()
+//            )
+            val updatedBillItem = BillItemDetail(
+                id = billItem.id,
+                billId = billItem.billId,
+                itemId = billItem.itemId,
+                userId = billItem.userId,
+                qty = billItem.qty,
+                status = newStatus,
+                createdAt = billItem.createdAt,
+                updatedAt = Timestamp.now()
+            )
+
+            // Use the document ID to update
+            billDetailRepo.updateWithDateFields(billItem.id, updatedBillItem)
+        }
+
+        return true
+    }
+
 
 }

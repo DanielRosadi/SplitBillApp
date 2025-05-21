@@ -23,6 +23,10 @@ class BillDetailRepository : Repositories<BillItemDetail>(BillItemDetail::class.
         return this.update(Collection.BILLITEMDETAIL.collection, id, data)
     }
 
+    override suspend fun updateWithDateFields(id: String, data: BillItemDetail) {
+        return this.updateWithDateFields(Collection.BILLITEMDETAIL.collection, id, data)
+    }
+
     override suspend fun delete(id: String) {
         this.delete(Collection.BILLITEMDETAIL.collection, id)
     }
