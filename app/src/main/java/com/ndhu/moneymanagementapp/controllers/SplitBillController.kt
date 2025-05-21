@@ -213,7 +213,6 @@ class SplitBillController {
                 createdAt = billItem.createdAt,
                 updatedAt = Timestamp.now()
             )
-
             // Use the document ID to update
             billDetailRepo.updateWithDateFields(billItem.id, updatedBillItem)
         }
