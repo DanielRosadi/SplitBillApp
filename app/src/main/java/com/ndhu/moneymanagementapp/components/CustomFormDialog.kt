@@ -79,6 +79,7 @@ fun CustomFormDialog(
                             .padding(bottom = 4.dp)
                     )
                 }
+                // Title text
                 Text(
                     text = title,
                     fontSize = 20.sp,
@@ -88,7 +89,7 @@ fun CustomFormDialog(
             }
         },
 
-        // Main form content
+        // Main content area with form fields and error message
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -180,7 +181,7 @@ fun CustomFormDialog(
                         .weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF666666)
+                        contentColor = Color(0xFF666666) // cancelGray
                     ),
                     border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
                 ) {
