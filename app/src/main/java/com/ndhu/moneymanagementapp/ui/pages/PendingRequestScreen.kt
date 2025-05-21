@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircleOutline
 import androidx.compose.material3.AlertDialog
@@ -51,13 +50,6 @@ import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.User
 import kotlinx.coroutines.launch
 
-/*
-TODO:
-    - Search function
-    - Ganti image
-    - Ganti font (optional)
-*/
-
 @Composable
 fun PendingRequestScreen(context: Context, navController: NavController) {
     val contactController = ContactController()
@@ -88,13 +80,13 @@ private fun ComposePendingRequest(
     val showRejectAllDialog = remember { mutableStateOf(false) }
     val showAcceptAllDialog = remember { mutableStateOf(false) }
 
-    var searchQuery = remember { mutableStateOf("") }
-    val filteredFriends = filterFriends(context, contacts, searchQuery.value, userController) //  no remember
+    val searchQuery = remember { mutableStateOf("") }
+    val filteredFriends =
+        filterFriends(context, contacts, searchQuery.value, userController) //  no remember
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Background Image
         BackgroundImage()
 
         // Full Page
@@ -116,7 +108,6 @@ private fun ComposePendingRequest(
                     .padding(10.dp)
             ) {
                 // Content Top Bar
-                // TODO: search function
                 ContentTopBar(navController = navController,
                     topBarText = "Pending Request",
                     searchBox = { SearchBox(searchQuery = searchQuery) }
@@ -133,7 +124,8 @@ private fun ComposePendingRequest(
                         EmptyStateMessage("No pending friend requests")
                     } else {
                         LazyColumn(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(12.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(filteredFriends, key = { it.senderId }) { contact ->
@@ -167,7 +159,7 @@ private fun ComposePendingRequest(
                             contentColor = Color.White
                         )
                     ) {
-                        Text(text = "Reject All", fontSize = 16.sp)
+                        Text(text = "Reject All", fontSize = 20.sp)
                     }
 
                     // Accept All
@@ -183,7 +175,7 @@ private fun ComposePendingRequest(
                             contentColor = Color.White
                         )
                     ) {
-                        Text(text = "Accept All", fontSize = 16.sp)
+                        Text(text = "Accept All", fontSize = 20.sp)
                     }
                 }
 
@@ -293,44 +285,35 @@ fun PendingCard(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(2f)
-                    .padding(20.dp),
+                    .padding(15.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-
-
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(50.dp)
                         .clip(CircleShape)
                 ) {
-                var profilePic = profilePictures.firstOrNull() {
-                    it.id == (userObject.value?.profilePictureId
-                        ?: 1)
-                }
+                    val profilePic = profilePictures.firstOrNull() {
+                        it.id == (userObject.value?.profilePictureId
+                            ?: 1)
+                    }
 
-//                Icon(
-//                    modifier = Modifier
-//                        .size(40.dp)
-//                        .clip(CircleShape),
-//                    imageVector = Icons.Filled.Person,
-//                    contentDescription = "Profile Picture",
-//                    tint = Color.Gray
-//                )
-                if (profilePic != null) {
-                    Image(
-                        painter = painterResource(id = profilePic.imageRes),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                    if (profilePic != null) {
+                        Image(
+                            painter = painterResource(id = profilePic.imageRes),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
 
-            }
+                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 when {
+                    // Case 1: Null = assumes loading
                     sender == null -> {
                         CircularProgressIndicator(
                             modifier = Modifier.size(18.dp),
@@ -339,6 +322,7 @@ fun PendingCard(
                         )
                     }
 
+                    // Case 2: Blank username = “Unknown User”
                     sender.username.isBlank() -> {
                         Text(
                             text = "Unknown User",
@@ -348,6 +332,7 @@ fun PendingCard(
                         )
                     }
 
+                    // Case 3: Have valid username
                     else -> {
                         Text(
                             text = sender.username,
@@ -360,7 +345,7 @@ fun PendingCard(
 
             } // Row 1
 
-            // Row 2 = Accept/Reject buttons
+            // Row 2 = Accept + Reject buttons
             Row(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -454,12 +439,12 @@ fun PendingCard(
 @Composable
 fun ContactContainer(
     modifier: Modifier = Modifier,
-    containerColor: Color = Color(0xFF9D9D9D),
+    containerColor: Color = darkGreyContainer,
     content: @Composable () -> Unit
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
         content()
@@ -485,7 +470,7 @@ fun EmptyStateMessage(message: String) {
     }
 }
 
-// Reusable for accept/reject-type actions in any list card
+// Reusable for accept/reject-type actions in contact list card
 @Composable
 fun BoxIconButton(
     modifier: Modifier = Modifier,
@@ -555,6 +540,7 @@ fun ConfirmationDialog(
                 Text(
                     text = message,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
                     fontSize = 14.sp,
                     color = Color.DarkGray // Dark Gray
                 )

@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -58,13 +57,6 @@ import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.launch
 
-/*
-TODO:
-    - Ganti font
-    - Ganti image
-    - Search function
-*/
-
 @Composable
 fun ContactPage(context: Context, navController: NavController) {
 
@@ -104,15 +96,12 @@ fun ComposeContactScreen(
 ) {
     val showAddFriendDialog = remember { mutableStateOf(false) }
 
-    var searchQuery = remember { mutableStateOf("") }
+    val searchQuery = remember { mutableStateOf("") }
     val filteredFriends = filterFriends(context, contacts, searchQuery.value, userController) //  no remember
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+        modifier = Modifier.fillMaxSize()
     ) {
-        // Background Image
         BackgroundImage()
 
         // Full Page
@@ -133,8 +122,7 @@ fun ComposeContactScreen(
                     .background(Color(0xFFD9D9D9))
                     .padding(10.dp)
             ) {
-                // Content Top Bar
-                // TODO: search func
+                // Content Top Bar + Search Box (Username)
                 ContentTopBar(navController = navController,
                     topBarText = "Contacts",
                     searchBox = { SearchBox(searchQuery = searchQuery) }
@@ -144,14 +132,16 @@ fun ComposeContactScreen(
                 ContactContainer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(3f)
+                        .height(350.dp)
+                        //.weight(3f)
                 ) {
                     // Handle empty list
                     if (contacts.isEmpty()) {
                         EmptyStateMessage("No contacts available")
                     } else {
                         LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(12.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(filteredFriends, key = { it.id }) { contact ->
@@ -166,9 +156,9 @@ fun ComposeContactScreen(
                 // Button Section
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                        .fillMaxWidth(),
+                        //.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
                     // Pending Request Button WITH badge
                     Box(
@@ -199,6 +189,7 @@ fun ComposeContactScreen(
 
                         // Notification Badge
                         if (pendingContacts.isNotEmpty()) {
+
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
@@ -211,12 +202,13 @@ fun ComposeContactScreen(
                                 Text(
                                     text = pendingContacts.size.toString(),
                                     color = Color.White,
-                                    fontSize = 16.sp,
+                                    fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center
                                 )
                             }
                         }
+
                     }
 
                     // Add Friend Button in a Box too (even if no badge)
@@ -248,7 +240,7 @@ fun ComposeContactScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                //Spacer(modifier = Modifier.height(20.dp))
 
                 if (showAddFriendDialog.value) { // Observe the boolean value
                     AddFriendDialog(
@@ -264,8 +256,6 @@ fun ComposeContactScreen(
         } // Full Page
     } // Outer Box
 }
-
-
 
 // Card Item inside Lazy Column containing Contact information
 @Composable
@@ -287,6 +277,7 @@ fun ContactCard(
         }
     }
 
+    // Contact Card (Image + Username)
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(Color.White),
@@ -296,26 +287,26 @@ fun ContactCard(
             .height(80.dp)
     ) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+        /*Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
-        ) {
+                .padding(horizontal = 20.dp)
+        ) {*/
+            // Container for Profile Picture
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(50.dp)
                     .clip(CircleShape)
             ) {
-
-                var profilePic = profilePictures.firstOrNull(){ it.id == (userResult?.profilePictureId ?: 1) }
-
-                /*TODO: change to image*/
-//                Icon(
-//                    Icons.Filled.Person,
-//                    contentDescription = "Profile Picture",
-//                    modifier = Modifier.size(40.dp),
-//                    tint = Color.Gray
-//                )
+                // Profile Picture
+                val profilePic = profilePictures.firstOrNull(){ it.id == (userResult?.profilePictureId ?: 1) }
                 if (profilePic != null) {
                     Image(
                         painter = painterResource(id = profilePic.imageRes),
@@ -329,7 +320,7 @@ fun ContactCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             when {
-                // case 1: null = assumes loading
+                // Case 1: Null = assumes loading
                 userResult == null -> {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
@@ -338,22 +329,22 @@ fun ContactCard(
                     )
                 }
 
-                // case 2: blank username = “Unknown User”
+                // Case 2: Blank username = “Unknown User”
                 userResult?.username.isNullOrBlank() -> {
                     Text(
                         text = "Unknown User",
                         color = Color.Gray,
-                        fontSize = 16.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
 
-                // case 3: have valid username
+                // Case 3: Have valid username
                 else -> {
                     Text(
                         text = userResult?.username ?: "Unknown",
                         color = primaryGreen,
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = alexandriaFont
                     )
@@ -372,7 +363,6 @@ fun AddFriendDialog(
     context: Context,
     contactController: ContactController,
     userController: UserController,
-    onSuccess: (() -> Unit)? = null
 ) {
     val coroutineScope = rememberCoroutineScope()
     var userName by remember { mutableStateOf("") }
@@ -430,6 +420,7 @@ fun AddFriendDialog(
             }
         },
         confirmButton = {
+            // Combine Cancel + Confirm button
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -476,6 +467,7 @@ fun AddFriendDialog(
                                 // Try to add contact using the controller
                                 val result = contactController.addContact(context, user.id)
 
+                                // Case 3 : Username found
                                 when (result) {
                                     ContactAddResult.SUCCESS -> {
                                         // Refresh contact list and show success message

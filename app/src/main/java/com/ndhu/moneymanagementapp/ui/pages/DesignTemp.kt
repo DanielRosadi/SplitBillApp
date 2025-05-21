@@ -24,7 +24,11 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun LazyColumnDesignTemplate(/* storeController: StoreController, data: SnapshotStateList<Store>, viewModel: SharedViewModel, */ navController: NavController, lazyColumnFunc: ()-> Unit, bottomPage: @Composable () -> Unit) {
+fun LazyColumnDesignTemplate(/* storeController: StoreController, data: SnapshotStateList<Store>, viewModel: SharedViewModel, */
+                             navController: NavController,
+                             lazyColumnFunc: () -> Unit,
+                             bottomPage: @Composable () -> Unit
+) {
     // var showDialogAddStore by remember { mutableStateOf(false) }
 
     Box(
@@ -65,18 +69,20 @@ fun LazyColumnDesignTemplate(/* storeController: StoreController, data: Snapshot
 
                 // Content Top Bar
                 // TODO: search func
-                ContentTopBar(navController = navController, topBarText = "List of Store",)
+                ContentTopBar(navController = navController, topBarText = "List of Store")
 
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(7f)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(darkGrey)
+                        .background(darkGreyContainer)
 
-                ){
+                ) {
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentPadding = PaddingValues(5.dp)
                     ) {
 
@@ -100,8 +106,7 @@ fun LazyColumnDesignTemplate(/* storeController: StoreController, data: Snapshot
                         .fillMaxWidth()
                         //.fillMaxHeight()
                         .weight(1f)
-                        .padding(2.dp)
-                    ,
+                        .padding(2.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // we no longer need delete item, keep it for possible future change

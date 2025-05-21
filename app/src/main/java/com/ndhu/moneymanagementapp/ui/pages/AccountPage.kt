@@ -3,15 +3,17 @@ package com.ndhu.moneymanagementapp.ui.pages
 import android.content.Context
 import com.ndhu.moneymanagementapp.R
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,11 +39,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AccountPage(context: Context, navController: NavController) {
-    val coroutine = rememberCoroutineScope()
     val userController = UserController()
+    val coroutine = rememberCoroutineScope()
+
+    val showDeleteAccountDialog  = remember { mutableStateOf(false) }
+    val showLogOutDialog = remember { mutableStateOf(false) }
+
     var user by remember { mutableStateOf<User?>(null) }
-    var showClearUserDataDialog by remember { mutableStateOf(false) }
-    var showLogOutDialog by remember { mutableStateOf(false) }
     var bio by remember { mutableStateOf(TextFieldValue("")) }
 
     LaunchedEffect(Unit) {
@@ -49,16 +53,14 @@ fun AccountPage(context: Context, navController: NavController) {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
-        // Top section
+        // Top Section
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.5f)
         ) {
-            // Background image
             Image(
                 painter = painterResource(id = R.drawable.background_dark),
                 contentDescription = "Background",
@@ -71,13 +73,11 @@ fun AccountPage(context: Context, navController: NavController) {
                     .padding(top = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Scaffold section
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp),
                 ) {
-                    // Back button
                     IconButton(
                         onClick = { navController.popBackStack() },
                         modifier = Modifier.align(Alignment.CenterStart)
@@ -89,7 +89,6 @@ fun AccountPage(context: Context, navController: NavController) {
                         )
                     }
 
-                    // We Split text
                     Row(
                         modifier = Modifier.align(Alignment.Center),
                         verticalAlignment = Alignment.CenterVertically
@@ -114,13 +113,10 @@ fun AccountPage(context: Context, navController: NavController) {
 
                 Spacer(modifier = Modifier.height(55.dp))
 
-                var profilePic = profilePictures.firstOrNull(){ it.id == (user?.profilePictureId ?: 1) }
-
-                // Profile Image
-                if (profilePic != null) {
+                val profilePic = profilePictures.firstOrNull { it.id == (user?.profilePictureId ?: 1) }
+                profilePic?.let {
                     Image(
-            //                    painter = painterResource(id = R.drawable.profile_picture),
-                        painter = painterResource(id = profilePic.imageRes),
+                        painter = painterResource(id = it.imageRes),
                         contentDescription = "Avatar",
                         modifier = Modifier
                             .size(150.dp)
@@ -129,13 +125,12 @@ fun AccountPage(context: Context, navController: NavController) {
                 }
 
                 Spacer(modifier = Modifier.height(18.dp))
-
                 Text(
                     text = user?.username ?: "{FAIL-LOGIN}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = syncopateFont,
-                    color = Color(0xFFF5C542), // golden yellow
+                    color = Color(0xFFF5C542),
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -182,7 +177,7 @@ fun AccountPage(context: Context, navController: NavController) {
                         backgroundColor = Color(0xFF961400),
                         modifier = Modifier.weight(0.3f)
                     ) {
-                        showClearUserDataDialog = true
+                        showDeleteAccountDialog.value = true
                     }
 
                     ColoredSettingsButton(
@@ -190,19 +185,19 @@ fun AccountPage(context: Context, navController: NavController) {
                         backgroundColor = Color(0xFF009669),
                         modifier = Modifier.weight(0.3f)
                     ) {
-                        showLogOutDialog = true
+                        showLogOutDialog.value = true
                     }
                 }
             }
         }
     }
 
-    if (showClearUserDataDialog) {
+    if (showDeleteAccountDialog.value) {
         DeleteAccountDialog(
-            onDismiss = { showClearUserDataDialog = false },
+            showDialog = showDeleteAccountDialog,
             onConfirm = {
                 coroutine.launch {
-                    userController.deleteCurrUser(context);
+                    userController.deleteCurrUser(context)
                 }
                 navController.navigate(AppScreens.LogInScreen.name) {
                     popUpTo(0) { inclusive = true }
@@ -211,11 +206,13 @@ fun AccountPage(context: Context, navController: NavController) {
         )
     }
 
-    if (showLogOutDialog) {
+    if (showLogOutDialog.value) {
         LogoutDialog(
-            onDismiss = { showLogOutDialog = false },
+            showDialog = showLogOutDialog,
             onConfirm = {
-                coroutine.launch { userController.logout(context) }
+                coroutine.launch {
+                    userController.logout(context)
+                }
                 navController.navigate(AppScreens.LogInScreen.name) {
                     popUpTo(0) { inclusive = true }
                 }
@@ -242,180 +239,45 @@ fun ColoredSettingsButton(
             .shadow(4.dp, shape = RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text, fontSize = 20.sp, fontFamily = surannaFont)
+        //Text(text, fontSize = 20.sp, fontFamily = surannaFont)
+        Text(text, fontSize = 20.sp)
     }
 }
 
 @Composable
 fun DeleteAccountDialog(
-    onDismiss: () -> Unit,
+    showDialog: MutableState<Boolean>,
     onConfirm: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.3f))
-            .wrapContentSize(Alignment.Center)
-    ) {
-        Box(
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 30.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                shape = RoundedCornerShape(20.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(
-                    modifier = Modifier.padding(top = 40.dp, bottom = 20.dp, start = 16.dp, end = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Are you sure you want to delete your account?",
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center,
-                        color = Color.Black,
-                        maxLines = 1
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "This action cannot be undone",
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center,
-                        color = Color.DarkGray
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Button(
-                            onClick = onDismiss,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF009669),
-                                contentColor = Color.White
-                            )
-                        ) {
-                            Text(
-                                "Cancel",
-                                fontSize = 18.sp,
-                                fontFamily = surannaFont,
-                                maxLines = 1,
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Button(
-                            onClick = onConfirm,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF961400),
-                                contentColor = Color.White
-                            )
-                        ) {
-                            Text(
-                                "Delete",
-                                fontSize = 18.sp,
-                                fontFamily = surannaFont,
-                                maxLines = 1,
-                            )
-                        }
-                    }
-                }
-            }
-
-            // "!" Logo symbol
-            Box(
-                modifier = Modifier
-                    .offset(y = (-25).dp)
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF8B0000)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("!", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            }
-        }
-    }
+    ConfirmationDialog(
+        title = "Delete your account?",
+        message = "This action can't be undone.",
+        confirmText = "Delete",
+        cancelText = "Cancel",
+        confirmColor = dangerRed,
+        icon = Icons.Default.Warning,
+        iconTint = Color.Red,
+        showDialog = showDialog,
+        onConfirm = onConfirm
+    )
 }
 
 @Composable
 fun LogoutDialog(
-    onDismiss: () -> Unit,
+    showDialog: MutableState<Boolean>,
     onConfirm: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.3f))
-            .wrapContentSize(Alignment.Center)
-    ) {
-        Card(
-            modifier = Modifier
-                .padding(horizontal = 30.dp)
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(20.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            Column(
-                modifier = Modifier.padding(vertical = 24.dp, horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Are you sure you want to log out?",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    color = Color.Black
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        onClick = onDismiss,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF009669),
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Cancel", fontSize = 18.sp, fontFamily = surannaFont)
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Button(
-                        onClick = onConfirm,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF961400),
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Log Out", fontSize = 18.sp, fontFamily = surannaFont)
-                    }
-                }
-            }
-        }
-    }
+    ConfirmationDialog(
+        title = "Log out?",
+        message = "Any unsaved changes will be lost.",
+        confirmText = "Log Out",
+        cancelText = "Cancel",
+        confirmColor = dangerRed,
+        icon = Icons.Default.ExitToApp,
+        iconTint = Color.Red,
+        showDialog = showDialog,
+        onConfirm = onConfirm
+    )
 }
 
 fun navigateToEditAccountScreen(navController: NavController) {
