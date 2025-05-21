@@ -347,6 +347,8 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp),
+                        // only able to save if all items have been fully assigned
+                        // and the list item is not empty/zero
                         enabled = isAllItemsFullyAssigned && listItemsAndOwners.isNotEmpty(),
                         shape = RoundedCornerShape(18.dp),
                         colors = ButtonColors(

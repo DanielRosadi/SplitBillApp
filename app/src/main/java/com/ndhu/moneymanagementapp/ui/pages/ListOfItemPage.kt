@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -103,7 +104,7 @@ fun ListOfItemPage(context : Context, navController: NavController, storeId: Str
 
         storeId?.let {
             itemController.getItemListBasedStoreId(it).map { dbItem->
-                UIItem(item = dbItem, quantity = 0) // initialise UI Item with quantity of 0
+                UIItem(item = dbItem, quantity = mutableStateOf(0)) // initialise UI Item with quantity of 0
             }
         }?.let {
             // clear items list and add data from database into the stores list (this helps to avoid multiple/duplicate data being taken/shown. use clear() for similar operation)
@@ -162,6 +163,12 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
     var searchQuery = remember { mutableStateOf("") }
 
     val filteredItems = filterItems(uiItems, searchQuery.value) //  no remember
+
+    val isDoneEnabled by remember {
+        derivedStateOf {
+            uiItems.any { it.quantity.value > 0 }
+        }
+    }
 
 
     Box(
@@ -314,13 +321,13 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                             onClick = {
                                 navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
                                 val result = uiItems
-                                    .filter { uiItem -> uiItem.quantity > 0 } // we don't send items data that are not in the transaction
+                                    .filter { uiItem -> uiItem.quantity.value > 0 } // we don't send items data that are not in the transaction
                                     .map { uiItem ->
                                         ItemDetail(
                                             id = uiItem.item.id,
                                             name = uiItem.item.name,
                                             price = uiItem.item.price,
-                                            qty = uiItem.quantity.toFloat()
+                                            qty = uiItem.quantity.value.toFloat()
                                         )
                                     }
 
@@ -333,6 +340,7 @@ private fun ComposeListItem(context : Context, listItem: SnapshotStateList<Item>
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(60.dp),
+                            enabled = isDoneEnabled, // <-- CHANGES HERE
                             shape = RoundedCornerShape(18.dp),
                             colors = ButtonColors(
                                 containerColor = primaryGreen,
@@ -385,12 +393,12 @@ private fun ListDataItem(
 ) {
     var showDialogEditItem by remember { mutableStateOf(false) }
     // var itemQuantity by remember { mutableStateOf(0) }
-    var itemQuantity by remember { mutableStateOf(uiItem.quantity) }
+    var itemQuantity by remember { mutableStateOf(uiItem.quantity.value) }
 
     // inner function only for updating item quantity
     fun updateItemQuantity(newItemQuantity: Int){
         itemQuantity = newItemQuantity
-        uiItem.quantity = newItemQuantity
+        uiItem.quantity.value = newItemQuantity
     }
 
     Card(
@@ -676,7 +684,7 @@ fun syncUiItemsFromDb(
         val existing = currentUiItems.find { it.item.id == dbItem.id }
         UIItem(
             item = dbItem,
-            quantity = existing?.quantity ?: 0 // preserve qty if exists
+            quantity = existing?.quantity ?: mutableStateOf(0)  // preserve qty if exists
         )
     }
 
