@@ -424,7 +424,7 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp)
+                .height(105.dp)
                 .padding(5.dp)
                 .clickable { // Handle click on the entire card to toggle user
                     selectedUser?.let { onToggleUser(it) }
@@ -578,6 +578,7 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
             .size(90.dp)
             .fillMaxWidth()
             .padding(5.dp)
+            .border(2.dp, color, CircleShape)
             .clickable {
                 // Toggle selection of the same user card
                 if (participant == selectedUser) {
@@ -597,12 +598,15 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
         colors = CardDefaults.cardColors(
             containerColor = if (participant == selectedUser) color else Color.White
             // containerColor = Color.White
+
         )
 
 
     ) {
 
-        Box(modifier = Modifier.fillMaxSize()) { //  Added Box for layering
+        Box(modifier = Modifier
+            .fillMaxSize()
+        ) { //  Added Box for layering
 
             var profilePic = profilePictures.firstOrNull(){ it.id == (participant?.profilePictureId ?: 1) }
 
@@ -611,7 +615,10 @@ fun ListBillParticipants(participant: User?, userColors: SnapshotStateMap<User?,
                     painter = painterResource(id = profilePic.imageRes),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .size(85.dp) // 20, 36 inner image
+                        // .clip(CircleShape)
+                    ,
                 )
             }
 
@@ -714,7 +721,7 @@ fun mapItemsToItemAndOwners(items: MutableList<ItemWithUsersList>): List<ItemAnd
 fun UserDot(user: User, color: Color) {
     Box(
         modifier = Modifier
-            .size(30.dp) // 24, 40 outer card
+            .size(31.dp) // 24, 40 outer card
             // .padding(end = 4.dp)
             .background(color = color, shape = CircleShape) //  perfect circle
             .border(1.dp, Color.Black, shape = CircleShape),
@@ -734,7 +741,7 @@ fun UserDot(user: User, color: Color) {
                 painter = painterResource(id = profilePic.imageRes),
                 contentDescription = "${user.username}'s profile picture",
                 modifier = Modifier
-                    .size(26.dp) // 20, 36 inner image
+                    .size(25.dp) // 20, 36 inner image
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
