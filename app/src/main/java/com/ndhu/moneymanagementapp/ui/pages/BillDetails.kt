@@ -359,17 +359,24 @@ fun UserBillCard(context: Context,
                             val currentGroup = billDetails.value?.users?.find { it.userId == currentUserId }
 
                             if (currentGroup != null) {
-                                currentGroup.status.value =
-                                    if (currentGroup.status.value == UserPaymentStatus.PAID) {
-                                    userStatus.value.value = UserPaymentStatus.UNPAID              // <-- CHANGES
+                                val newStatus = if (currentGroup.status.value == UserPaymentStatus.PAID) {
+                                    userStatus.value.value = UserPaymentStatus.UNPAID        // <-- CHANGES
                                     statusText.value = "Not Paid"                            // <-- CHANGES
-                                        runBlocking { splitBillController.updateStatus(billId = billDetails.value!!.billId, userId = currentUserId, newStatus = UserPaymentStatus.UNPAID ) }
                                     UserPaymentStatus.UNPAID
                                 } else {
-                                    userStatus.value.value = UserPaymentStatus.PAID                // <-- CHANGES
+                                    userStatus.value.value = UserPaymentStatus.PAID          // <-- CHANGES
                                     statusText.value = "Paid"                                // <-- CHANGES
-                                        runBlocking { splitBillController.updateStatus(billId = billDetails.value!!.billId, userId = currentUserId, newStatus = UserPaymentStatus.PAID ) }
-                                        UserPaymentStatus.PAID
+                                    UserPaymentStatus.PAID
+                                }
+
+                                currentGroup.status.value = newStatus
+
+                                runBlocking {
+                                    splitBillController.updateStatus(
+                                        billId = billDetails.value!!.billId,
+                                        userId = currentUserId,
+                                        newStatus = newStatus
+                                    )
                                 }
                             }
                                                                  },
