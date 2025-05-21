@@ -1,7 +1,6 @@
 package com.ndhu.moneymanagementapp.controllers
 
 import android.content.Context
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import com.google.firebase.Timestamp
@@ -92,8 +91,8 @@ class SplitBillController {
                     billList[updatedIndex].itemList.add(0, ItemDetail(
                         id = billItem.itemId,
                         name = item.name,
-                        price = item.price,
-                        qty = billItem.qty
+                        oneItemPrice = item.price,
+                        userTakenQuantity = billItem.qty
                     ))
                 }
             }
@@ -118,8 +117,8 @@ class SplitBillController {
             val itemDetail = ItemDetail(
                 id = billItem.itemId,
                 name = item.name,
-                price = item.price,
-                qty = billItem.qty
+                oneItemPrice = item.price,
+                userTakenQuantity = billItem.qty
             )
 
             userToItems.getOrPut(billItem.userId) { mutableListOf() }.add(itemDetail)
@@ -173,8 +172,8 @@ class SplitBillController {
                     billList[updatedIndex].itemList.add(0, ItemDetail(
                         id = billItem.itemId,
                         name = item.name,
-                        price = item.price,
-                        qty = billItem.qty
+                        oneItemPrice = item.price,
+                        userTakenQuantity = billItem.qty
                     ))
                 }
             }
@@ -214,7 +213,6 @@ class SplitBillController {
                 createdAt = billItem.createdAt,
                 updatedAt = Timestamp.now()
             )
-
             // Use the document ID to update
             billDetailRepo.updateWithDateFields(billItem.id, updatedBillItem)
         }

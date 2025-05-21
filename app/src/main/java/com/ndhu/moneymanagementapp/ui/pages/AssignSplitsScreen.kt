@@ -197,7 +197,7 @@ fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, 
                     val assignedQty = itemWithUsers.ownership.fold(0f) { sum, itemOwnership ->
                         sum + itemOwnership.itemQuantity.value
                     }
-                    assignedQty == itemWithUsers.item.qty.toFloat() // Check if assigned quantity matches total quantity
+                    assignedQty == itemWithUsers.item.userTakenQuantity.toFloat() // Check if assigned quantity matches total quantity
                 }
 
 
@@ -395,8 +395,8 @@ fun filterItemsAndOwners(listItemsAndOwners:MutableList<ItemWithUsersList>, quer
     } else {
         listItemsAndOwners.filter {
             it.item.name.contains(query, ignoreCase = true) ||
-                    it.item.price.toString().contains(query, ignoreCase = true) ||
-                    it.item.qty.toString().contains(query, ignoreCase = true) ||
+                    it.item.oneItemPrice.toString().contains(query, ignoreCase = true) ||
+                    it.item.userTakenQuantity.toString().contains(query, ignoreCase = true) ||
                     it.ownership.any { ownership ->
                         ownership.owner.username.contains(query, ignoreCase = true)
                     }
@@ -419,7 +419,7 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
     var isFullyAssigned by remember {mutableStateOf(false)}
 
     // keep track of quantities to provide feedback to user if the item quantities has not been assigned
-    isFullyAssigned = itemWithUsers.item.qty.toFloat() == itemWithUsers.ownership.fold(0f) {sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}
+    isFullyAssigned = itemWithUsers.item.userTakenQuantity.toFloat() == itemWithUsers.ownership.fold(0f) { sum, itemOwnership -> sum + itemOwnership.itemQuantity.value}
 
         Card(
             modifier = Modifier
@@ -470,7 +470,7 @@ fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, na
 
                         Text(
                             // TODO: omit additional float 0 on price
-                            text = itemWithUsers.item.qty.toString() + " x " + itemWithUsers.item.price.toString(),
+                            text = itemWithUsers.item.userTakenQuantity.toString() + " x " + itemWithUsers.item.oneItemPrice.toString(),
                             fontSize = 15.sp,
                             //fontFamily = surannaFont,
                             // color = Color.hsv(43f, 1f, 1f),

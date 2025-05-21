@@ -69,7 +69,7 @@ fun SplitItemScreen(context: Context, navController: NavController, viewModel: S
 fun ComposeSplitItem(context: Context, navController: NavController, viewModel: SharedViewModel){
     // val listItemsAndOwners = viewModel.listItemAndUserQuantities
     var totalAssignedQuantity by remember { mutableStateOf(0f) }
-    val totalItemQuantity by remember { mutableStateOf(viewModel.currentItem.qty.toFloat()) } // cast to Float type from a Number type
+    val totalItemQuantity by remember { mutableStateOf(viewModel.currentItem.userTakenQuantity.toFloat()) } // cast to Float type from a Number type
 
     // Calculate total assigned quantity and total item quantity for each item
     //totalItemQuantity = viewModel.currentItemAndUserQuantities.item.qty // total item quantity

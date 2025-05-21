@@ -313,20 +313,20 @@ private fun ComposeListItem(
 
                     Spacer(modifier = Modifier.height(15.dp))
 
-                    Button(
-                        // TODO: need to pass item list
-                        onClick = {
-                            navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
-                            val result = uiItems
-                                .filter { uiItem -> uiItem.quantity.value > 0 } // we don't send items data that are not in the transaction
-                                .map { uiItem ->
-                                    ItemDetail(
-                                        id = uiItem.item.id,
-                                        name = uiItem.item.name,
-                                        price = uiItem.item.price,
-                                        qty = uiItem.quantity.value.toFloat()
-                                    )
-                                }
+                        Button(
+                            // TODO: need to pass item list
+                            onClick = {
+                                navController.navigate(route = AppScreens.SelectFriendsScreen.name) /* need to also perform database update */
+                                val result = uiItems
+                                    .filter { uiItem -> uiItem.quantity.value > 0 } // we don't send items data that are not in the transaction
+                                    .map { uiItem ->
+                                        ItemDetail(
+                                            id = uiItem.item.id,
+                                            name = uiItem.item.name,
+                                            oneItemPrice = uiItem.item.price,
+                                            userTakenQuantity = uiItem.quantity.value.toFloat()
+                                        )
+                                    }
 
                             // TODO: what to do with result? e.g onDoneClicked(result)
                             // save the items for Assign_Split page

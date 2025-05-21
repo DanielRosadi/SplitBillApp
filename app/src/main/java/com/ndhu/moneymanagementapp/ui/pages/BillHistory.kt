@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.components.SearchBox
@@ -31,7 +30,6 @@ import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
-import com.ndhu.moneymanagementapp.models.History
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
@@ -162,6 +160,25 @@ fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navCo
 
     viewModel.currentBillId = billResponse.billId
 
+//    val totalPrice = billResponse.itemList
+//        .groupBy { it.id }
+//        .map { (_, items) ->
+//            val totalQty = items.sumOf { it.qty.toDouble() }
+//            val totalPrice = items.firstOrNull()?.price?.toDouble() ?: 0.0
+//            val unitPrice = if (totalQty > 0) totalPrice / totalQty else 0.0
+//            items.sumOf { it.qty.toDouble() * unitPrice }
+//        }.sum()
+
+    // this only calculate debt/price of the current logged in user
+    val totalLoginUserDebt = billResponse.itemList.fold(0.0) { acc, item ->
+        acc + (item.oneItemPrice * item.userTakenQuantity)
+    }
+
+    billResponse.itemList.forEach { item ->
+        Log.d("CARD BILL HISTORY", item.toString())
+    }
+
+
     // History card component
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -211,9 +228,7 @@ fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navCo
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = "NTD " + (billResponse.itemList.fold(0.0) { acc, item ->
-                        acc + (item.price.toDouble() * item.qty.toDouble())
-                    }).toString(),
+                    text = "NTD " + totalLoginUserDebt.toFloat().toString(),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = primaryGreen
