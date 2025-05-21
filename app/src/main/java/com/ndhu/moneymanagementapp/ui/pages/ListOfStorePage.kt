@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -41,6 +43,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.components.CustomFormDialog
+import com.ndhu.moneymanagementapp.components.FormField
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
@@ -50,7 +54,7 @@ import kotlinx.coroutines.*
 
 
 @Composable
-fun ListStorePage(context : Context, navController: NavController, viewModel: SharedViewModel){
+fun ListStorePage(context: Context, navController: NavController, viewModel: SharedViewModel) {
 //    // Get the actual window size (container size)
 //    val windowInfo = LocalWindowInfo.current
 //    val screenWidthPx = windowInfo?.containerSize?.width ?: 0
@@ -64,7 +68,11 @@ fun ListStorePage(context : Context, navController: NavController, viewModel: Sh
 }
 
 @Composable
-fun GetStoreListFromDatabase(context : Context, navController: NavController, viewModel: SharedViewModel){
+fun GetStoreListFromDatabase(
+    context: Context,
+    navController: NavController,
+    viewModel: SharedViewModel
+) {
 
     val storeController = StoreController() // Initialize object
 
@@ -77,7 +85,7 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
 
         // clear stores list and add data from database into the stores list
         stores.clear()
-        stores.addAll( storeController.getListOfStores() )
+        stores.addAll(storeController.getListOfStores())
         viewModel.storeList = storeController.getListOfStores().toMutableList()
 
     }
@@ -87,7 +95,12 @@ fun GetStoreListFromDatabase(context : Context, navController: NavController, vi
 }
 
 @Composable
-fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel) {
+fun ComposeListStore(
+    storeController: StoreController,
+    data: SnapshotStateList<Store>,
+    navController: NavController,
+    viewModel: SharedViewModel
+) {
     var showDialogAddStore by remember { mutableStateOf(false) }
 
     var searchQuery = remember { mutableStateOf("") }
@@ -156,14 +169,16 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                         .clip(RoundedCornerShape(20.dp))
                         .background(darkGreyContainer)
 
-                ){
+                ) {
 
 //                    LaunchedEffect(searchQuery.value) {
 //                        println("Search query updated to: ${searchQuery.value}")
 //                    }
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentPadding = PaddingValues(5.dp)
                     ) {
 
@@ -184,8 +199,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                         .fillMaxWidth()
                         //.fillMaxHeight()
                         .weight(1f)
-                        .padding(2.dp)
-                    ,
+                        .padding(2.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // we no longer need delete item, keep it for possible future change
@@ -205,7 +219,7 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
                             .fillMaxWidth()
                             .fillMaxHeight()
 
-                            //.weight(1f)
+                        //.weight(1f)
                         ,
                         shape = RoundedCornerShape(18.dp),
                         colors = ButtonColors(
@@ -240,8 +254,8 @@ fun ComposeListStore(storeController: StoreController, data: SnapshotStateList<S
 
                 }
             }
+        }
     }
-}
 }
 
 // filter function for search box
@@ -260,12 +274,19 @@ fun filterStores(storeList: SnapshotStateList<Store>, query: String): SnapshotSt
 }
 
 
-
 @Composable
-fun LazyColumnTest(storeController: StoreController, data: SnapshotStateList<Store>, navController: NavController, viewModel: SharedViewModel){
+fun LazyColumnTest(
+    storeController: StoreController,
+    data: SnapshotStateList<Store>,
+    navController: NavController,
+    viewModel: SharedViewModel
+) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-        contentPadding = PaddingValues(5.dp)) {
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        contentPadding = PaddingValues(5.dp)
+    ) {
 
         // items(data) { item ->
         items(data) { item ->
@@ -277,10 +298,16 @@ fun LazyColumnTest(storeController: StoreController, data: SnapshotStateList<Sto
 
 
 @Composable
-fun ListDataStore(storeController: StoreController, storeObject: Store, navController: NavController, data: SnapshotStateList<Store>, viewModel: SharedViewModel) {
+fun ListDataStore(
+    storeController: StoreController,
+    storeObject: Store,
+    navController: NavController,
+    data: SnapshotStateList<Store>,
+    viewModel: SharedViewModel
+) {
     var showDialogEditStore by remember { mutableStateOf(false) }
 
-    Card (
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(90.dp)
@@ -289,8 +316,8 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
             // pass respective storeId to the screen
             .clickable {
                 navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + storeObject.id)
-                       viewModel.selectedStore = storeObject
-                       },
+                viewModel.selectedStore = storeObject
+            },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
@@ -347,93 +374,164 @@ fun ListDataStore(storeController: StoreController, storeObject: Store, navContr
             )
          */
         }
-        if (showDialogEditStore){
-            PopUpEditStore(storeObject = storeObject, storeController = storeController,
-                onDismiss = {showDialogEditStore = false}, storeList = data, viewModel = viewModel
+        if (showDialogEditStore) {
+            PopUpEditStore(
+                storeObject = storeObject, storeController = storeController,
+                onDismiss = { showDialogEditStore = false }, storeList = data, viewModel = viewModel
             )
         }
     }
 }
 
 // TODO: rework design
+/*
 @Composable
-fun PopUpAddStore(storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedViewModel) {
+fun PopUpAddStore(
+    storeController: StoreController,
+    onDismiss: () -> Unit,
+    storeList: SnapshotStateList<Store>,
+    viewModel: SharedViewModel
+) {
     var storeName by remember { mutableStateOf("") }
     var storeAddress by remember { mutableStateOf("") }
     var storeDescription by remember { mutableStateOf("") }
 
 
-            AlertDialog(
-                onDismissRequest = onDismiss,
-                title = { Text(text = "Add Store") },
-                text = {
-                    Column {
-                        TextField(
-                            value = storeName,
-                            onValueChange = { storeName = it },
-                            label = { Text("Store Name") }
-                        )
-                        TextField(
-                            value = storeAddress,
-                            onValueChange = { storeAddress = it },
-                            label = { Text("Store Address") }
-                        )
-                        TextField(
-                            value = storeDescription,
-                            onValueChange = { storeDescription = it },
-                            label = { Text("Store Description") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Add Store") },
+        text = {
+            Column {
+                TextField(
+                    value = storeName,
+                    onValueChange = { storeName = it },
+                    label = { Text("Store Name") }
+                )
+                TextField(
+                    value = storeAddress,
+                    onValueChange = { storeAddress = it },
+                    label = { Text("Store Address") }
+                )
+                TextField(
+                    value = storeDescription,
+                    onValueChange = { storeDescription = it },
+                    label = { Text("Store Description") }
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+
+                    // add store record to the database
+                    runBlocking {
+                        storeController.addStore(
+                            storeName,
+                            storeAddress,
+                            storeDescription
                         )
                     }
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
+                    // add store to the LazyColumn data
+                    // this approach can only generate different id, which different from db
+                    // storeList.add(Store(storeName, storeAddress, storeDescription))
+                    runBlocking {
+                        storeList.clear()
+                        storeList.addAll(storeController.getListOfStores())
+                        viewModel.storeList = storeController.getListOfStores().toMutableList()
 
-                            // add store record to the database
-                            runBlocking {
-                                storeController.addStore(
-                                    storeName,
-                                    storeAddress,
-                                    storeDescription
-                                )
-                            }
-                            // add store to the LazyColumn data
-                            // this approach can only generate different id, which different from db
-                            // storeList.add(Store(storeName, storeAddress, storeDescription))
-                            runBlocking {
-                                storeList.clear()
-                                storeList.addAll(storeController.getListOfStores())
-                                viewModel.storeList = storeController.getListOfStores().toMutableList()
-
-                            }
-
-                            // add store to SharedViewModel
-                            // TODO: need to check for possibility of having different Store object.
-                            // TODO: if yes, then need to use the same Store object created at the top.
-                            // viewModel.storeList?.add(Store(storeName, storeAddress, storeDescription))
-
-                            // println("User entered: $storeName $storeAddress $storeDescription") // Handle input
-
-                            onDismiss()
-                        }
-                    ) {
-                        Text("Save")
                     }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = onDismiss
-                    ) {
-                        Text("Cancel")
-                    }
+
+                    // add store to SharedViewModel
+                    // TODO: need to check for possibility of having different Store object.
+                    // TODO: if yes, then need to use the same Store object created at the top.
+                    // viewModel.storeList?.add(Store(storeName, storeAddress, storeDescription))
+
+                    // println("User entered: $storeName $storeAddress $storeDescription") // Handle input
+
+                    onDismiss()
                 }
-            )
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
 
+}
+*/
+
+@Composable
+fun PopUpAddStore(
+    storeController: StoreController,
+    onDismiss: () -> Unit,
+    storeList: SnapshotStateList<Store>,
+    viewModel: SharedViewModel
+) {
+    var storeName by remember { mutableStateOf("") }
+    var storeAddress by remember { mutableStateOf("") }
+    var storeDescription by remember { mutableStateOf("") }
+
+    val showDialog = remember { mutableStateOf(true) }
+
+    CustomFormDialog(
+        showDialog = showDialog,
+        title = "Add Store",
+        icon = Icons.Default.Store,
+        fields = listOf(
+            FormField(
+                label = "Store Name",
+                value = storeName,
+                onValueChange = { storeName = it }
+            ),
+            FormField(
+                label = "Store Address",
+                value = storeAddress,
+                onValueChange = { storeAddress = it }
+            ),
+            FormField(
+                label = "Store Description",
+                value = storeDescription,
+                onValueChange = { storeDescription = it }
+            )
+        ),
+        confirmButtonText = "Save",
+        cancelButtonText = "Cancel",
+        onCancel = {
+            showDialog.value = false
+            onDismiss()
+        },
+        onConfirm = {
+            runBlocking {
+                storeController.addStore(
+                    storeName.trim(),
+                    storeAddress.trim(),
+                    storeDescription.trim()
+                )
+                storeList.clear()
+                storeList.addAll(storeController.getListOfStores())
+                viewModel.storeList = storeController.getListOfStores().toMutableList()
+            }
+            showDialog.value = false
+            onDismiss()
+        }
+    )
 }
 
 // TODO: rework design
 @Composable
-fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismiss: () -> Unit, storeList: SnapshotStateList<Store>, viewModel: SharedViewModel) {
+fun PopUpEditStore(
+    storeObject: Store,
+    storeController: StoreController,
+    onDismiss: () -> Unit,
+    storeList: SnapshotStateList<Store>,
+    viewModel: SharedViewModel
+) {
     var storeName by remember { mutableStateOf("") }
     var storeAddress by remember { mutableStateOf("") }
     var storeDescription by remember { mutableStateOf("") }
@@ -502,15 +600,15 @@ fun PopUpEditStore(storeObject: Store, storeController: StoreController, onDismi
 }
 
 
-
-
-
-fun testPrintStoreAttributes(obj: Store){
+fun testPrintStoreAttributes(obj: Store) {
     print("Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
-    Log.d("StoreTag", "Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}")
+    Log.d(
+        "StoreTag",
+        "Store id: ${obj.id}, Store name: ${obj.name} , Store description: ${obj.description}"
+    )
 }
 
-fun testGetStoreListFromDatabase(){
+fun testGetStoreListFromDatabase() {
     val storeList = StoreController() // Initialize object
 
     runBlocking {

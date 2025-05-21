@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -225,6 +226,7 @@ fun AccountPage(context: Context, navController: NavController) {
         CustomFormDialog(
             showDialog = showDialogState,
             title = "Change Password",
+            icon = Icons.Default.Lock,
             fields = listOf(
                 FormField(
                     label = "Current Password",
