@@ -41,15 +41,31 @@ class AuthViewModel : ViewModel() {
             else -> null
         }
 
-        // Password validation: required + minimum length
+        // --- Password Validation ---
         passwordError = when {
             trimmedPassword.isEmpty() -> {
                 isValid = false
                 "Password cannot be empty"
             }
-            trimmedPassword.length < 6 -> {
+            trimmedPassword.length < 8 -> {
                 isValid = false
-                "Password must be at least 6 characters"
+                "Password must be at least 8 characters"
+            }
+            !trimmedPassword.matches(Regex(".*[A-Z].*")) -> {
+                isValid = false
+                "Password must include an uppercase letter"
+            }
+            !trimmedPassword.matches(Regex(".*[a-z].*")) -> {
+                isValid = false
+                "Password must include a lowercase letter"
+            }
+            !trimmedPassword.matches(Regex(".*\\d.*")) -> {
+                isValid = false
+                "Password must include a number"
+            }
+            !trimmedPassword.matches(Regex("^[A-Za-z\\d]+$")) -> {
+                isValid = false
+                "Password must not contain symbols"
             }
             else -> null
         }
@@ -106,9 +122,25 @@ class AuthViewModel : ViewModel() {
                 isValid = false
                 "Password cannot be empty"
             }
-            trimmedPassword.length < 6 -> {
+            trimmedPassword.length < 8 -> {
                 isValid = false
-                "Password must be at least 6 characters"
+                "Password must be at least 8 characters"
+            }
+            !trimmedPassword.matches(Regex(".*[A-Z].*")) -> {
+                isValid = false
+                "Password must include an uppercase letter"
+            }
+            !trimmedPassword.matches(Regex(".*[a-z].*")) -> {
+                isValid = false
+                "Password must include a lowercase letter"
+            }
+            !trimmedPassword.matches(Regex(".*\\d.*")) -> {
+                isValid = false
+                "Password must include a number"
+            }
+            !trimmedPassword.matches(Regex("^[A-Za-z\\d]+$")) -> {
+                isValid = false
+                "Password must not contain symbols"
             }
             else -> null
         }
