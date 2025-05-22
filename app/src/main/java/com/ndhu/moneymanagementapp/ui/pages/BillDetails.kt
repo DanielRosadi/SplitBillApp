@@ -207,7 +207,8 @@ fun ComposeBillDetailsScreen(
                     Button(
                         onClick = {}, // Placeholder action
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (allPaid == true) Color(0xFFA8E6CF) else Color(0xFFFFC8C8)
+                            // containerColor = if (allPaid == true) Color(0xFFA8E6CF) else Color(0xFFFFC8C8)
+                            containerColor = if (allPaid == true) primaryGreen else dangerRed
                         ),
                         modifier = Modifier
                             .fillMaxWidth()

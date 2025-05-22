@@ -119,7 +119,6 @@ fun ComposeListStore(
 
     val filteredStores = filterStores(data, searchQuery.value) //  no remember
 
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -176,20 +175,22 @@ fun ComposeListStore(
 //                        println("Search query updated to: ${searchQuery.value}")
 //                    }
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentPadding = PaddingValues(5.dp)
-                    ) {
-
-                        // items(data) { item ->
-                        ///items(data) { item ->
-                        items(filteredStores) { item ->
-                            ListDataStore(storeController, item, navController, data, viewModel)
+                    // Handle Empty State
+                    if (filteredStores.isEmpty()) {
+                        EmptyStateMessage(message = "No stores found. Please add a store.")
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            contentPadding = PaddingValues(5.dp)
+                        ) {
+                            items(filteredStores) { item ->
+                                ListDataStore(storeController, item, navController, data, viewModel)
+                            }
                         }
-
                     }
+
 
                 }
 
@@ -399,8 +400,8 @@ fun AddStoreDialog(
                 // Inline error shown under text field
                 error = when {
                     trimmedName.isEmpty() -> "Store Name cannot be empty."
-                    isNameDuplicate       -> "Store Name already exists."
-                    else                  -> null
+                    isNameDuplicate -> "Store Name already exists."
+                    else -> null
                 }
             ),
             FormField(
@@ -491,8 +492,8 @@ fun EditStoreDialog(
                 },
                 error = when {
                     trimmedName.isEmpty() -> "Store Name cannot be empty."
-                    isNameDuplicate       -> "Store Name already exists."
-                    else                  -> null
+                    isNameDuplicate -> "Store Name already exists."
+                    else -> null
                 }
             ),
             FormField(
