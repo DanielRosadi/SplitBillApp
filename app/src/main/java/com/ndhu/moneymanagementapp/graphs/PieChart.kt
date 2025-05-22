@@ -11,6 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun PieChart(
@@ -43,6 +47,30 @@ fun PieChart(
                 topLeft = Offset(center.x - diameter / 2, center.y - diameter / 2),
                 size = Size(diameter, diameter)
             )
+
+            drawIntoCanvas { canvas ->
+                val labelAngle = startAngle + sweepAngle / 2
+                val labelRadius = diameter / 2.5f // place label slightly inside
+
+                val labelX = center.x + labelRadius * cos(Math.toRadians(labelAngle.toDouble())).toFloat()
+                val labelY = center.y + labelRadius * sin(Math.toRadians(labelAngle.toDouble())).toFloat()
+
+                val paint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.BLACK
+                    textAlign = android.graphics.Paint.Align.CENTER
+                    textSize = 40f
+                    isAntiAlias = true
+                }
+
+                canvas.nativeCanvas.drawText(
+                    "NTD ${value.toInt()}",
+                    labelX,
+                    labelY + paint.textSize / 3f, // baseline adjustment
+                    paint
+                )
+            }
+
+
             startAngle += sweepAngle
         }
     }

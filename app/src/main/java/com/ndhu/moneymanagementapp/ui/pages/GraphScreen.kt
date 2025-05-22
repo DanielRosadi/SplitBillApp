@@ -89,16 +89,50 @@ fun FetchBill(context: Context, billResponseList: List<String>, splitBillControl
 }
 
 @Composable
-fun ComposeDebtListing(context: Context, billDetailsList:  SnapshotStateList<FullBillDetail?>, splitBillController: SplitBillController, userController: UserController){
+fun ComposeDebtListing(
+    context: Context,
+    billDetailsList:  SnapshotStateList<FullBillDetail?>,
+    splitBillController: SplitBillController,
+    userController: UserController){
 
     // in float type
-    var currentLoggedInUserDebt = CurrentLoggedInUserDebt(context, billDetailsList, splitBillController, userController)
+    var currentLoggedInUserDebt = currentLoggedInUserDebt(context, billDetailsList, splitBillController, userController)
 
+    ChartDebt(context, billDetailsList, splitBillController, userController, currentLoggedInUserDebt)
 
 }
 
 @Composable
-fun CurrentLoggedInUserDebt(context: Context, billDetailsList: SnapshotStateList<FullBillDetail?>, splitBillController: SplitBillController, userController: UserController){
+fun ChartDebt(
+    context: Context,
+    billDetailsList:  SnapshotStateList<FullBillDetail?>,
+    splitBillController: SplitBillController,
+    userController: UserController,
+    currentLoggedInUserDebt: Float
+){
+    Column (
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val data = listOf(currentLoggedInUserDebt, 2000f, /* 50f*/)
+        val colors = listOf(Color.Red, Color.Green, /* Color.Blue */)
+
+        Text("Pie Chart", style = MaterialTheme.typography.titleLarge)
+        PieChart(
+            entries = data,
+            colors = colors,
+            modifier = Modifier.size(200.dp)
+        )
+    }
+}
+
+fun currentLoggedInUserDebt(
+    context: Context,
+    billDetailsList: SnapshotStateList<FullBillDetail?>,
+    splitBillController: SplitBillController,
+    userController: UserController)
+: Float{
 
     var currentLoggedInUser = runBlocking { userController.getOnboardUser(context) }
     var currentLoggedInUserDebt: Float = 0f
@@ -112,13 +146,17 @@ fun CurrentLoggedInUserDebt(context: Context, billDetailsList: SnapshotStateList
         filteredBillResponse ->
             if (filteredBillResponse != null) {
                 filteredBillResponse.users.forEach{ itemGroup ->
-                    if (itemGroup.status.value == UserPaymentStatus.UNPAID){
-                        currentLoggedInUserDebt += itemGroup.items.fold(0f) {sum, item -> sum + item.oneItemPrice * item.userTakenQuantity}
+                    if ( itemGroup.userId == currentLoggedInUser.id ) {
+                        if (itemGroup.status.value == UserPaymentStatus.UNPAID){
+                            currentLoggedInUserDebt += itemGroup.items.fold(0f) { sum, item -> sum + item.oneItemPrice * item.userTakenQuantity }
+                        }
                     }
                 }
             }
     }
     }
+
+    return currentLoggedInUserDebt
 
 }
 
