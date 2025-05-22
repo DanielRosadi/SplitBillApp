@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,8 +32,6 @@ import kotlinx.coroutines.runBlocking
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.User
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun Home(context: Context, navController: NavController) {
@@ -177,6 +174,7 @@ fun Home(context: Context, navController: NavController) {
                 ) {
                     HomeButton(
                         iconResId = R.drawable.icon_split_bill,
+                        backgroundResId = R.drawable.button_background,
                         text = "Split Bill",
                         textFontSize = 24,
                         onClick = { navigateToSplitBillScreen(navController) },
@@ -192,6 +190,7 @@ fun Home(context: Context, navController: NavController) {
                     ) {
                         HomeButton(
                             iconResId = R.drawable.icon_history,
+                            backgroundResId = R.drawable.bill_history,
                             text = "Bill History",
                             textFontSize = 16,
                             onClick = { navigateToBillHistoryScreen(navController) },
@@ -201,6 +200,7 @@ fun Home(context: Context, navController: NavController) {
                         )
                         HomeButton(
                             iconResId = R.drawable.icon_contact,
+                            backgroundResId = R.drawable.contact,
                             text = "Contact",
                             textFontSize = 20,
                             onClick = { navigateToContactScreen(navController) },
@@ -219,6 +219,7 @@ fun Home(context: Context, navController: NavController) {
 @Composable
 fun HomeButton(
     iconResId: Int,
+    backgroundResId: Int,
     text: String,
     textFontSize: Int,
     onClick: () -> Unit,
@@ -236,7 +237,7 @@ fun HomeButton(
     ) {
         // Background for button
         Image(
-            painter = painterResource(id = R.drawable.button_background),
+            painter = painterResource(id = backgroundResId),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(
