@@ -275,6 +275,13 @@ fun UserBillCard(context: Context,
     val userStatus = remember { mutableStateOf(user.status) } // <-- CHANGES
     val statusText = remember { mutableStateOf(if (userStatus.value.value == UserPaymentStatus.PAID) "Paid" else "Not Paid") } // <-- CHANGES
 
+    billDetails.value?.billId.toString().let { Log.d("DEBUG BD CARD", it) }
+    billDetails.value?.users?.forEach{ item ->
+        Log.d("DEBUG BD CARD", item.toString())
+    }
+    Log.d("DEBUG BD CARD", "\n\n\n")
+
+
     // TODO: calculation time expensive due to hot-fix, need to refactor backend data classes
     // var userTotal = remember { mutableStateOf(0f) }
     // complete the totalQuality and user price share

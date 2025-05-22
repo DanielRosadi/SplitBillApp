@@ -157,8 +157,8 @@ fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navCo
         UserPaymentStatus.UNPAID -> Color(0xFFFFC8C8) // Light red for pending
         else -> Color.White // Default white background
     }
-
-    viewModel.currentBillId = billResponse.billId
+// BUG HERE
+//    viewModel.currentBillId = billResponse.billId
 
 //    val totalPrice = billResponse.itemList
 //        .groupBy { it.id }
@@ -190,6 +190,7 @@ fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navCo
             .clickable {
                 // Navigate to bill details
                 navController.navigate(route = AppScreens.BillDetailsScreen.name)
+                viewModel.currentBillId = billResponse.billId
             }
     ) {
         Row(
