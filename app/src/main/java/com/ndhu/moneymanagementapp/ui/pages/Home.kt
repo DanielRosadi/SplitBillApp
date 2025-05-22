@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -208,6 +209,11 @@ fun Home(context: Context, navController: NavController) {
                                 .weight(2f)
                                 .fillMaxWidth()
                         )
+
+                        // Temporary Button
+                        Button(onClick = { navController.navigate(route = AppScreens.GraphingScreen.name) }) {
+                            Text(text = "Graph (Temp)")
+                        }
                     }
                 }
             }

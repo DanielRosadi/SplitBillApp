@@ -16,6 +16,7 @@ import com.ndhu.moneymanagementapp.ui.pages.ContactPage
 import com.ndhu.moneymanagementapp.ui.pages.DeleteStoreScreen
 import com.ndhu.moneymanagementapp.ui.pages.EditProfile
 import com.ndhu.moneymanagementapp.ui.oldpages.FirstLogin
+import com.ndhu.moneymanagementapp.ui.pages.GraphingScreen
 import com.ndhu.moneymanagementapp.ui.pages.Home
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
@@ -143,6 +144,11 @@ fun AppNavigation(context : Context){
         // Testing Screen
         composable(AppScreens.TestingScreen.name){
             TestingScreen(context, navController = navController)
+        }
+
+        // Graph Screen
+        composable(AppScreens.GraphingScreen.name){
+            GraphingScreen(context, navController = navController, viewModel = sharedViewModel)
         }
 
     }
