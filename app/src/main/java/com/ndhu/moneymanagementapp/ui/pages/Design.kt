@@ -77,15 +77,24 @@ val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~2
 val profilePictures = listOf(
     ProfilePicture(1, R.drawable.defaultavatarimage),
     ProfilePicture(2, R.drawable.black_panther),
-    ProfilePicture(3, R.drawable.banteng),
-    ProfilePicture(4, R.drawable.download),
-    ProfilePicture(5, R.drawable.download_1),
-    ProfilePicture(6, R.drawable.download_2),
-    ProfilePicture(7, R.drawable.download_3),
+    ProfilePicture(3, R.drawable.bull),
+
+    ProfilePicture(4, R.drawable.racoon),
+    ProfilePicture(5, R.drawable.cat),
+    ProfilePicture(6, R.drawable.gato_mafia),
+
+    ProfilePicture(7, R.drawable.fox),
+    ProfilePicture(8, R.drawable.crocodile),
+    ProfilePicture(9, R.drawable.dog),
+
+    ProfilePicture(10, R.drawable.snake),
+    ProfilePicture(11, R.drawable.tiger),
+    ProfilePicture(12, R.drawable.penguin),
 )
 
+// maxPictureRand variable must follows the number of template profile picture available
 var minPictureRand = 2
-var maxPictureRand = 7
+var maxPictureRand = 12
 var profilePictureRandomizer = (minPictureRand..maxPictureRand).random()
 
 // Background Image used in most pages
