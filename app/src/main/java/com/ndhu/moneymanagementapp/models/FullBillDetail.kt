@@ -6,6 +6,9 @@ import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
 
+// ADDED
+// Internal usage in backend
+
 // New data classes for grouped response
 data class UserItemGroup(
     val userId: String,
