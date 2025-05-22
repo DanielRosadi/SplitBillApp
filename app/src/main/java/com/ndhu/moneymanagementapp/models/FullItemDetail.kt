@@ -1,5 +1,8 @@
 package com.ndhu.moneymanagementapp.models
 
+// ADDED
+// Internal usage in Backend
+
 data class FullItemDetail(
     var itemId : String = "",
     var itemName : String = "",

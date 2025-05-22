@@ -4,6 +4,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.ndhu.moneymanagementapp.models.Item
 
+// ADDED
+// Internal usage in Frontend
+
 // INTERNAL USE for ListOfItemPage.kt only !
 
 // UIItem is used for ListOfItemPage.kt only (internal usage)

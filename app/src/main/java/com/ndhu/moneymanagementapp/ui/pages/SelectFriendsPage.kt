@@ -320,6 +320,15 @@ fun filterFriends(
                     ?: "Unknown Contact"
             }
 
+            /*
+            POSSIBLE BUG:
+            May produce Unknown contact if:
+            - developer accidentally/intentionally delete User data directly from Firebase,
+            therefore making Contact data between user A and B not valid (because now
+            one of them is null). Therefore, searchUserByUserId() returns null and elvis operator/null safety
+            produces "Unknown Contact"
+            */
+
             friendName.contains(query, ignoreCase = true)
         }.toMutableStateList() // Convert result to SnapshotStateList
     }
@@ -343,6 +352,15 @@ fun ListFriends(
     var userObject = runBlocking { userController.searchUserByUserId(context, friendUserId) }
 
     var friendName = userObject?.username ?: "Unknown Contact"
+
+    /*
+            POSSIBLE BUG:
+            May produce Unknown contact if:
+            - developer accidentally/intentionally delete User data directly from Firebase,
+            therefore making Contact data between user A and B not valid (because now
+            one of them is null). Therefore, searchUserByUserId() returns null and elvis operator/null safety
+            produces "Unknown Contact"
+    */
 
     // val cardColor = if (isSelected) correctTransparentGreen else Color.White
 

@@ -129,7 +129,8 @@ class SplitBillController {
             UserItemGroup(
                 userId = userId,
                 status = mutableStateOf( userToStatus[userId] ?: UserPaymentStatus.UNPAID ) ,
-                items = items
+                // items = items // shallow copy problem
+                items = items.map { it.copy() }.toMutableList()
             )
         }
 
