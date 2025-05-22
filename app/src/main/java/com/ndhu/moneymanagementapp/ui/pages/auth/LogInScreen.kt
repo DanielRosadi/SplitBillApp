@@ -1,6 +1,7 @@
 package com.ndhu.moneymanagementapp.ui.pages.auth
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,7 +55,7 @@ fun LogInScreen(navController: NavController) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                    //.padding(top = 16.dp),
+                //.padding(top = 16.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
@@ -148,6 +149,13 @@ fun LoginForm(
                     } else {
                         viewModel.password = ""
                         viewModel.loginError = "Invalid email or password"
+
+                        // Show a Toast message
+                        Toast.makeText(
+                            context,
+                            "Login failed: invalid credentials or account deleted",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
