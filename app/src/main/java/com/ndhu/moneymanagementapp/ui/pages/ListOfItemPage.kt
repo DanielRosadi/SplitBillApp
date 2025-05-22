@@ -223,28 +223,30 @@ private fun ComposeListItem(
                         .background(darkGreyContainer)
 
                 ) {
-
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .weight(1f),
-                        contentPadding = PaddingValues(5.dp)
-                    ) {
-
-                        items(filteredItems) { uiItem ->
-                            ListDataItem(
-                                uiItem,
-                                store,
-                                itemController,
-                                listItem,
-                                viewModel,
-                                uiItems
-                            )
-
+                    // Handle Empty State
+                    if (filteredItems.isEmpty()) {
+                        EmptyStateMessage(message = "No items found. Please add an item.")
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .weight(1f),
+                            contentPadding = PaddingValues(5.dp)
+                        ) {
+                            items(filteredItems) { uiItem ->
+                                ListDataItem(
+                                    uiItem,
+                                    store,
+                                    itemController,
+                                    listItem,
+                                    viewModel,
+                                    uiItems
+                                )
+                            }
                         }
-
                     }
+
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
