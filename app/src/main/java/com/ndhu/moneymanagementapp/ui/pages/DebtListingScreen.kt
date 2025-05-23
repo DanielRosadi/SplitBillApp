@@ -2,7 +2,9 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -10,6 +12,7 @@ import androidx.navigation.NavController
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,9 +20,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
@@ -30,10 +36,14 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.graphs.DonutChart
 import com.ndhu.moneymanagementapp.graphs.PieChart
@@ -218,6 +228,7 @@ fun ComposeDebtListing(
     }
 }
 
+// TODO: NEED User object
 @Composable
 fun ListDebt(
     context: Context,
@@ -226,6 +237,54 @@ fun ListDebt(
     splitBillController: SplitBillController,
     userController: UserController
 ){
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .padding(5.dp)
+            //.background(Color.White)
+            // pass respective storeId to the screen
+            .clickable {
+                // navController.navigate(route = AppScreens.ListItemsScreen.name + "/" + storeObject.id)
+                // viewModel.selectedStore = storeObject
+
+                // or uses arrow
+            },
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(10.dp).background(Color.White),
+        ){
+
+            // profile picture here
+            // TODO: change
+            Image(
+                painter = painterResource(id = R.drawable.defaultavatarimage),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.weight(1f)
+            )
+
+            // user name
+            // TODO: change
+            Text(text = "user", modifier = Modifier.weight(1f))
+
+            Spacer(modifier = Modifier.width(120.dp))
+
+            // debt
+            Text(
+                text = "NTD ${debt.toString()}",
+                modifier = Modifier.weight(1f),
+                color = if (debt >= 0) lightGreenDebtScreen else lightRedDebtScreen // Green or Red
+                )
+        }
+
+
+    }
 
 }
 
@@ -243,11 +302,11 @@ fun ChartDebt(
         verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val oldLightRedDebtScreen = Color(0xfffd594d)
-        val oldLightGreenDebtScreen = Color(0xff85d479)
+        //val oldLightRedDebtScreen = Color(0xfffd594d)
+        //val oldLightGreenDebtScreen = Color(0xff85d479)
 
-        val lightRedDebtScreen = Color(0xFFF44336)
-        val lightGreenDebtScreen = Color(0xFF4CAF50)
+        //val lightRedDebtScreen = Color(0xFFF44336)
+        //val lightGreenDebtScreen = Color(0xFF4CAF50)
 
         // TODO: currentLoggedInUserDebt is not correctly fetched?
         // val data = listOf(currentLoggedInUserDebt, 2000f, /* 50f*/)

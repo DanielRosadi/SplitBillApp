@@ -73,6 +73,9 @@ val darkGreyContainer = Color(0xFF9D9D9D) // mostly used for dark grey container
 val correctTransparentGreen = Color(0xAA4CAF50) // green transparent for selected user card
 val overlayColor = Color(0x33009669) // 20% transparent green (Hex ARGB: 33 = ~20% opacity)
 
+val lightRedDebtScreen = Color(0xFFF44336)
+val lightGreenDebtScreen = Color(0xFF4CAF50)
+
 // for profile picture
 val profilePictures = listOf(
     ProfilePicture(1, R.drawable.defaultavatarimage),
