@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,7 +39,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
@@ -165,12 +168,14 @@ fun ComposeDebtListing(
                 currentLoggedInUserDebt
             )
 
+            Spacer(modifier = Modifier.height(30.dp))
+
             // White Box
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     //.fillMaxHeight()
-                    .weight(1f)
+                    .weight(2f)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(Color(0xFFD9D9D9))
                     .padding(10.dp)
@@ -186,7 +191,7 @@ fun ComposeDebtListing(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(7f)
+                        .weight(8f)
                         .clip(RoundedCornerShape(20.dp))
                         .background(darkGreyContainer)
 
@@ -209,8 +214,7 @@ fun ComposeDebtListing(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        //.fillMaxHeight()
-                        .weight(1f)
+                        //.weight(1f)
                         .padding(2.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -241,7 +245,7 @@ fun ListDebt(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
+            .height(90.dp)
             .padding(5.dp)
             //.background(Color.White)
             // pass respective storeId to the screen
@@ -257,30 +261,56 @@ fun ListDebt(
     ) {
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(10.dp).background(Color.White),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .background(Color.White),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ){
 
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    //.weight(0.5f)
+                    .clip(CircleShape)
+            ) {
             // profile picture here
             // TODO: change
             Image(
                 painter = painterResource(id = R.drawable.defaultavatarimage),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxSize()
             )
+
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
 
             // user name
             // TODO: change
-            Text(text = "user", modifier = Modifier.weight(1f))
+            Text(text = "user",
+                modifier = Modifier.weight(2f),
+                color = primaryGreen,
+                fontSize = 20.sp,
+                fontFamily = alexandriaFont,
+                )
 
-            Spacer(modifier = Modifier.width(120.dp))
+            //Spacer(modifier = Modifier.width(90.dp))
+            Spacer(modifier = Modifier.weight(3f))
 
             // debt
             Text(
-                text = "NTD ${debt.toString()}",
-                modifier = Modifier.weight(1f),
-                color = if (debt >= 0) lightGreenDebtScreen else lightRedDebtScreen // Green or Red
-                )
+                text = "NTD $debt",
+                modifier = Modifier.weight(4f),
+                color = if (debt >= 0) lightGreenDebtScreen else lightRedDebtScreen, // Green or Red
+                fontSize = 18.sp,
+                // fontWeight = FontWeight.Medium,
+                fontFamily = syncopateFont
+            )
         }
 
 
@@ -318,7 +348,14 @@ fun ChartDebt(
         val colors = listOf(lightRedDebtScreen, lightGreenDebtScreen)
         // val colors = listOf(Color.Red, Color.Green, /* Color.Blue */)
 
-        Text("Debt Chart", style = MaterialTheme.typography.titleLarge)
+        Text("Debt Chart",
+            //color = Color.White,
+            color = Color.hsv(43f, 1f, 1f),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            fontFamily = sensationLightFont
+        )
+
         TwoSlicePieChart(
             toGet = toGet,
             toPay = toPay,

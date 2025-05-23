@@ -13,6 +13,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.platform.LocalContext
+import android.graphics.Typeface
+import androidx.core.content.res.ResourcesCompat
+import com.ndhu.moneymanagementapp.R
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -89,6 +93,8 @@ fun TwoSlicePieChart(
     val total = toGet + toPay
     val animatedProgress = remember { Animatable(0f) }
 
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         animatedProgress.animateTo(
             targetValue = 1f,
@@ -119,16 +125,28 @@ fun TwoSlicePieChart(
                 size = chartSize
             )
 
+
+
             drawIntoCanvas { canvas ->
                 val labelAngle = startAngle + sweepAngle / 2
-                val labelRadius = diameter / 1.4f
+                val labelRadius = diameter / 1.2f
 
                 val labelX = center.x + labelRadius * cos(Math.toRadians(labelAngle.toDouble())).toFloat()
                 val labelY = center.y + labelRadius * sin(Math.toRadians(labelAngle.toDouble())).toFloat()
 
                 val paint = android.graphics.Paint().apply {
-                    color = android.graphics.Color.BLACK
+                    // color = android.graphics.Color.BLACK
+                    color = android.graphics.Color.WHITE
+                    // color = Color(0xffbb8f00)
                     textAlign = android.graphics.Paint.Align.CENTER
+                    // TODO: error for custom font
+                    // typeface = Typeface.createFromAsset(context.assets, "fonts/sensation_light.ttf")
+                    Typeface.create(ResourcesCompat.getFont(context, R.font.sensation_light), Typeface.NORMAL)
+
+                    //typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)  // <-- CUSTOM FONT STYLE
+                    // Typeface.SANS_SERIF
+                    //Typeface.SERIF
+                    //Typeface.MONOSPACE
                     textSize = 38f
                     isAntiAlias = true
                 }
