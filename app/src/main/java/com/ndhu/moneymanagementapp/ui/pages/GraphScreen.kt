@@ -25,6 +25,7 @@ import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.graphs.DonutChart
 import com.ndhu.moneymanagementapp.graphs.PieChart
+import com.ndhu.moneymanagementapp.graphs.TwoSlicePieChart
 import com.ndhu.moneymanagementapp.models.FullBillDetail
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
@@ -115,14 +116,28 @@ fun ChartDebt(
         verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val data = listOf(currentLoggedInUserDebt, 2000f, /* 50f*/)
-        val colors = listOf(Color.Red, Color.Green, /* Color.Blue */)
+        val oldLightRedDebtScreen = Color(0xfffd594d)
+        val oldLightGreenDebtScreen = Color(0xff85d479)
+
+        val lightRedDebtScreen = Color(0xFFF44336)
+        val lightGreenDebtScreen = Color(0xFF4CAF50)
+
+        // TODO: currentLoggedInUserDebt is not correctly fetched?
+        // val data = listOf(currentLoggedInUserDebt, 2000f, /* 50f*/)
+
+        // val data = listOf(30f, 20f)
+        var toGet = 20f
+        var toPay = 30f
+        val colors = listOf(lightRedDebtScreen, lightGreenDebtScreen)
+        // val colors = listOf(Color.Red, Color.Green, /* Color.Blue */)
 
         Text("Pie Chart", style = MaterialTheme.typography.titleLarge)
-        PieChart(
-            entries = data,
-            colors = colors,
-            modifier = Modifier.size(200.dp)
+        TwoSlicePieChart(
+            toGet = toGet,
+            toPay = toPay,
+            modifier = Modifier.size(200.dp),
+            getColor = lightGreenDebtScreen, // green
+            payColor = lightRedDebtScreen // red
         )
     }
 }
