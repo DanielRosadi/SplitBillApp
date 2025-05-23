@@ -66,7 +66,7 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
 
         billDetail.value = splitBillController.getBillDetailGroupedByUser(viewModel.currentBillId)
 
-    // TODO: add view model if needed
+        // TODO: add view model if needed
         // viewModel.billHistory = storeController.getListOfStores().toMutableList()
     }
 
@@ -100,8 +100,8 @@ fun BillDetails(context: Context, navController: NavController, viewModel: Share
     // Calculate total unpaid amount
     val unpaidUsers = billDetail.value?.users?.filter { it.status.value == UserPaymentStatus.UNPAID }
     val totalUnpaid = unpaidUsers?.fold(0f) {
-                                            sum, userItemGroup -> sum + (userItemGroup.items.fold(0f){
-                                                                                                     innerSum, item ->
+            sum, userItemGroup -> sum + (userItemGroup.items.fold(0f){
+            innerSum, item ->
         var itemTotalQuantity = totalItemQuantities[item.id]
         if (itemTotalQuantity != null && itemTotalQuantity != 0f) {
             innerSum + (item.oneItemPrice * item.userTakenQuantity)
@@ -351,25 +351,38 @@ fun UserBillCard(context: Context,
                     textAlign = TextAlign.Center
                 )
 
-                    Text(
-                        text = statusText.value,
-                        color = if (userStatus.value.value == UserPaymentStatus.PAID) Color(0xFF388E3C) else Color.Red, // <-- CHANGES
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.weight(1f).clickable {
+                var loggedInUser: User?
+
+                runBlocking { loggedInUser = UserController().getOnboardUser(context) }
+
+
+                Text(
+                    text = statusText.value,
+                    color = if (userStatus.value.value == UserPaymentStatus.PAID) Color(0xFF388E3C) else Color.Red, // <-- CHANGES
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    modifier = Modifier.weight(1f).clickable {
+
+                        if ( (billDetails.value?.billOwnerId ?: "BILL DETAILS ERROR") == (loggedInUser?.id ?: "LOGGED IN USER ERROR") ) {
                             val currentUserId = user.userId
-                            val currentGroup = billDetails.value?.users?.find { it.userId == currentUserId }
+                            val currentGroup =
+                                billDetails.value?.users?.find { it.userId == currentUserId }
 
                             if (currentGroup != null) {
-                                val newStatus = if (currentGroup.status.value == UserPaymentStatus.PAID) {
-                                    userStatus.value.value = UserPaymentStatus.UNPAID        // <-- CHANGES
-                                    statusText.value = "Not Paid"                            // <-- CHANGES
-                                    UserPaymentStatus.UNPAID
-                                } else {
-                                    userStatus.value.value = UserPaymentStatus.PAID          // <-- CHANGES
-                                    statusText.value = "Paid"                                // <-- CHANGES
-                                    UserPaymentStatus.PAID
-                                }
+                                val newStatus =
+                                    if (currentGroup.status.value == UserPaymentStatus.PAID) {
+                                        userStatus.value.value =
+                                            UserPaymentStatus.UNPAID        // <-- CHANGES
+                                        statusText.value =
+                                            "Not Paid"                            // <-- CHANGES
+                                        UserPaymentStatus.UNPAID
+                                    } else {
+                                        userStatus.value.value =
+                                            UserPaymentStatus.PAID          // <-- CHANGES
+                                        statusText.value =
+                                            "Paid"                                // <-- CHANGES
+                                        UserPaymentStatus.PAID
+                                    }
 
                                 currentGroup.status.value = newStatus
 
@@ -381,9 +394,13 @@ fun UserBillCard(context: Context,
                                     )
                                 }
                             }
-                                                                 },
-                        textAlign = TextAlign.End
-                    )
+
+                        }
+
+
+                    },
+                    textAlign = TextAlign.End
+                )
 
             }
 
