@@ -304,7 +304,7 @@ fun ListDebt(
 
             // debt
             Text(
-                text = "NTD $debt",
+                text = if (debt >=0) "NTD +$debt" else "NTD $debt",
                 modifier = Modifier.weight(4f),
                 color = if (debt >= 0) lightGreenDebtScreen else lightRedDebtScreen, // Green or Red
                 fontSize = 18.sp,
