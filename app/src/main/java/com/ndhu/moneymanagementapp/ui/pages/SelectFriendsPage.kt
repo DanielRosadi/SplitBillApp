@@ -182,34 +182,38 @@ fun ComposeSelectFriends(
                         .fillMaxWidth()
                         .weight(5.5f)
                 ) {
+                    // Handle Empty State
+                    if (filteredFriends.isEmpty()) {
+                        EmptyStateMessage(message = "No friends found. Add a friend to get started.")
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            contentPadding = PaddingValues(5.dp)
+                        ) {
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentPadding = PaddingValues(5.dp)
-                    ) {
+                            items(filteredFriends) { friend ->
+                                // initially, isSelected is false for all friends (cards are unchecked)
+                                // selectedFriends list are empty
+                                val isSelected = friend in selectedFriends
 
-                        items(filteredFriends) { friend ->
-                            // initially, isSelected is false for all friends (cards are unchecked)
-                            // selectedFriends list are empty
-                            val isSelected = friend in selectedFriends
+                                // if user clicks the friend's card, it will be added to selectedFriends list
+                                // else, if user unclick the friend's card, it will be remove from the selectedFriends list
+                                // we only define the isSelected and onCheckedChange function as parameter here, execution happens later
+                                ListFriends(
+                                    context = context,
+                                    friend = friend,
+                                    isSelected = isSelected,
+                                    onCheckedChange = { checked ->
+                                        if (checked) selectedFriends.add(friend)
+                                        else selectedFriends.remove(friend)
+                                    },
+                                    userController = userController
+                                )
+                            }
 
-                            // if user clicks the friend's card, it will be added to selectedFriends list
-                            // else, if user unclick the friend's card, it will be remove from the selectedFriends list
-                            // we only define the isSelected and onCheckedChange function as parameter here, execution happens later
-                            ListFriends(
-                                context = context,
-                                friend = friend,
-                                isSelected = isSelected,
-                                onCheckedChange = { checked ->
-                                    if (checked) selectedFriends.add(friend)
-                                    else selectedFriends.remove(friend)
-                                },
-                                userController = userController
-                            )
                         }
-
                     }
                 }
 
