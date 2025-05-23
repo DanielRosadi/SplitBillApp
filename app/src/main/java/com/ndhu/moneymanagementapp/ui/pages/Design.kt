@@ -108,6 +108,17 @@ fun BackgroundImage() {
     )
 }
 
+// Background Image (light version)
+@Composable
+fun LightBackgroundImage() {
+    Image(
+        painter = painterResource(id = R.drawable.background_white),
+        contentDescription = null,
+        modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+        contentScale = ContentScale.Crop
+    )
+}
+
 // "WE SPLIT" Title Text
 @Composable
 fun TitleText(){

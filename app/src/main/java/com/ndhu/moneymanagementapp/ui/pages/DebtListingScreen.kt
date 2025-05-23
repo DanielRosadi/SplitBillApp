@@ -2,14 +2,24 @@ package com.ndhu.moneymanagementapp.ui.pages
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
@@ -19,7 +29,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
@@ -32,7 +44,7 @@ import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun GraphingScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
+fun DebtListingScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
 
     // GraphExample()
 
@@ -56,14 +68,14 @@ fun GraphingScreen(context: Context, navController: NavController, viewModel: Sh
         billResponse -> billResponse.billId
     }
 
-    FetchBill(context, billIdList, splitBillController, userController)
+    FetchBill(context, navController, billIdList, splitBillController, userController)
 
     // ComposeDebtListing(context, billIdList, splitBillController, userController)
 
 }
 
 @Composable
-fun FetchBill(context: Context, billResponseList: List<String>, splitBillController: SplitBillController, userController: UserController){
+fun FetchBill(context: Context, navController: NavController, billResponseList: List<String>, splitBillController: SplitBillController, userController: UserController){
 
 
     var billDetailsList = remember { mutableStateListOf<FullBillDetail?>(null) }
@@ -86,33 +98,148 @@ fun FetchBill(context: Context, billResponseList: List<String>, splitBillControl
         // viewModel.billHistory = storeController.getListOfStores().toMutableList()
     }
 
-    ComposeDebtListing(context, billDetailsList, splitBillController, userController)
+    ComposeDebtListing(context, navController , billDetailsList, splitBillController, userController)
 }
 
 @Composable
 fun ComposeDebtListing(
     context: Context,
+    navController: NavController,
     billDetailsList:  SnapshotStateList<FullBillDetail?>,
     splitBillController: SplitBillController,
-    userController: UserController){
+    userController: UserController
+) {
 
     // in float type
-    var currentLoggedInUserDebt = currentLoggedInUserDebt(context, billDetailsList, splitBillController, userController)
+    var currentLoggedInUserDebt =
+        currentLoggedInUserDebt(context, billDetailsList, splitBillController, userController)
 
-    ChartDebt(context, billDetailsList, splitBillController, userController, currentLoggedInUserDebt)
+    var searchQuery = remember { mutableStateOf("") }
+
+    val filteredDebts =
+    // val filteredDebts = filterStores(data, searchQuery.value) //  no remember
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        // Background Image
+        BackgroundImage()
+
+        // Full Page
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+            //.fillMaxHeight()
+            // .padding(paddingValues)
+            //.padding(10.dp)
+            ,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            TitleText()
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            ChartDebt(
+                context,
+                Modifier.weight(1f).padding(16.dp),
+                billDetailsList,
+                splitBillController,
+                userController,
+                currentLoggedInUserDebt
+            )
+
+            // White Box
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    //.fillMaxHeight()
+                    .weight(1f)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color(0xFFD9D9D9))
+                    .padding(10.dp)
+            )
+            {
+                // Content Top Bar
+                // TODO: search func
+                ContentTopBar(navController = navController,
+                    topBarText = "Debt Listing",
+                    // searchBox = { SearchBox(searchQuery = searchQuery) }
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(7f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(darkGreyContainer)
+
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentPadding = PaddingValues(5.dp)
+                    ) {
+                        items(listOf(10f, 20f, -30f, -50f, 70f)) { debt ->
+                            ListDebt(context, navController , debt, splitBillController, userController)
+                        }
+                    }
+
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.fillMaxHeight()
+                        .weight(1f)
+                        .padding(2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    // if any, bottomPage
+
+                }
+
+
+
+            }
+
+        }
+
+    }
+}
+
+@Composable
+fun ListDebt(
+    context: Context,
+    navController: NavController,
+    debt:  Float,
+    splitBillController: SplitBillController,
+    userController: UserController
+){
 
 }
 
 @Composable
 fun ChartDebt(
     context: Context,
+    modifier: Modifier,
     billDetailsList:  SnapshotStateList<FullBillDetail?>,
     splitBillController: SplitBillController,
     userController: UserController,
     currentLoggedInUserDebt: Float
 ){
     Column (
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -124,6 +251,7 @@ fun ChartDebt(
 
         // TODO: currentLoggedInUserDebt is not correctly fetched?
         // val data = listOf(currentLoggedInUserDebt, 2000f, /* 50f*/)
+        // /Log.d("Debt Screen", currentLoggedInUserDebt)
 
         // val data = listOf(30f, 20f)
         var toGet = 20f
@@ -131,7 +259,7 @@ fun ChartDebt(
         val colors = listOf(lightRedDebtScreen, lightGreenDebtScreen)
         // val colors = listOf(Color.Red, Color.Green, /* Color.Blue */)
 
-        Text("Pie Chart", style = MaterialTheme.typography.titleLarge)
+        Text("Debt Chart", style = MaterialTheme.typography.titleLarge)
         TwoSlicePieChart(
             toGet = toGet,
             toPay = toPay,
