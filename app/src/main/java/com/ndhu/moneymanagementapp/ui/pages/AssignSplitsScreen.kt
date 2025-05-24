@@ -53,17 +53,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ndhu.moneymanagementapp.frontend_internal_classes.ItemOwnership
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.frontend_internal_classes.ItemWithUsersList
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemAndOwner
 import com.ndhu.moneymanagementapp.payloads.SplitBillRequest
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun AssignSplitsScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
+fun AssignSplitsScreen(context: Context, navController: NavController, viewModel: SplitBillViewModel){
 
     // TODO: need to save bill owner in view model?
     // viewModel.setBillOwner()
@@ -97,7 +99,7 @@ fun AssignSplitsScreen(context: Context, navController: NavController, viewModel
 }
 
 @Composable
-fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItemsAndOwners: MutableList<ItemWithUsersList>, navController: NavController, splitBillController: SplitBillController, viewModel: SharedViewModel, userColors: SnapshotStateMap<User?, Color>){
+fun ComposeAssignSplits(context: Context, listParticipants: MutableList<User?>, listItemsAndOwners: MutableList<ItemWithUsersList>, navController: NavController, splitBillController: SplitBillController, viewModel: SplitBillViewModel, userColors: SnapshotStateMap<User?, Color>){
     // val userColors = remember { mutableStateMapOf<User?, Color>() }
     var selectedUser by remember { mutableStateOf<User?>(null) }
     // var selectedUser by remember { mutableStateOf<User?>("No User Selected") }
@@ -414,7 +416,7 @@ fun filterItemsAndOwners(listItemsAndOwners:MutableList<ItemWithUsersList>, quer
 
 
 @Composable
-fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit, viewModel: SharedViewModel) {
+fun ListItemSplits(listItemAndUserQuantities: MutableList<ItemWithUsersList>, navController: NavController, itemWithUsers: ItemWithUsersList, selectedUser: User?, userColors: SnapshotStateMap<User?, Color>, onToggleUser: (User)-> Unit, viewModel: SplitBillViewModel) {
 
     var isFullyAssigned by remember {mutableStateOf(false)}
 

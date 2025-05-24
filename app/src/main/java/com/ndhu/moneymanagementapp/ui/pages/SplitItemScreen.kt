@@ -57,16 +57,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
+import com.ndhu.moneymanagementapp.frontend_internal_classes.ItemWithUsersList
 import com.ndhu.moneymanagementapp.models.User
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 
 @Composable
-fun SplitItemScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
+fun SplitItemScreen(context: Context, navController: NavController, viewModel: SplitBillViewModel){
     ComposeSplitItem(context = context, navController = navController, viewModel = viewModel)
 }
 
 @Composable
-fun ComposeSplitItem(context: Context, navController: NavController, viewModel: SharedViewModel){
+fun ComposeSplitItem(context: Context, navController: NavController, viewModel: SplitBillViewModel){
     // val listItemsAndOwners = viewModel.listItemAndUserQuantities
     var totalAssignedQuantity by remember { mutableStateOf(0f) }
     val totalItemQuantity by remember { mutableStateOf(viewModel.currentItem.userTakenQuantity.toFloat()) } // cast to Float type from a Number type
@@ -328,7 +329,7 @@ fun ComposeSplitItem(context: Context, navController: NavController, viewModel: 
 }
 
 // filter out user with 0 item quantity
-fun filterZeroQuantityUser(viewModel: SharedViewModel) {
+fun filterZeroQuantityUser(viewModel: SplitBillViewModel) {
     // This mutates the list in-place → Compose will recompose correctly
     viewModel.currentItemAndUserQuantities.ownership.apply {
         val filtered = filter { ownership -> ownership.itemQuantity.value > 0 }
@@ -357,7 +358,7 @@ fun deepCopyItemWithUsersList(itemWithUsersList: ItemWithUsersList): ItemWithUse
 }
 
 @Composable
-fun SplitItemTopBar(navController: NavController, viewModel: SharedViewModel){
+fun SplitItemTopBar(navController: NavController, viewModel: SplitBillViewModel){
     /*
     Top Bar
     */
@@ -414,7 +415,7 @@ fun SplitItemTopBar(navController: NavController, viewModel: SharedViewModel){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListSplitItemNonEqual(user: User, viewModel: SharedViewModel){
+fun ListSplitItemNonEqual(user: User, viewModel: SplitBillViewModel){
     // TODO: need to pass the real itemWithUsers, and update the quantities on the data variable so we can save it
     //var initialQuantity by remember { mutableStateOf( viewModel.tempItemAndUserQuantities.ownership.find { it.owner == user }?.itemQuantity ) }
 

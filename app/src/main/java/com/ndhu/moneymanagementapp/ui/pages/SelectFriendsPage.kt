@@ -28,11 +28,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
@@ -48,14 +46,14 @@ import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.controllers.ContactController
 import com.ndhu.moneymanagementapp.controllers.UserController
+import com.ndhu.moneymanagementapp.frontend_internal_classes.ItemWithUsersList
 import com.ndhu.moneymanagementapp.models.Contact
-import com.ndhu.moneymanagementapp.models.Store
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun SelectFriendsPage(context: Context, navController: NavController, viewModel: SharedViewModel) {
+fun SelectFriendsPage(context: Context, navController: NavController, viewModel: SplitBillViewModel) {
 
     var contactController = ContactController()
     var userController = UserController()
@@ -90,7 +88,7 @@ fun ComposeSelectFriends(
     navController: NavController,
     contactController: ContactController,
     userController: UserController,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
     // TODO: Bind with Contact
     val selectedFriends = remember { mutableStateListOf<Contact>() }

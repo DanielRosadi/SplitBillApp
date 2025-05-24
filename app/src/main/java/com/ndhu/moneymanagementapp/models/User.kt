@@ -14,5 +14,4 @@ data class User(
     var profilePictureId: Int? = profilePictureRandomizer
 ) {
     constructor() : this("", "", "", UserStatus.ACTIVE, "", "", profilePictureRandomizer)
-    // (2..7).random()
 }

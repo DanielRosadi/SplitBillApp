@@ -1,4 +1,4 @@
-package com.ndhu.moneymanagementapp.models
+package com.ndhu.moneymanagementapp.backend_internal_classes
 
 // ADDED
 // Internal usage in Backend

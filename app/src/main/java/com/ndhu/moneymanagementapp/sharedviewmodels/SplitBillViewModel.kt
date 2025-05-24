@@ -5,29 +5,23 @@ import androidx.lifecycle.ViewModel
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.Contact
 import com.ndhu.moneymanagementapp.models.Item
-import com.ndhu.moneymanagementapp.models.ProfilePicture
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.models.User
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
-import com.ndhu.moneymanagementapp.ui.pages.ItemOwnership
-import com.ndhu.moneymanagementapp.ui.pages.ItemWithUsersList
-
-// ignore this for
-/*
-class SharedViewModels {
-}
-
- */
+import com.ndhu.moneymanagementapp.frontend_internal_classes.ItemWithUsersList
 
 /*
-This file will contains SharedViewModel of every database table/collection.
+This view model only used for Split Bill screens
+Other unrelated view model should be moved to either matching or new view model to respect
+SRP (Single Responsibility Principle as in SOLID principle in Object Oriented Design and Principle)
+
 The purpose is for data distribution between screens.
 These SharedViewModels will be global across screens
 And developer only need to pass it onto the screen via AppNavigation.kt
 And pass respective dataId to find specific database record/row/document
- */
+*/
 
-class SharedViewModel : ViewModel() {
+class SplitBillViewModel : ViewModel() {
 
     // --------------- class variables/fields
 
@@ -80,6 +74,11 @@ class SharedViewModel : ViewModel() {
     var currentBillId = ""
 
     // --------------- functions (getters, setters)
+
+    /*
+    We can make getters and setters for every class variable for safety.
+    But the usage won't be as easy
+     */
 
     fun getStoreById(id: String): Store? {
         return storeList?.find { it.id == id }

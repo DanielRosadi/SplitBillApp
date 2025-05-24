@@ -1,4 +1,4 @@
-package com.ndhu.moneymanagementapp.models
+package com.ndhu.moneymanagementapp.backend_internal_classes
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList

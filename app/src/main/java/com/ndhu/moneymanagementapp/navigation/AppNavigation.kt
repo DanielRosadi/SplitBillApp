@@ -7,15 +7,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import com.ndhu.moneymanagementapp.ui.pages.AccountPage
 import com.ndhu.moneymanagementapp.ui.pages.AssignSplitsScreen
 import com.ndhu.moneymanagementapp.ui.pages.BillDetails
 import com.ndhu.moneymanagementapp.ui.pages.BillHistory
 import com.ndhu.moneymanagementapp.ui.pages.ContactPage
-import com.ndhu.moneymanagementapp.ui.pages.DeleteStoreScreen
+import com.ndhu.moneymanagementapp.ui.oldpages.DeleteStoreScreen
 import com.ndhu.moneymanagementapp.ui.pages.EditProfile
 import com.ndhu.moneymanagementapp.ui.oldpages.FirstLogin
+import com.ndhu.moneymanagementapp.ui.pages.DebtListingScreen
 import com.ndhu.moneymanagementapp.ui.pages.Home
 import com.ndhu.moneymanagementapp.ui.pages.ListOfItemPage
 import com.ndhu.moneymanagementapp.ui.pages.ListStorePage
@@ -34,7 +35,7 @@ fun AppNavigation(context : Context){
     // this defines nav controller, that controls/instruct the navigation to screens
     // when the user needs to navigate, they should use nav controller to do so
     val navController = rememberNavController()
-    val sharedViewModel: SharedViewModel = viewModel()
+    val splitBillViewModel: SplitBillViewModel = viewModel()
 
     val startDestination = if (Util.isUserLoggedIn(context)) {
         AppScreens.HomeScreen.name
@@ -62,48 +63,48 @@ fun AppNavigation(context : Context){
 
         // BillHistory screen
         composable(AppScreens.BillHistoryScreen.name){
-            BillHistory(context, navController = navController, viewModel = sharedViewModel)
+            BillHistory(context, navController = navController, viewModel = splitBillViewModel)
         }
 
         // BillDetails screen
         composable(AppScreens.BillDetailsScreen.name){
-            BillDetails(context, navController = navController, viewModel = sharedViewModel)
+            BillDetails(context, navController = navController, viewModel = splitBillViewModel)
         }
 
         // ListOfStore screen
         composable(AppScreens.ListStoresScreen.name){
-            ListStorePage(context, navController = navController, sharedViewModel)
+            ListStorePage(context, navController = navController, splitBillViewModel)
         }
 
         // DeleteStoreScreen
         composable(AppScreens.DeleteStoresScreen.name){
-            DeleteStoreScreen(context, navController = navController, viewModel = sharedViewModel)
+            DeleteStoreScreen(context, navController = navController, viewModel = splitBillViewModel)
         }
 
         // ListOfItem screen
         composable(AppScreens.ListItemsScreen.name+"/{storeId}",){backStackEntry ->
             val storeId = backStackEntry.arguments?.getString("storeId")
-            ListOfItemPage(context, navController = navController, storeId = storeId, sharedViewModel)
+            ListOfItemPage(context, navController = navController, storeId = storeId, splitBillViewModel)
         }
 
         // SelectFriends screen
         composable(AppScreens.SelectFriendsScreen.name){
-            SelectFriendsPage(context, navController = navController, viewModel = sharedViewModel)
+            SelectFriendsPage(context, navController = navController, viewModel = splitBillViewModel)
         }
 
         // SelectBillOwner screen
         composable(AppScreens.SelectBillOwnerScreen.name){
-            SelectBillOwnerScreen(context, navController = navController, viewModel = sharedViewModel)
+            SelectBillOwnerScreen(context, navController = navController, viewModel = splitBillViewModel)
         }
 
         // AssignSplits screen
         composable(AppScreens.AssignSplitsScreen.name){
-            AssignSplitsScreen(context, navController = navController, viewModel = sharedViewModel)
+            AssignSplitsScreen(context, navController = navController, viewModel = splitBillViewModel)
         }
 
         // SplitNonEqualScreen screen
         composable(AppScreens.SplitItemScreen.name){
-            SplitItemScreen(context, navController = navController, viewModel = sharedViewModel)
+            SplitItemScreen(context, navController = navController, viewModel = splitBillViewModel)
         }
 
         // Contact screen
@@ -143,6 +144,11 @@ fun AppNavigation(context : Context){
         // Testing Screen
         composable(AppScreens.TestingScreen.name){
             TestingScreen(context, navController = navController)
+        }
+
+        // Debt Listing (Graph) Screen
+        composable(AppScreens.DebtListingScreen.name){
+            DebtListingScreen(context, navController = navController, viewModel = splitBillViewModel)
         }
 
     }

@@ -20,8 +20,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
-// still in experiment
 
+// WARNING:
+// everything in this page is still EXPERIMENTAL and may not work correctly
+// this file is used to store and test functions before moving it to Design.kt,
+// only when they have produce expected behaviour
 
 @Composable
 fun LazyColumnDesignTemplate(/* storeController: StoreController, data: SnapshotStateList<Store>, viewModel: SharedViewModel, */

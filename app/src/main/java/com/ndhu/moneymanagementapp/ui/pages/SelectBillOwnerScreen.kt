@@ -44,17 +44,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ndhu.moneymanagementapp.R
 import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.models.User
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import com.ndhu.moneymanagementapp.utils.Util
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun SelectBillOwnerScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
+fun SelectBillOwnerScreen(context: Context, navController: NavController, viewModel: SplitBillViewModel){
     var userController = UserController()
 
     // get friend list from previous page
@@ -83,7 +82,7 @@ fun SelectBillOwnerScreen(context: Context, navController: NavController, viewMo
 }
 
 @Composable
-fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<User?>, navController: NavController, viewModel: SharedViewModel) {
+fun ComposeSelectBillOwner(context: Context, listPossibleOwners: MutableList<User?>, navController: NavController, viewModel: SplitBillViewModel) {
     var selectedIndex by remember { mutableStateOf(-1) }
 
     var searchQuery = remember { mutableStateOf("") }
