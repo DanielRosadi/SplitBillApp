@@ -8,7 +8,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.InsertChartOutlined
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -105,6 +111,43 @@ fun Home(context: Context, navController: NavController) {
                     fontFamily = kronaOneFont,
                     fontSize = 12.sp,
                 )
+
+                // TODO: need dynamic spacing (maybe via applying weights?)
+                Spacer(modifier = Modifier.width(160.dp))
+
+                Button(
+                    onClick = { navController.navigate(route = AppScreens.DebtListingScreen.name) },
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
+                    )
+                    ) {
+
+                    Row(
+                        // modifier = Modifier.fillMaxHeight()
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Text(
+                            text = "Chart",
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontFamily = kronaOneFont
+                        )
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Icon(Icons.Default.InsertChartOutlined,
+                            contentDescription = "Debt Listing Screen",
+                            modifier = Modifier.size(30.dp),
+                            tint = Color.White
+                        )
+                    }
+
+
+                }
             }
 
             Spacer(modifier = Modifier.height(64.dp))
@@ -211,9 +254,9 @@ fun Home(context: Context, navController: NavController) {
                         )
 
                         // Temporary Button
-                        Button(onClick = { navController.navigate(route = AppScreens.GraphingScreen.name) }) {
-                            Text(text = "Graph (Temp)")
-                        }
+//                        Button(onClick = { navController.navigate(route = AppScreens.DebtListingScreen.name) }) {
+//                            Text(text = "Graph (Temp)")
+//                        }
                     }
                 }
             }

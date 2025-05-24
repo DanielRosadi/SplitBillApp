@@ -146,8 +146,8 @@ fun AppNavigation(context : Context){
             TestingScreen(context, navController = navController)
         }
 
-        // Graph Screen
-        composable(AppScreens.GraphingScreen.name){
+        // Debt Listing (Graph) Screen
+        composable(AppScreens.DebtListingScreen.name){
             DebtListingScreen(context, navController = navController, viewModel = sharedViewModel)
         }
 
