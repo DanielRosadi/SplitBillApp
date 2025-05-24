@@ -57,9 +57,10 @@ import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.controllers.ItemController
+import com.ndhu.moneymanagementapp.frontend_internal_classes.UIItem
 import com.ndhu.moneymanagementapp.models.Item
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -89,7 +90,7 @@ fun ListOfItemPage(
     context: Context,
     navController: NavController,
     storeId: String?,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
 
     val itemController = ItemController()
@@ -152,7 +153,7 @@ private fun ComposeListItem(
     store: Store?,
     navController: NavController,
     itemController: ItemController,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
 
     var showDialogAddItem by remember { mutableStateOf(false) }
@@ -385,7 +386,7 @@ private fun ListDataItem(
     store: Store?,
     itemController: ItemController,
     listItem: SnapshotStateList<Item>,
-    viewModel: SharedViewModel,
+    viewModel: SplitBillViewModel,
     uiItems: SnapshotStateList<UIItem>
 ) {
     var showDialogEditItem by remember { mutableStateOf(false) }
@@ -529,7 +530,7 @@ fun AddItemDialog(
     onDismiss: () -> Unit,
     storeId: String,
     itemList: SnapshotStateList<Item>,
-    viewModel: SharedViewModel,
+    viewModel: SplitBillViewModel,
     uiItems: SnapshotStateList<UIItem>
 ) {
     // Dialog visibility state
@@ -633,7 +634,7 @@ fun EditItemDialog(
     itemController: ItemController,
     onDismiss: () -> Unit,
     itemList: SnapshotStateList<Item>,
-    viewModel: SharedViewModel,
+    viewModel: SplitBillViewModel,
     uiItems: SnapshotStateList<UIItem>
 ) {
     // Dialog visibility state

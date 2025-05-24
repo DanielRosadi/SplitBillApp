@@ -26,11 +26,11 @@ import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
-import com.ndhu.moneymanagementapp.models.FullBillDetail
-import com.ndhu.moneymanagementapp.models.FullItemDetail
+import com.ndhu.moneymanagementapp.backend_internal_classes.FullBillDetail
+import com.ndhu.moneymanagementapp.backend_internal_classes.FullItemDetail
 import com.ndhu.moneymanagementapp.models.User
-import com.ndhu.moneymanagementapp.models.UserItemGroup
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.backend_internal_classes.UserItemGroup
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import kotlinx.coroutines.runBlocking
 
 // Data class representing an item associated with a user
@@ -49,7 +49,7 @@ data class BillUserDetail(
 )
 
 @Composable
-fun BillDetails(context: Context, navController: NavController, viewModel: SharedViewModel) {
+fun BillDetails(context: Context, navController: NavController, viewModel: SplitBillViewModel) {
     val splitBillController = SplitBillController()
 
     // var billDetail = remember { mutableStateOf<FullBillDetail?>(null) }
@@ -137,7 +137,7 @@ fun ComposeBillDetailsScreen(
     navController: NavController,
     totalItemQuantities: MutableMap<String, Float>,
     splitBillController: SplitBillController,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
     var searchQuery = remember { mutableStateOf("") }
 

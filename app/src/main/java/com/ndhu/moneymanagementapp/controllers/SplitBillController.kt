@@ -7,8 +7,8 @@ import com.google.firebase.Timestamp
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.models.Bill
 import com.ndhu.moneymanagementapp.models.BillItemDetail
-import com.ndhu.moneymanagementapp.models.FullBillDetail
-import com.ndhu.moneymanagementapp.models.UserItemGroup
+import com.ndhu.moneymanagementapp.backend_internal_classes.FullBillDetail
+import com.ndhu.moneymanagementapp.backend_internal_classes.UserItemGroup
 import com.ndhu.moneymanagementapp.payloads.ItemDetail
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
 import com.ndhu.moneymanagementapp.payloads.SplitBillRequest

@@ -31,13 +31,13 @@ import com.ndhu.moneymanagementapp.controllers.UserController
 import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun BillHistory(context: Context, navController: NavController, viewModel: SharedViewModel) {
+fun BillHistory(context: Context, navController: NavController, viewModel: SplitBillViewModel) {
     val splitBillController = SplitBillController()
 
 
@@ -66,7 +66,7 @@ fun BillHistory(context: Context, navController: NavController, viewModel: Share
 }
 
 @Composable
-fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateList<ListUserSplitBillResponse>, navController: NavController, viewModel: SharedViewModel) {
+fun ComposeBillHistoryScreen(context: Context, billResponseList: SnapshotStateList<ListUserSplitBillResponse>, navController: NavController, viewModel: SplitBillViewModel) {
     var searchQuery = remember { mutableStateOf("") }
 
     val filteredHistories = filterHistories(context, billResponseList, searchQuery.value) //  no remember
@@ -151,7 +151,7 @@ fun filterHistories(context: Context, billResponseList: SnapshotStateList<ListUs
 
 
 @Composable
-fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navController: NavController, viewModel: SharedViewModel) {
+fun HistoryItem(context: Context, billResponse: ListUserSplitBillResponse, navController: NavController, viewModel: SplitBillViewModel) {
     // Change background color based on transaction status
     val backgroundColor = when (billResponse.status) {
         UserPaymentStatus.UNPAID -> Color(0xFFFFC8C8) // Light red for pending

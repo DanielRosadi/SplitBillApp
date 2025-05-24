@@ -1,4 +1,4 @@
-package com.ndhu.moneymanagementapp.ui.pages
+package com.ndhu.moneymanagementapp.frontend_internal_classes
 
 import androidx.compose.runtime.MutableState
 import com.ndhu.moneymanagementapp.models.User

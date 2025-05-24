@@ -51,11 +51,11 @@ import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
 import com.ndhu.moneymanagementapp.enums.AppScreens
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import kotlinx.coroutines.*
 
 @Composable
-fun ListStorePage(context: Context, navController: NavController, viewModel: SharedViewModel) {
+fun ListStorePage(context: Context, navController: NavController, viewModel: SplitBillViewModel) {
 //    // Get the actual window size (container size)
 //    val windowInfo = LocalWindowInfo.current
 //    val screenWidthPx = windowInfo?.containerSize?.width ?: 0
@@ -72,7 +72,7 @@ fun ListStorePage(context: Context, navController: NavController, viewModel: Sha
 fun GetStoreListFromDatabase(
     context: Context,
     navController: NavController,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
 
     val storeController = StoreController() // Initialize object
@@ -100,7 +100,7 @@ fun ComposeListStore(
     storeController: StoreController,
     data: SnapshotStateList<Store>,
     navController: NavController,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
     var showDialogAddStore by remember { mutableStateOf(false) }
 
@@ -281,7 +281,7 @@ fun ListDataStore(
     storeObject: Store,
     navController: NavController,
     data: SnapshotStateList<Store>,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
     var showDialogEditStore by remember { mutableStateOf(false) }
 
@@ -366,7 +366,7 @@ fun AddStoreDialog(
     storeController: StoreController,
     onDismiss: () -> Unit,
     storeList: SnapshotStateList<Store>,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
     val showDialog = remember { mutableStateOf(true) }
     val context = LocalContext.current
@@ -458,7 +458,7 @@ fun EditStoreDialog(
     storeController: StoreController,
     onDismiss: () -> Unit,
     storeList: SnapshotStateList<Store>,
-    viewModel: SharedViewModel
+    viewModel: SplitBillViewModel
 ) {
     val showDialog = remember { mutableStateOf(true) }
     val context = LocalContext.current

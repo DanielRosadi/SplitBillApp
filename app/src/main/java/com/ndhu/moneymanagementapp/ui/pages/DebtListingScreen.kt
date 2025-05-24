@@ -43,21 +43,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ndhu.moneymanagementapp.R
-import com.ndhu.moneymanagementapp.components.SearchBox
 import com.ndhu.moneymanagementapp.controllers.SplitBillController
 import com.ndhu.moneymanagementapp.controllers.UserController
-import com.ndhu.moneymanagementapp.enums.AppScreens
 import com.ndhu.moneymanagementapp.enums.UserPaymentStatus
 import com.ndhu.moneymanagementapp.graphs.DonutChart
 import com.ndhu.moneymanagementapp.graphs.PieChart
 import com.ndhu.moneymanagementapp.graphs.TwoSlicePieChart
-import com.ndhu.moneymanagementapp.models.FullBillDetail
+import com.ndhu.moneymanagementapp.backend_internal_classes.FullBillDetail
 import com.ndhu.moneymanagementapp.payloads.ListUserSplitBillResponse
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun DebtListingScreen(context: Context, navController: NavController, viewModel: SharedViewModel){
+fun DebtListingScreen(context: Context, navController: NavController, viewModel: SplitBillViewModel){
 
     // GraphExample()
 

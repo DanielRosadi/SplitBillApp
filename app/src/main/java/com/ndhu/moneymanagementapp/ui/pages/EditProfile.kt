@@ -350,6 +350,7 @@ fun EditProfile(context: Context, navController: NavController) {
     }
 
     // TODO: for profile pic (need to be moved)
+    // TODO: can rework pop up
     // --- Profile Picture Selection Dialog ---
     if (showEditProfilePictureDialog) {
         AlertDialog(
@@ -373,6 +374,7 @@ fun EditProfile(context: Context, navController: NavController) {
                                     color = if (picture.id == selectedPictureId) primaryGreen else Color.Gray,
                                     shape = CircleShape
                                 )
+                                // TODO: (BUG) profile picture changes and saved even when user press cancel
                                 .clickable {
                                     selectedPictureId = picture.id
                                     // showDialog = false // Close dialog after selection
@@ -400,8 +402,8 @@ fun EditProfile(context: Context, navController: NavController) {
                             )
                         }
 
-                        Toast.makeText(context, "Selected Picture ID: $id", Toast.LENGTH_SHORT)
-                            .show()
+                        // Only for debugging
+                        // Toast.makeText(context, "Selected Picture ID: $id", Toast.LENGTH_SHORT).show()
 
                     }
                     Text("Save")

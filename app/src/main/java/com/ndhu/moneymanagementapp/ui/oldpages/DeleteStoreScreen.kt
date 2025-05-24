@@ -1,4 +1,4 @@
-package com.ndhu.moneymanagementapp.ui.pages
+package com.ndhu.moneymanagementapp.ui.oldpages
 
 import android.content.Context
 import android.util.Log
@@ -44,11 +44,11 @@ import androidx.navigation.NavController
 import com.ndhu.moneymanagementapp.components.SearchBoxDefault
 import com.ndhu.moneymanagementapp.controllers.StoreController
 import com.ndhu.moneymanagementapp.models.Store
-import com.ndhu.moneymanagementapp.sharedviewmodels.SharedViewModel
+import com.ndhu.moneymanagementapp.sharedviewmodels.SplitBillViewModel
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun DeleteStoreScreen(context : Context, navController: NavController, viewModel: SharedViewModel){
+fun DeleteStoreScreen(context : Context, navController: NavController, viewModel: SplitBillViewModel){
     GetStoreListFromDatabase(context, navController)
 }
 
